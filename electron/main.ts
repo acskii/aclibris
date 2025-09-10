@@ -1,10 +1,25 @@
-import { app, BrowserWindow } from 'electron'
-import { createRequire } from 'node:module'
+import { app, BrowserWindow, Menu } from 'electron'
+// import { createRequire } from 'node:module'
+import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 
-import { MainWindowContext } from './window-context'
+import { registerIPCHandlers } from './handlers'
+import { ApplicationMenu } from './menu'
 
-const require = createRequire(import.meta.url)
+// Used for ES6 modules
+// If path to current directory is needed
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+// const require = createRequire(import.meta.url)
+const isDev = process.env.NODE_ENV !== 'production';
+
+const MainWindowContext = {
+    width: (isDev) ? 1200 : 800,
+    height: 600,    
+    icon: path.join(__dirname, '../public/icon.png'),
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.mjs'),
+    },
+};
 
 // The built directory structure
 //
@@ -34,6 +49,10 @@ function createWindow() {
     win?.webContents.send('main-process-message', (new Date).toLocaleString())
   })
 
+  if (isDev) win.webContents.openDevTools();
+  const menu = Menu.buildFromTemplate(ApplicationMenu);
+  win.setMenu(menu);
+
   if (VITE_DEV_SERVER_URL) {
     win.loadURL(VITE_DEV_SERVER_URL)
   } else {
@@ -47,8 +66,8 @@ function createWindow() {
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    app.quit()
-    win = null
+    app.quit();
+    win = null;
   }
 })
 
@@ -56,8 +75,11 @@ app.on('activate', () => {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow()
+    createWindow();
   }
 })
 
-app.whenReady().then(createWindow)
+app.whenReady().then(() => {
+  registerIPCHandlers();
+  createWindow();
+})
