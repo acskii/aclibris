@@ -22,3 +22,7 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   // You can expose other APTs you need here.
   // ...
 })
+
+contextBridge.exposeInMainWorld('files', {
+  get: (filePath: string) => ipcRenderer.invoke('file:get', filePath)
+})

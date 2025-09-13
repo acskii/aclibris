@@ -1,24 +1,22 @@
-import { useState } from 'react'
+import FileDropArea from './components/common/FileDropArea'
 import './App.css'
+import { useNavigate } from 'react-router-dom'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const navigate = useNavigate();
+
+  const handleFile = async (file: File) => {
+    navigate(`/view`, {
+      state: {
+        file: file.path
+      }
+    });
+  }
 
   return (
-    <>
-      <h1 className="font-bold text-red-400">Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div className="max-w-screen max-h-screen flex items-center justify-center">
+      <FileDropArea onFileSelect={handleFile} />
+    </div>
   )
 }
 
