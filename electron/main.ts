@@ -14,7 +14,12 @@ const isDev = process.env.NODE_ENV !== 'production';
 
 const MainWindowContext = {
     width: (isDev) ? 1200 : 800,
-    height: 600,    
+    height: 600,
+    minWidth: 800,
+    minHeight: 600,    
+    resizable: true,
+    fullscreenable: true,
+    center: true,
     icon: path.join(__dirname, '../public/icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
