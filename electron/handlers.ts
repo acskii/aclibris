@@ -16,7 +16,7 @@ export function registerIPCHandlers() {
 
             return {
                 success: true,
-                result: new Uint8Array(result)
+                result: result
             };
         } catch (error: any) {
             console.error('[file:get] => Error getting the file: ', error);

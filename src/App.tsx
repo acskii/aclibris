@@ -6,7 +6,7 @@ function App() {
   const navigate = useNavigate();
 
   const handleFile = async (file: File) => {
-    navigate(`/view`, {
+    navigate("/view/1", {
       state: {
         file: file.path
       }
