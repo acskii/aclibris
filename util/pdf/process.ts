@@ -1,3 +1,7 @@
+/*
+    Deprecated
+*/
+
 import { getDocument, GlobalWorkerOptions, PDFDocumentProxy } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import worker from 'pdfjs-dist/legacy/build/pdf.worker?url';
 import fs from 'fs/promises';
