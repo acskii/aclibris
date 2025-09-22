@@ -18,7 +18,7 @@ export const SideMenuProvider = ({ children }: { children: ReactNode }) => {
           <div className="grow-1">
             <SideMenu />
           </div>
-          <div className={`grow-2 h-screen w-full transition-all duration-300 overflow-y-auto`}>
+          <div className={`grow-2 no-scrollbar h-screen w-full transition-all duration-300 overflow-y-auto`}>
               {children}
           </div>
         </div>

@@ -5,6 +5,7 @@ import { Spinner } from '../common/spinner/Spinner';
 import { PDFDocumentProxy } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { PageNavigate } from './PageNavigate';
 import { TriangleAlert } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 type PDFViewerProps = { 
     file: string;
@@ -12,22 +13,25 @@ type PDFViewerProps = {
 };
 
 export function PDFViewer({ file, page }: PDFViewerProps) {
+    const navigate = useNavigate();
+    const keyPressTimeout = useRef<NodeJS.Timeout | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
-    const [document, setDocument] = useState<PDFDocumentProxy | null>(null);
+    const [pdf, setPDF] = useState<PDFDocumentProxy | null>(null);
     const [totalPages, setTotalPages] = useState<number>(0);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const renderLock = useRef<boolean>(false);
 
     useEffect(() => {
-        const loadDocument = async () => {
+        const loadPDF = async () => {
             try {
+                if (file == null) return null;
                 setLoading(true);
                 if (!file.endsWith(".pdf")) setError("Incorrect file extension");
                 
-                const document = await documentCache.getDocument(file);
-                setDocument(document);
-                setTotalPages(document ? document.numPages : 0);
+                const doc = await documentCache.getDocument(file);
+                setPDF(doc);
+                setTotalPages(doc ? doc.numPages : 0);
                 setError(null)
             } catch (error: any) {
                 setError(error.message);
@@ -35,15 +39,15 @@ export function PDFViewer({ file, page }: PDFViewerProps) {
                 setLoading(false);
             }
         };
-        loadDocument(); 
+        loadPDF(); 
     }, [file])
     
     const renderPage = async () => {
         try {
             setLoading(true);
-            if (document != null) {
+            if (pdf != null) {
                 renderLock.current = true;
-                const documentPage = await document.getPage(page);
+                const documentPage = await pdf.getPage(page);
                 const viewport = documentPage.getViewport({ scale: 1.5 });
                 const canvas = canvasRef.current;
 
@@ -67,10 +71,31 @@ export function PDFViewer({ file, page }: PDFViewerProps) {
         }
     };
 
+    const handleKeyDown = (event: KeyboardEvent) => {
+        if (keyPressTimeout.current) {
+            clearTimeout(keyPressTimeout.current);
+            keyPressTimeout.current = null;
+        }
+
+        keyPressTimeout.current = setTimeout(() => {
+            if (event.key == 'ArrowLeft') {
+                if (page >= 1) navigate(`/view/${(page == 1) ? 1 : page - 1}`);
+            } else if (event.key == 'ArrowRight') {
+                if (page < totalPages) navigate(`/view/${page + 1}`);
+            } 
+        }, 40);
+    }
+
     useEffect(() => {
-        if (!document || renderLock.current) return;
+        document.addEventListener('keydown', handleKeyDown);
+        if (!pdf || renderLock.current) return;
         renderPage();
-    }, [document, page]);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+            if (keyPressTimeout.current) clearTimeout(keyPressTimeout.current);
+        }
+    }, [pdf, page]);
 
     return (
         <div className="flex flex-col w-full">
