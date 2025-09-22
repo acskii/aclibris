@@ -14,7 +14,7 @@ function App() {
   }
 
   return (
-    <div className="max-w-screen max-h-screen flex items-center justify-center">
+    <div className="flex items-center justify-center">
       <FileDropArea onFileSelect={handleFile} />
     </div>
   )

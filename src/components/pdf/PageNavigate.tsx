@@ -34,8 +34,8 @@ export function PageNavigate({ current, total, file }: PageNavigateProps) {
   }
 
   return (
-    <div className="fixed top-0 left-1/2 transform -translate-x-1/2 z-30 w-3/5">
-      <div className="max-w-full bg-gradient-to-b from-violet-700 via-sky-500 to-cyan-400 overflow-hidden text-white rounded-b-xl flex flex-col items-center backdrop-blur-md border border-blue-700">
+    <div className="sticky top-0 w-full flex justify-center z-30">
+      <div className="w-full min-w-[50%] bg-gradient-to-r from-sky-600 via-cyan-500 to-violet-400 overflow-hidden text-white flex flex-col items-center backdrop-blur-md">
         {/* Navigation Controls */}
         <div className="flex flex-row gap-2 items-center justify-between w-full px-4 py-2">
           <button

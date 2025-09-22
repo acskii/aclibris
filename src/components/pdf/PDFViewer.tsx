@@ -73,9 +73,16 @@ export function PDFViewer({ file, page }: PDFViewerProps) {
     }, [document, page]);
 
     return (
-        <div>
+        <div className="flex flex-col w-full">
+            <PageNavigate current={page} total={totalPages} file={file} />
+            <div className="mb-8 relative flex justify-center">
+                <canvas 
+                    ref={canvasRef} 
+                    className={`${loading ? "hidden" : ""} relative z-10 max-w-full max-h-full h-full rounded-lg shadow-2xl border border-indigo-500/30`}
+                />
+            </div>
             {loading && (
-                <div className="flex flex-row items-center justify-center gap-2 fixed top-6 left-6 z-30">
+                <div className="flex flex-row items-center justify-center gap-2 z-30 my-10">
                     <Spinner />
                     <p className="text-violet-500 font-bold text-center text-md">
                         Loading..
@@ -96,13 +103,6 @@ export function PDFViewer({ file, page }: PDFViewerProps) {
                     </div>
                 </div>
             )}
-            <PageNavigate current={page} total={totalPages} file={file} />
-            <div className="mt-20 mb-8 relative">
-                <canvas 
-                    ref={canvasRef} 
-                    className={`${loading ? "hidden" : ""} relative z-10 max-w-full h-auto rounded-lg shadow-2xl border border-indigo-500/30`}
-                />
-            </div>
         </div>
     );
 }
