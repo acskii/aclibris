@@ -5,6 +5,7 @@ import path from 'node:path'
 
 import { registerIPCHandlers } from './handlers'
 import { ApplicationMenu } from './menu'
+import { migrate } from './database/migrate'
 
 // Used for ES6 modules
 // If path to current directory is needed
@@ -86,5 +87,6 @@ app.on('activate', () => {
 
 app.whenReady().then(() => {
   registerIPCHandlers();
+  migrate.init();
   createWindow();
 })
