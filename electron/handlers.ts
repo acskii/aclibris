@@ -1,7 +1,10 @@
 import { ipcMain } from 'electron';
 import { getFile } from '../util/pdf/process';
+import { registerDbHandlers } from './handlers/db';
 
 export function registerIPCHandlers() {
+    registerDbHandlers();
+    
     ipcMain.handle('file:get', async (_, filePath) => {
         console.log('[file:get] => Getting file at path: ', filePath);
         

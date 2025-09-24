@@ -1,0 +1,133 @@
+import { database } from "./connection";
+import { Book, type BookQueryObject } from "./objects/Book";
+import { Collection, type CollectionQueryObject } from "./objects/Collection";
+import { Shelf, type ShelfQueryObject } from "./objects/Shelf";
+
+class DatabaseQuery {
+    getBooks() {
+        // Get general info about all books stored
+        return database.prepare(
+            `
+            SELECT id, title, pages, file_path, file_size, collection_id, created_at FROM books
+            `
+        ).all().map((o: BookQueryObject) => new Book(o.id, o.title, o.collection_id, o.file_path, o.file_size, o.pages, o.created_at));
+    }
+
+    getBookById(id: number) {
+        // Get details on a specific book
+        const result = database.prepare(
+            `
+            SELECT title, pages, file_path, file_size, collection_id, created_at FROM books
+            WHERE id = ?
+            `
+        ).get(id);
+
+        return new Book(
+            result.id, 
+            result.title, 
+            result.collection_id, 
+            result.file_path, 
+            result.file_size, 
+            result.pages, 
+            result.created_at
+        );
+    }
+
+    getCollectionsByShelfId(id: number) {
+        // Get all collections on a specific shelf
+        return database.prepare(
+            `
+            SELECT id, collection_name FROM collections
+            WHERE shelf_id = ?
+            `
+        ).all(id).map((o: CollectionQueryObject) => new Collection(o.id, o.collection_name, id));
+    }
+
+    getShelfs() {
+        // Get general info about all shelfs stored
+        return database.prepare(
+            `
+            SELECT id, shelf_name FROM shelfs
+            `
+        ).all().map((o: ShelfQueryObject) => new Shelf(o.id, o.shelf_name));
+    }
+
+    getBooksByCollectionId(id: number) {
+        // Get general info about books within a specific collection
+        return database.prepare(
+            `
+            SELECT id, title, pages, file_path, file_size, collection_id, created_at FROM books
+            WHERE collection_id = ?
+            `
+        ).all(id).map((o: BookQueryObject) => new Book(o.id, o.title, o.collection_id, o.file_path, o.file_size, o.pages, o.created_at));
+    }
+
+    addBook(title: string, pages: number, file_path: string, 
+            file_size: number, created_at: number, collection_id: number) {
+        // add a new book
+        // added values must be validated before calling this function
+        database.prepare(
+            `
+            INSERT INTO books (title, pages, file_path, file_size, created_at, collection_id) VALUES 
+            (?, ?, ?, ?, ?, ?);
+            `
+        ).run(title, pages, file_path, file_size, created_at, collection_id);
+    }
+
+    addCollection(collection_name: string, shelf_id: number) {
+        // add a new collection
+        database.prepare(
+            `
+            INSERT INTO collections (collection_name, sheld_id) VALUES
+            (?, ?);
+            `
+        ).run(collection_name, shelf_id);
+    }
+
+    addShelf(shelf_name: string) {
+        // add a new shelf
+        database.prepare(
+            `
+            INSERT INTO shelfs (shelf_name) VALUES
+            (?);
+            `
+        ).run(shelf_name);
+    }
+
+    deleteShelf(shelf_id: number) {
+        // delete an existing shelf
+        database.prepare(
+            `
+            DELETE FROM shelfs
+            WHERE id = ?
+            `
+        ).run(shelf_id);
+    }
+    
+    deleteCollection(collection_id: number) {
+        // delete an existing collection
+        database.prepare(
+            `
+            DELETE FROM collections
+            WHERE id = ?
+            `
+        ).run(collection_id);
+    }
+
+    deleteBook(book_id: number) {
+        // delete an existing book
+        database.prepare(
+            `
+            DELETE FROM books
+            WHERE id = ?
+            `
+        ).run(book_id);
+    }
+
+    // updateCollection
+    // updateBook
+    // updateShelf
+    
+}
+
+export const query = new DatabaseQuery();

@@ -25,4 +25,14 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
 
 contextBridge.exposeInMainWorld('files', {
   get: (filePath: string) => ipcRenderer.invoke('file:get', filePath)
+});
+
+contextBridge.exposeInMainWorld('db', {
+  shelf: {
+    new: (shelf_name: string) => ipcRenderer.invoke('db:shelf:new', shelf_name),
+    getAll: () => ipcRenderer.invoke('db:shelf:getAll')
+  },
+  collection: {
+    getByShelf: (shelf_id: number) => ipcRenderer.invoke('db:collection:get-by-shelf', shelf_id)
+  }
 })
