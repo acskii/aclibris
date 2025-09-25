@@ -1,15 +1,22 @@
 import { ipcMain } from 'electron';
-import { getFile } from '../util/pdf/process';
+import fs from 'fs/promises';
 import { registerDbHandlers } from './handlers/db';
+
 
 export function registerIPCHandlers() {
     registerDbHandlers();
     
-    ipcMain.handle('file:get', async (_, filePath) => {
+    ipcMain.handle('file:get', async (_, filePath: string) => {
+        if (!filePath.endsWith(".pdf")) {
+            console.log('[file:get] => Path points to a file without a .pdf extension: ', filePath);
+            return {
+                success: false
+            };
+        }
         console.log('[file:get] => Getting file at path: ', filePath);
         
         try {
-            const result = await getFile(filePath);
+            const result = await fs.readFile(filePath);
             if (result == null) {
                 console.log('[file:get] => Unable to get file at path: ', filePath);
                 return {
