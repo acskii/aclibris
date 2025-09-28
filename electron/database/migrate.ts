@@ -16,7 +16,7 @@ class DatabaseMigration {
         database.prepare(
             `
             CREATE TABLE IF NOT EXISTS shelfs (
-                id INTEGER PRIMARY KEY,
+                id INTEGER PRIMARY KEY UNIQUE,
                 shelf_name VARCHAR(100) NOT NULL
             )
             `    
@@ -65,7 +65,7 @@ class DatabaseMigration {
                 file_path TEXT NOT NULL,
                 file_size INTEGER NOT NULL,
                 pages INTEGER NOT NULL,
-                title TEXT NOT NULL,
+                title TEXT NOT NULL UNIQUE,
                 created_at INTEGER NOT NULL,
                 collection_id INTEGER REFERENCES collections(id) ON DELETE CASCADE
             )
@@ -73,7 +73,49 @@ class DatabaseMigration {
         ).run();
     }
 
-    
+    private create_meta_table() {
+        database.prepare(
+            `
+            CREATE TABLE IF NOT EXISTS meta (
+                key TEXT PRIMARY KEY,
+                value TEXT
+            )
+            `    
+        ).run();
+    }
+
+    private seed_default_values() {
+        const seeded = database.prepare(
+            `
+            SELECT value FROM meta
+            WHERE key = 'seeded'
+            `
+        ).get();
+        
+        if (!seeded) {
+            database.prepare(
+                `
+                INSERT INTO shelfs (shelf_name) VALUES 
+                ('Default');
+                `
+            ).run();
+
+            const default_shelf_id = database.prepare(`SELECT id FROM shelfs WHERE shelf_name = 'Default'`).get();
+            database.prepare(
+                `
+                INSERT INTO collections (collection_name, shelf_id) VALUES 
+                ('Default', ?);
+                `
+            ).run(default_shelf_id.id);
+                        database.prepare(
+                `
+                INSERT INTO meta (key, value) VALUES 
+                ('seeded', 'true');
+                `
+            ).run();
+            console.log("[db:migrate] => Seeded Default Values");
+        }
+    }
 
     init() {
         this.create_shelfs_table();
@@ -81,7 +123,9 @@ class DatabaseMigration {
         this.create_books_table();
         this.create_tags_table();
         this.create_book_tag_table();
-        console.log("[database:migrate] => Initialised local database schema");
+        this.create_meta_table();
+        this.seed_default_values();
+        console.log("[db:migrate] => Initialised local database schema");
     }
 }
 
