@@ -1,21 +1,25 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './App.tsx'
+import UploadPage from './pages/Upload.tsx'
 import './index.css'
-import { Routes, Route, BrowserRouter } from 'react-router-dom'
+import { Routes, Route, HashRouter } from 'react-router-dom'
 import { View } from './pages/View.tsx'
 import { SideMenuProvider } from './contexts/SideMenuContext.tsx'
+import { Home } from './pages/Home.tsx'
+import { LibraryPage } from './pages/Library.tsx'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <BrowserRouter>
+    <HashRouter>
       <SideMenuProvider>
         <Routes>
-          <Route path="/upload" element={<App />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/upload" element={<UploadPage />} />
+          <Route path="/library" element={<LibraryPage />} />
           <Route path="/view/:page" element={<View />} />
         </Routes>  
       </SideMenuProvider>
-    </BrowserRouter>
+    </HashRouter>
   </React.StrictMode>,
 )
 
