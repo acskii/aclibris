@@ -15,14 +15,14 @@ class DatabaseQuery {
 
     getBookById(id: number) {
         // Get details on a specific book
-        const result = database.prepare(
+        const result: BookQueryObject = database.prepare(
             `
             SELECT title, pages, file_path, file_size, collection_id, created_at FROM books
             WHERE id = ?
             `
         ).get(id);
 
-        return new Book(
+        if (result) return new Book(
             result.id, 
             result.title, 
             result.collection_id, 
@@ -31,6 +31,7 @@ class DatabaseQuery {
             result.pages, 
             result.created_at
         );
+        else return null;
     }
 
     getCollectionsByShelfId(id: number) {
@@ -50,6 +51,31 @@ class DatabaseQuery {
             SELECT id, shelf_name FROM shelfs
             `
         ).all().map((o: ShelfQueryObject) => new Shelf(o.id, o.shelf_name));
+    }
+
+    getShelfByName(name: string) {
+        // Get general info about all shelfs stored
+        const result: ShelfQueryObject = database.prepare(
+            `
+            SELECT id, shelf_name FROM shelfs
+            WHERE shelf_name = ?
+            `
+        ).get(name);
+
+        if (result) return new Shelf(
+            result.id,
+            result.shelf_name
+        ); 
+        else return null;
+    }
+
+    getCollections() {
+        // Get general info about all collections stored
+        return database.prepare(
+            `
+            SELECT id, collection_name, shelf_id FROM collections
+            `
+        ).all().map((o: CollectionQueryObject) => new Collection(o.id, o.collection_name, o.shelf_id));
     }
 
     getBooksByCollectionId(id: number) {
@@ -78,10 +104,25 @@ class DatabaseQuery {
         // add a new collection
         database.prepare(
             `
-            INSERT INTO collections (collection_name, sheld_id) VALUES
+            INSERT INTO collections (collection_name, shelf_id) VALUES
             (?, ?);
             `
         ).run(collection_name, shelf_id);
+        
+        // return object
+        const result: CollectionQueryObject = database.prepare(
+            `
+            SELECT id, collection_name, shelf_id FROM collections
+            WHERE collection_name = ?
+            AND shelf_id = ?
+            `
+        ).get(collection_name, shelf_id);
+        
+        return new Collection(
+            result.id,
+            result.collection_name,
+            result.shelf_id
+        );
     }
 
     addShelf(shelf_name: string) {
@@ -92,6 +133,19 @@ class DatabaseQuery {
             (?);
             `
         ).run(shelf_name);
+
+        // return object
+        const result: ShelfQueryObject = database.prepare(
+            `
+            SELECT id, shelf_name FROM shelfs
+            WHERE shelf_name = ?
+            `
+        ).get(shelf_name);
+
+        return new Shelf(
+            result.id,
+            result.shelf_name
+        );
     }
 
     deleteShelf(shelf_id: number) {
