@@ -26,3 +26,11 @@ export function formatDate (dateString: string) {
 export function toUnix (dateString: string) {
     return new Date(dateString).getTime();
 }
+
+export function fromUnix (unix: number) {
+    return new Date(unix).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+}   

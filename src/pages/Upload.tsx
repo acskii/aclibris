@@ -9,6 +9,7 @@ import { type ShelfObject } from '../../electron/database/objects/Shelf';
 import { type CollectionObject } from '../../electron/database/objects/Collection';
 import { Spinner } from '../components/common/spinner/Spinner';
 import { formatDate, toUnix } from '../service/util/Date';
+import { formatFileSize } from '../service/util/FileSize';
 
 
 function UploadPage() {
@@ -241,9 +242,9 @@ function UploadPage() {
             <div className="flex flex-col bg-indigo-800/20 items-start justify-center rounded-md p-4 gap-2">
               <h3 className="font-semibold text-white text-nowrap underline decoration-cyan-400">File Size (Bytes)</h3>
               <input 
-                type="number"
+                type="text"
                 className="border border-2 rounded-md p-2 w-full border-cyan-400/60 focus:border-violet-800/60 bg-gray-600/50 text-white"
-                value={meta.filesize}
+                value={formatFileSize(meta.filesize)}
                 disabled={true}
               />
             </div>
