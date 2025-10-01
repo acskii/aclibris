@@ -8,16 +8,16 @@ class DatabaseQuery {
         // Get general info about all books stored
         return database.prepare(
             `
-            SELECT id, title, pages, file_path, file_size, collection_id, created_at FROM books
+            SELECT id, title, author, pages, file_path, file_size, collection_id, created_at FROM books
             `
-        ).all().map((o: BookQueryObject) => new Book(o.id, o.title, o.collection_id, o.file_path, o.file_size, o.pages, o.created_at));
+        ).all().map((o: BookQueryObject) => new Book(o.id, o.title, o.collection_id, o.file_path, o.file_size, o.pages, o.created_at, o.author));
     }
 
     getBookById(id: number) {
         // Get details on a specific book
         const result: BookQueryObject = database.prepare(
             `
-            SELECT title, pages, file_path, file_size, collection_id, created_at FROM books
+            SELECT title, author, pages, file_path, file_size, collection_id, created_at FROM books
             WHERE id = ?
             `
         ).get(id);
@@ -29,7 +29,8 @@ class DatabaseQuery {
             result.file_path, 
             result.file_size, 
             result.pages, 
-            result.created_at
+            result.created_at,
+            result.author
         );
         else return null;
     }
@@ -78,26 +79,43 @@ class DatabaseQuery {
         ).all().map((o: CollectionQueryObject) => new Collection(o.id, o.collection_name, o.shelf_id));
     }
 
+    getCollectionById(collection_id: number) {
+        // Get details about a specifc collection
+        const result:CollectionQueryObject = database.prepare(
+            `
+            SELECT id, collection_name, shelf_id FROM collections
+            WHERE id = ?
+            `
+        ).get(collection_id);
+
+        if (result) return new Collection(
+            result.id,
+            result.collection_name,
+            result.shelf_id
+        );
+        else return null;
+    }
+
     getBooksByCollectionId(id: number) {
         // Get general info about books within a specific collection
         return database.prepare(
             `
-            SELECT id, title, pages, file_path, file_size, collection_id, created_at FROM books
+            SELECT id, title, author, pages, file_path, file_size, collection_id, created_at FROM books
             WHERE collection_id = ?
             `
-        ).all(id).map((o: BookQueryObject) => new Book(o.id, o.title, o.collection_id, o.file_path, o.file_size, o.pages, o.created_at));
+        ).all(id).map((o: BookQueryObject) => new Book(o.id, o.title, o.collection_id, o.file_path, o.file_size, o.pages, o.created_at, o.author));
     }
 
     addBook(title: string, pages: number, file_path: string, 
-            file_size: number, created_at: number, collection_id: number) {
+            file_size: number, created_at: number, collection_id: number, author: string) {
         // add a new book
         // added values must be validated before calling this function
         database.prepare(
             `
-            INSERT INTO books (title, pages, file_path, file_size, created_at, collection_id) VALUES 
-            (?, ?, ?, ?, ?, ?);
+            INSERT INTO books (title, pages, file_path, file_size, created_at, collection_id, author) VALUES 
+            (?, ?, ?, ?, ?, ?, ?);
             `
-        ).run(title, pages, file_path, file_size, created_at, collection_id);
+        ).run(title, pages, file_path, file_size, created_at, collection_id, author);
     }
 
     addCollection(collection_name: string, shelf_id: number) {

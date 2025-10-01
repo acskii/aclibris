@@ -66,6 +66,7 @@ class DatabaseMigration {
                 file_size INTEGER NOT NULL,
                 pages INTEGER NOT NULL,
                 title TEXT NOT NULL UNIQUE,
+                author VARCHAR(100) NOT NULL,
                 created_at INTEGER NOT NULL,
                 collection_id INTEGER REFERENCES collections(id) ON DELETE CASCADE
             )

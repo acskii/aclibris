@@ -19,6 +19,14 @@ export function registerDbHandlers() {
         }
     });
 
+    ipcMain.handle('db:book:get-by-collection', async (_, collection_id: number) => {
+        try {
+            return query.getBooksByCollectionId(collection_id);
+        } catch (error: any) {
+            console.log("[db:query] => Error occured when handling 'book:get:get-by-collection': ", error.message);
+        }
+    });
+
     ipcMain.handle('db:book:delete', async (_, book_id) => {
         try {
             return query.deleteBook(book_id);
@@ -41,7 +49,7 @@ export function registerDbHandlers() {
                 // Save book
                 query.addBook(
                     data.title, data.pages, file_path, data.filesize,
-                    0, c.id   // creationdate as unix seconds
+                    data.createdAt, c.id, data.author
                 );
             } else {
                 const ns = query.addShelf(shelf_name);
@@ -50,7 +58,7 @@ export function registerDbHandlers() {
                 // Save book
                 query.addBook(
                     data.title, data.pages, file_path, data.filesize,
-                    0, nc.id   // creationdate as unix seconds
+                    data.createdAt, nc.id, data.author
                 );
             }
         } catch (error: any) {
@@ -88,6 +96,14 @@ export function registerDbHandlers() {
             return  query.getCollections();
         } catch (error: any) {
             console.log("[db:query] => Error occured when handling 'collection:getAll': ", error.message);
+        }
+    });
+
+    ipcMain.handle('db:collection:get', async (_, collection_id: number) => {
+        try {
+            return query.getCollectionById(collection_id);
+        } catch (error: any) {
+            console.log("[db:query] => Error occured when handling 'collection:get': ", error.message);
         }
     });
 }

@@ -14,3 +14,15 @@ export function parsePDFDate (dateStr: string | undefined): string | undefined {
         return undefined;
     }
 };
+
+export function formatDate (dateString: string) {
+    return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+};
+
+export function toUnix (dateString: string) {
+    return new Date(dateString).getTime();
+}

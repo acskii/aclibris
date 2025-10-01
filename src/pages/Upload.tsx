@@ -8,6 +8,7 @@ import { type PDFMetadata } from '../service/types/DocumentCache';
 import { type ShelfObject } from '../../electron/database/objects/Shelf';
 import { type CollectionObject } from '../../electron/database/objects/Collection';
 import { Spinner } from '../components/common/spinner/Spinner';
+import { formatDate, toUnix } from '../service/util/Date';
 
 
 function UploadPage() {
@@ -75,9 +76,15 @@ function UploadPage() {
       const cn = selectedCollection ? selectedCollection.name : collectionInput;
       const sn = selectedShelf ? selectedShelf.name : shelfInput;
 
+      let data: any = {
+        ...meta
+      }
+      if (meta.creationdate) data.createdAt = toUnix(meta.creationdate);
+
       // TODO: validation for metadata
       // TODO: error view
-      await window.db.book.add(file.path, meta, cn, sn);
+
+      await window.db.book.add(file.path, data, cn, sn);
       setSaving(false);
       navigate('/library');
     }
@@ -254,7 +261,7 @@ function UploadPage() {
               <input 
                 type="text"
                 className="border border-2 rounded-md p-2 w-full border-cyan-400/60 focus:border-violet-800/60 bg-gray-600/50 text-white"
-                value={meta.creationdate}
+                value={meta.creationdate ? formatDate(meta.creationdate) : 'N/A'}
                 disabled={true}
               />
             </div>
