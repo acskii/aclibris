@@ -4,29 +4,29 @@ import { useNavigate } from "react-router-dom";
 type PageNavigateProps = {
     current: number;
     total: number;
-    file: string;
+    bookId: number;
 }
 
-export function PageNavigate({ current, total, file }: PageNavigateProps) {
+export function PageNavigate({ current, total, bookId }: PageNavigateProps) {
   const progress = (current / total) * 100;
   const navigate = useNavigate();
 
   const jumpToStart = () => {
-    navigate(`/view/1`, { state: { file } });
+    navigate(`/view/${bookId}/1`);
   };
 
   const jumpToEnd = () => {
-    navigate(`/view/${total}`, { state: { file } });
+    navigate(`/view/${bookId}/${total}`);
   };
 
   const jumpToNext = () => {
     const jump = current + 1 > total ? total : current + 1;
-    navigate(`/view/${jump}`, { state: { file } });
+    navigate(`/view/${bookId}/${jump}`);
   };
 
   const jumpToPrevious = () => {
     const jump = current - 1 <= 0 ? 1 : current - 1;
-    navigate(`/view/${jump}`, { state: { file } });
+    navigate(`/view/${bookId}/${jump}`);
   };
 
   const jumpToHome = () => {

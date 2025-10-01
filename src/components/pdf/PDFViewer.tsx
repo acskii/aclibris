@@ -5,16 +5,14 @@ import { Spinner } from '../common/spinner/Spinner';
 import { PDFDocumentProxy } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { PageNavigate } from './PageNavigate';
 import { TriangleAlert } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 
 type PDFViewerProps = { 
     file: string;
+    bookId: number;
     page: number;
 };
 
-export function PDFViewer({ file, page }: PDFViewerProps) {
-    const navigate = useNavigate();
-    const keyPressTimeout = useRef<NodeJS.Timeout | null>(null);
+export function PDFViewer({ file, page, bookId }: PDFViewerProps) {
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const [pdf, setPDF] = useState<PDFDocumentProxy | null>(null);
@@ -23,12 +21,10 @@ export function PDFViewer({ file, page }: PDFViewerProps) {
     const renderLock = useRef<boolean>(false);
 
     useEffect(() => {
-        const loadPDF = async () => {
+        const loadDocument = async () => {
             try {
-                if (file == null) return null;
                 setLoading(true);
-                if (!file.endsWith(".pdf")) setError("Incorrect file extension");
-                
+
                 const doc = await documentCache.getDocument(file);
                 setPDF(doc);
                 setTotalPages(doc ? doc.numPages : 0);
@@ -39,7 +35,7 @@ export function PDFViewer({ file, page }: PDFViewerProps) {
                 setLoading(false);
             }
         };
-        loadPDF(); 
+        loadDocument(); 
     }, [file])
     
     const renderPage = async () => {
@@ -71,39 +67,18 @@ export function PDFViewer({ file, page }: PDFViewerProps) {
         }
     };
 
-    const handleKeyDown = (event: KeyboardEvent) => {
-        if (keyPressTimeout.current) {
-            clearTimeout(keyPressTimeout.current);
-            keyPressTimeout.current = null;
-        }
-
-        keyPressTimeout.current = setTimeout(() => {
-            if (event.key == 'ArrowLeft') {
-                if (page >= 1) navigate(`/view/${(page == 1) ? 1 : page - 1}`);
-            } else if (event.key == 'ArrowRight') {
-                if (page < totalPages) navigate(`/view/${page + 1}`);
-            } 
-        }, 40);
-    }
-
     useEffect(() => {
-        document.addEventListener('keydown', handleKeyDown);
         if (!pdf || renderLock.current) return;
         renderPage();
-
-        return () => {
-            document.removeEventListener('keydown', handleKeyDown);
-            if (keyPressTimeout.current) clearTimeout(keyPressTimeout.current);
-        }
     }, [pdf, page]);
 
     return (
         <div className="flex flex-col w-full">
-            <PageNavigate current={page} total={totalPages} file={file} />
-            <div className="mb-8 relative flex justify-center">
+            <PageNavigate current={page} total={totalPages} bookId={bookId} />
+            <div className="relative flex justify-center">
                 <canvas 
                     ref={canvasRef} 
-                    className={`${loading ? "hidden" : ""} relative z-10 max-w-full max-h-full h-full rounded-lg shadow-2xl border border-indigo-500/30`}
+                    className={`${loading ? "hidden" : ""} relative z-10 max-w-full max-h-full h-full shadow-lg`}
                 />
             </div>
             {loading && (

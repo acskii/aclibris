@@ -3,7 +3,8 @@ import { useState, useEffect } from 'react';
 import { type ShelfObject } from '../../electron/database/objects/Shelf';
 import { type CollectionObject } from '../../electron/database/objects/Collection';
 import { Spinner } from '../components/common/spinner/Spinner';
-import { TriangleAlert, Library, Plus, SquareLibrary, Book, BookAlert} from 'lucide-react';
+import { TriangleAlert, Library, SquareLibrary, Book, BookAlert} from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 type LibraryShelf = {
     shelf: ShelfObject;
@@ -11,9 +12,14 @@ type LibraryShelf = {
 }
 
 export function LibraryPage() {
+    const navigate = useNavigate();
     const [data, setData] = useState<LibraryShelf[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string>('');
+
+    const goToCollection = (id: number) => {
+        navigate(`/collection/${id}`);
+    }
 
     useEffect(() => {
         const loadData = async () => {
@@ -98,40 +104,41 @@ export function LibraryPage() {
                         <div className="overflow-x-auto pb-4">
                             <div className="flex gap-6 min-w-max">
                                 {d.collections.map((collection) => (
-                                <div 
-                                    key={collection.id}
-                                    className="group cursor-pointer transform hover:scale-105 transition-transform duration-200"
-                                >
-                                    {/* Book Stack */}
-                                    <div className="relative w-32 h-40 mb-3">
-                                    {/* Multiple book spines stacked */}
-                                    <div className="absolute inset-0 flex gap-0.5">
-                                        {/* Main book spine */}
-                                        <div className="w-20 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-l-sm shadow-lg" />
+                                    <button 
+                                        key={collection.id}
+                                        onClick={() => goToCollection(collection.id)}
+                                        className="group cursor-pointer transform hover:scale-105 transition-transform duration-200"
+                                    >
+                                        {/* Book Stack */}
+                                        <div className="relative w-32 h-40 mb-3">
+                                            {/* Multiple book spines stacked */}
+                                            <div className="absolute inset-0 flex gap-0.5">
+                                                {/* Main book spine */}
+                                                <div className="w-20 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-l-sm shadow-lg" />
+                                                
+                                                {/* Additional book spines peeking out */}
+                                                <div className="w-4 bg-gradient-to-r from-violet-700 to-indigo-700 rounded-l-sm opacity-80" />
+                                                <div className="w-3 bg-gradient-to-r from-violet-800 to-indigo-800 rounded-l-sm opacity-60" />
+                                                <div className="w-2 bg-gradient-to-r from-violet-900 to-indigo-900 rounded-l-sm opacity-40" />
+                                            </div>
                                         
-                                        {/* Additional book spines peeking out */}
-                                        <div className="w-4 bg-gradient-to-r from-violet-700 to-indigo-700 rounded-l-sm opacity-80" />
-                                        <div className="w-3 bg-gradient-to-r from-violet-800 to-indigo-800 rounded-l-sm opacity-60" />
-                                        <div className="w-2 bg-gradient-to-r from-violet-900 to-indigo-900 rounded-l-sm opacity-40" />
-                                    </div>
-                                    
-                                    {/* Book cover effect */}
-                                    <div className="absolute right-0 top-2 w-12 h-36 bg-gradient-to-l from-violet-500/20 to-indigo-500/10 rounded-r-sm border-l border-indigo-400/30" />
-                                    
-                                    {/* Collection icon overlay */}
-                                    <div className="absolute inset-0 flex items-center justify-center">
-                                        <Book className="w-8 h-8 text-white/60 group-hover:text-white/80 transition-colors" />
-                                    </div>    
-                                </div>
+                                            {/* Book cover effect */}
+                                            <div className="absolute right-0 top-2 w-12 h-36 bg-gradient-to-l from-violet-500/20 to-indigo-500/10 rounded-r-sm border-l border-indigo-400/30" />
+                                            
+                                            {/* Collection icon overlay */}
+                                            <div className="absolute inset-0 flex items-center justify-center">
+                                                <Book className="w-8 h-8 text-white/60 group-hover:text-white/80 transition-colors" />
+                                            </div>    
+                                        </div>
 
-                                {/* Collection Info */}
-                                <div className="text-center">
-                                    <h3 className="font-semibold text-white text-sm mb-1 line-clamp-2 group-hover:text-indigo-200 transition-colors">
-                                        {collection.name}
-                                    </h3>
-                                    </div>
-                                </div>
-                            ))}
+                                        {/* Collection Info */}
+                                        <div className="text-center">
+                                            <h3 className="font-semibold text-white text-sm mb-1 line-clamp-2 group-hover:text-indigo-200 transition-colors">
+                                                {collection.name}
+                                            </h3>
+                                        </div>
+                                    </button>
+                                ))}
                         </div>
                     </div>
                 </div>
