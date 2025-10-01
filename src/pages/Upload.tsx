@@ -161,7 +161,7 @@ function UploadPage() {
 
 
   return (
-    <div className="min-h-screen p-5 space-y-4 bg-gradient-to-br from-cyan-500 via-sky-600 to-violet-500">
+    <div className="min-h-screen p-5 space-y-4">
       <div className="mb-8 flex flex-col items-start">
         <h1 className="mb-2 flex gap-3 justify-start">
           <Upload className="w-10 h-10" />

@@ -8,7 +8,7 @@ export function View() {
     const { file } = location.state || {};
 
     return (
-        <div>
+        <div className="bg-white">
             <PDFViewer file={file} page={page} />
         </div>
     );

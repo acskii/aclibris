@@ -44,7 +44,7 @@ export function LibraryPage() {
     }, []);
 
     return (
-        <div className="min-h-screen flex flex-col p-5 bg-gradient-to-br from-cyan-500 via-sky-600 to-violet-500">
+        <div className="min-h-screen flex flex-col p-5">
             {loading && (
                 <div className="flex bg-indigo-400 p-3 rounded-lg flex-row items-center justify-center gap-2 z-30 my-10">
                     <Spinner />
