@@ -22,7 +22,15 @@ export class Book {
     }
 }
 
-export type BookObject = typeof Book;
+export type BookObject = {
+    id: number;
+    title: string;
+    filePath: string;
+    fileSize: number;
+    pages: number;
+    createdAtInUnix: number;
+    collectionId: number;
+};
 
 export type BookQueryObject = {
     id: number;
