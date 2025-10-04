@@ -15,6 +15,7 @@ type PageItem = {
 
 const pages: PageItem[] = [
   { icon: PlusSquareIcon, label: "Upload Book", url: "/upload" },
+  { icon: BookMarkedIcon, label: "Library", url: "/library" },
 ];
 
 export function SideMenu() {
