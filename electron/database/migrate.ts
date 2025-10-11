@@ -62,7 +62,7 @@ class DatabaseMigration {
             `
             CREATE TABLE IF NOT EXISTS books (
                 id INTEGER PRIMARY KEY,
-                file_path TEXT NOT NULL,
+                file_path TEXT NOT NULL UNIQUE,
                 file_size INTEGER NOT NULL,
                 pages INTEGER NOT NULL,
                 title TEXT NOT NULL UNIQUE,
