@@ -61,9 +61,11 @@ export function registerDbHandlers() {
                     data.createdAt, nc.id, data.author
                 );
             }
+
+            return null;
         } catch (error: any) {
             console.log("[db:query] => Error occured when handling 'book:add': ", error.message);
-            return "Unable to save book";
+            return error.message;
         }
     })
 

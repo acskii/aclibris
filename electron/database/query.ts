@@ -2,6 +2,8 @@ import { database } from "./connection";
 import { Book, type BookQueryObject } from "./objects/Book";
 import { Collection, type CollectionQueryObject } from "./objects/Collection";
 import { Shelf, type ShelfQueryObject } from "./objects/Shelf";
+import TitleAlreadyExistsError from "./exceptions/TitleAlreadyExistsError";
+import FileAlreadyExistsError from "./exceptions/FileAlreadyExistsError";
 
 class DatabaseQuery {
     getBooks() {
@@ -110,60 +112,105 @@ class DatabaseQuery {
             file_size: number, created_at: number, collection_id: number, author: string) {
         // add a new book
         // added values must be validated before calling this function
-        database.prepare(
-            `
-            INSERT INTO books (title, pages, file_path, file_size, created_at, collection_id, author) VALUES 
-            (?, ?, ?, ?, ?, ?, ?);
-            `
-        ).run(title, pages, file_path, file_size, created_at, collection_id, author);
+        try {
+            database.prepare(
+                `
+                INSERT INTO books (title, pages, file_path, file_size, created_at, collection_id, author) VALUES 
+                (?, ?, ?, ?, ?, ?, ?);
+                `
+            ).run(title, pages, file_path, file_size, created_at, collection_id, author);
+
+            // return object
+            const result: BookQueryObject = database.prepare(
+                `
+                SELECT id, title, pages, file_path, file_size, created_at, collection_id, author FROM books
+                WHERE title = ?
+                AND file_path = ?
+                `
+            ).get(title, file_path);
+            
+            return new Book(
+                result.id,
+                result.title,
+                result.collection_id,
+                result.file_path,
+                result.file_size,
+                result.pages,
+                result.created_at,
+                result.author
+            );
+
+        } catch (error: any) {
+            if (error.code == 'SQLITE_CONSTRAINT_UNIQUE') {
+                if (error.message.includes("books.title")) throw new TitleAlreadyExistsError("Book title is already used");
+                else if (error.message.includes("books.file_path")) throw new FileAlreadyExistsError("File uploaded already exists");
+            } else {
+                // re-throw if not recognised
+                throw error;
+            }
+        }
     }
 
     addCollection(collection_name: string, shelf_id: number) {
         // add a new collection
-        database.prepare(
-            `
-            INSERT INTO collections (collection_name, shelf_id) VALUES
-            (?, ?);
-            `
-        ).run(collection_name, shelf_id);
-        
-        // return object
-        const result: CollectionQueryObject = database.prepare(
-            `
-            SELECT id, collection_name, shelf_id FROM collections
-            WHERE collection_name = ?
-            AND shelf_id = ?
-            `
-        ).get(collection_name, shelf_id);
-        
-        return new Collection(
-            result.id,
-            result.collection_name,
-            result.shelf_id
-        );
+        try {
+            database.prepare(
+                `
+                INSERT INTO collections (collection_name, shelf_id) VALUES
+                (?, ?);
+                `
+            ).run(collection_name, shelf_id);
+            
+            // return object
+            const result: CollectionQueryObject = database.prepare(
+                `
+                SELECT id, collection_name, shelf_id FROM collections
+                WHERE collection_name = ?
+                AND shelf_id = ?
+                `
+            ).get(collection_name, shelf_id);
+            
+            return new Collection(
+                result.id,
+                result.collection_name,
+                result.shelf_id
+            );
+        } catch (error: any) {
+            console.log("[db:query] => Error occurred when attempting to add a collection: ", error.message);
+            
+            // re-throw error
+            throw error;
+        }
     }
 
     addShelf(shelf_name: string) {
         // add a new shelf
-        database.prepare(
-            `
-            INSERT INTO shelfs (shelf_name) VALUES
-            (?);
-            `
-        ).run(shelf_name);
+        try {
+            database.prepare(
+                `
+                INSERT INTO shelfs (shelf_name) VALUES
+                (?);
+                `
+            ).run(shelf_name);
 
-        // return object
-        const result: ShelfQueryObject = database.prepare(
-            `
-            SELECT id, shelf_name FROM shelfs
-            WHERE shelf_name = ?
-            `
-        ).get(shelf_name);
+            // return object
+            const result: ShelfQueryObject = database.prepare(
+                `
+                SELECT id, shelf_name FROM shelfs
+                WHERE shelf_name = ?
+                `
+            ).get(shelf_name);
 
-        return new Shelf(
-            result.id,
-            result.shelf_name
-        );
+            return new Shelf(
+                result.id,
+                result.shelf_name
+            );
+        } catch (error: any) {
+            console.log("[db:query] => Error occurred when attempting to add a shelf: ", error.message);
+            
+            // re-throw error
+            throw error;
+        }
     }
 
     deleteShelf(shelf_id: number) {

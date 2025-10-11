@@ -18,6 +18,7 @@ function UploadPage() {
   const [meta, setMeta] = useState<PDFMetadata | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [saving, setSaving] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
   
   /*
     INFO DUMP:
@@ -85,9 +86,15 @@ function UploadPage() {
       // TODO: validation for metadata
       // TODO: error view
 
-      await window.db.book.add(file.path, data, cn, sn);
+      const error = await window.db.book.add(file.path, data, cn, sn);
       setSaving(false);
-      navigate('/library');
+
+      if (error) {
+        // error
+        setError(error);
+      } else {
+        navigate('/library');
+      }
     }
   }
 
@@ -322,6 +329,11 @@ function UploadPage() {
 
        {file && meta && (collectionInput && shelfInput) && (
         <div className="flex justify-end">
+          {error != '' && (
+            <p className="bg-gradient-to-br from-orange-500 to-red-600 text-md text-white font-bold px-2 py-1 rounded-md mr-3">
+              {error}
+            </p>
+          )}
           <button
             onClick={saveBook}
             disabled={saving}
