@@ -4,6 +4,8 @@ import { Collection, type CollectionQueryObject } from "./objects/Collection";
 import { Shelf, type ShelfQueryObject } from "./objects/Shelf";
 import TitleAlreadyExistsError from "./exceptions/TitleAlreadyExistsError";
 import FileAlreadyExistsError from "./exceptions/FileAlreadyExistsError";
+import BookDoesNotExistError from "./exceptions/BookDoesNotExistError";
+import { MetaQueryObject } from "./objects/Metadata";
 
 class DatabaseQuery {
     getBooks() {
@@ -19,7 +21,7 @@ class DatabaseQuery {
         // Get details on a specific book
         const result: BookQueryObject = database.prepare(
             `
-            SELECT title, author, pages, file_path, file_size, collection_id, created_at FROM books
+            SELECT id, title, author, pages, file_path, file_size, collection_id, created_at, recent_page, recent_read_at FROM books
             WHERE id = ?
             `
         ).get(id);
@@ -32,7 +34,9 @@ class DatabaseQuery {
             result.file_size, 
             result.pages, 
             result.created_at,
-            result.author
+            result.author,
+            result.recent_page,
+            result.recent_read_at
         );
         else return null;
     }
@@ -241,6 +245,55 @@ class DatabaseQuery {
             WHERE id = ?
             `
         ).run(book_id);
+    }
+
+    addRecentBook(book_id: number, page: number, last_visited_unix: number) {
+        // update values in the book
+        const info = database.prepare(
+            `
+            UPDATE books
+            SET recent_page = ?,
+                recent_read_at = ?
+            WHERE id = ?
+            `
+        ).run(page, last_visited_unix, book_id);
+
+        if (info.changes == 0) throw new BookDoesNotExistError("Book was not found");
+
+        // add as the most recent book
+        database.prepare(
+            `
+            UPDATE meta
+            SET value = ?
+            WHERE key = 'last_book'
+            `
+        ).run(`${book_id}`);
+    }
+
+    getRecentBook() {
+        // get the most recently opened book
+
+        try {
+            const response: MetaQueryObject = database.prepare(
+                `
+                SELECT key, value FROM meta
+                WHERE key = 'last_book'
+                `
+            ).get();
+
+            if (response.value == 'null') return null;
+            else {
+                const book_id: number = parseInt(response.value);
+                return this.getBookById(book_id);
+            }
+
+        } catch (error: any) {
+            console.log("[db:query] => Error occurred when attempting to get metadata: ", error.message);
+            
+            // re-throw error
+            throw error;
+        }
+        
     }
 
     // updateCollection

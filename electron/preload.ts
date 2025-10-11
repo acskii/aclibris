@@ -40,6 +40,8 @@ contextBridge.exposeInMainWorld('db', {
   book: {
     get: (book_id: number) => ipcRenderer.invoke('db:book:get', book_id),
     getByCollection: (collection_id: number) => ipcRenderer.invoke('db:book:get-by-collection', collection_id),
-    add: (file_path: string, data: any, collection_name: string, shelf_name: string) => ipcRenderer.invoke('db:book:add', file_path, data, collection_name, shelf_name)
+    add: (file_path: string, data: any, collection_name: string, shelf_name: string) => ipcRenderer.invoke('db:book:add', file_path, data, collection_name, shelf_name),
+    addRecent: (book_id: number, last_page: number, last_visited_at_unix: number) => ipcRenderer.invoke('db:book:add-recent', book_id, last_page, last_visited_at_unix),
+    getRecent: () => ipcRenderer.invoke('db:book:get-recent')
   }
 })

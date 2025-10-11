@@ -9,10 +9,14 @@ export class Book {
     public pages: number;
     public createdAtInUnix: number;
     public collectionId: number;
+    public lastReadPage: number = 1;
+    public lastVisitedInUnix: number | null = null;
 
     constructor(id: number, title: string, collectionId: number, 
                 filePath: string, fileSize: number, pages: number,
-                createdAtInUnix: number, author: string = 'N/A') {
+                createdAtInUnix: number, author: string = 'N/A', lastReadPage: number = 1,
+                lastVisitedInUnix: number | null = null
+            ) {
         this.id = id;
         this.title = title;
         this.author = author;
@@ -21,6 +25,8 @@ export class Book {
         this.fileSize = fileSize;
         this.pages = pages;
         this.collectionId = collectionId;
+        this.lastReadPage = lastReadPage;
+        this.lastVisitedInUnix = lastVisitedInUnix;
     }
 }
 
@@ -33,6 +39,8 @@ export type BookObject = {
     pages: number;
     createdAtInUnix: number;
     collectionId: number;
+    lastReadPage?: number;
+    lastVisitedInUnix?: number | null;
 };
 
 export type BookQueryObject = {
@@ -44,4 +52,6 @@ export type BookQueryObject = {
     file_size: number;
     collection_id: number;
     created_at: number;
+    recent_page?: number;
+    recent_read_at?: number;
 };

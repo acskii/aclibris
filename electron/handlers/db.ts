@@ -108,4 +108,20 @@ export function registerDbHandlers() {
             console.log("[db:query] => Error occured when handling 'collection:get': ", error.message);
         }
     });
+
+    ipcMain.handle('db:book:add-recent', async (_, book_id: number, last_page: number, last_visited_at_unix: number) => {
+        try {
+            query.addRecentBook(book_id, last_page, last_visited_at_unix);
+        } catch (error: any) {
+            console.log("[db:query] => Error occured when handling 'book:add-recent': ", error.message);
+        }
+    });
+
+    ipcMain.handle('db:book:get-recent', async (_) => {
+        try {
+            return query.getRecentBook();
+        } catch (error: any) {
+            console.log("[db:query] => Error occured when handling 'book:get-recent': ", error.message);
+        }
+    });
 }

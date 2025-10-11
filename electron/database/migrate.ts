@@ -65,9 +65,11 @@ class DatabaseMigration {
                 file_path TEXT NOT NULL UNIQUE,
                 file_size INTEGER NOT NULL,
                 pages INTEGER NOT NULL,
+                recent_page INTEGER DEFAULT 1,
                 title TEXT NOT NULL UNIQUE,
                 author VARCHAR(100) NOT NULL,
                 created_at INTEGER NOT NULL,
+                recent_read_at INTEGER DEFAULT NULL,
                 collection_id INTEGER REFERENCES collections(id) ON DELETE CASCADE
             )
             `    
@@ -108,13 +110,35 @@ class DatabaseMigration {
                 ('Default', ?);
                 `
             ).run(default_shelf_id.id);
-                        database.prepare(
+            
+            database.prepare(
                 `
                 INSERT INTO meta (key, value) VALUES 
                 ('seeded', 'true');
                 `
             ).run();
             console.log("[db:migrate] => Seeded Default Values");
+        }
+    }
+
+    private add_recent_book_read() {
+        // Will include either 'null' for no recent book (at first use)
+        //              or '{book_id}' to relate to a saved book
+
+        const lastBook = database.prepare(
+            `
+            SELECT value FROM meta
+            WHERE key = 'last_book'
+            `
+        ).get();
+
+        if (!lastBook) {
+            database.prepare(
+            `
+            INSERT INTO meta (key, value) VALUES 
+            ('last_book', 'null');
+            `
+            ).run();
         }
     }
 
@@ -126,6 +150,7 @@ class DatabaseMigration {
         this.create_book_tag_table();
         this.create_meta_table();
         this.seed_default_values();
+        this.add_recent_book_read();
         console.log("[db:migrate] => Initialised local database schema");
     }
 }
