@@ -12,6 +12,17 @@ export function View() {
     const page = params.page ? parseInt(params.page) : 1;
 
     useEffect(() => {
+        const saveAsRecent = async () => {
+            // This specific line will always run at every page turn
+            // TODO: here or another place?
+            await window.db.book.addRecent(id, page, Date.now());
+            // ^^^
+        };
+
+        saveAsRecent();
+    }, [page]);
+
+    useEffect(() => {
         const loadFilePath = async () => {
             if (!id) {
                 setError(true);
@@ -21,6 +32,7 @@ export function View() {
 
             // Electron specific
             // Calls the database to query on the book corresponding to the id requested
+
             const book = await window.db.book.get(id);
             const file = book.filePath;
 

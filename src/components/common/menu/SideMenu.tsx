@@ -3,6 +3,7 @@ import {
   BookMarkedIcon,
   LucideIcon,
   MenuIcon,
+  HomeIcon,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSideMenu } from "../../../contexts/SideMenuContext";
@@ -14,6 +15,7 @@ type PageItem = {
 };
 
 const pages: PageItem[] = [
+  { icon: HomeIcon, label: "Home", url: "/" },
   { icon: PlusSquareIcon, label: "Upload Book", url: "/upload" },
   { icon: BookMarkedIcon, label: "Library", url: "/library" },
 ];

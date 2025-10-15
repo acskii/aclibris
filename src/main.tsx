@@ -5,18 +5,20 @@ import './index.css'
 import { Routes, Route, HashRouter } from 'react-router-dom'
 import { View } from './pages/View.tsx'
 import { SideMenuProvider } from './contexts/SideMenuContext.tsx'
-import { Home } from './pages/Home.tsx'
+import { HomePage } from './pages/Home.tsx'
 import { LibraryPage } from './pages/Library.tsx'
+import { CollectionPage } from './pages/Collection.tsx'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <HashRouter>
       <SideMenuProvider>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<HomePage />} />
           <Route path="/upload" element={<UploadPage />} />
           <Route path="/library" element={<LibraryPage />} />
-          <Route path="/view/:page" element={<View />} />
+          <Route path="/view/:id/:page" element={<View />} />
+          <Route path="/collection/:id" element={<CollectionPage />} />
         </Routes>  
       </SideMenuProvider>
     </HashRouter>
