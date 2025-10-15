@@ -64,6 +64,7 @@ class DatabaseMigration {
                 id INTEGER PRIMARY KEY,
                 file_path TEXT NOT NULL UNIQUE,
                 file_size INTEGER NOT NULL,
+                thumbnail BLOB DEFAULT NULL,
                 pages INTEGER NOT NULL,
                 recent_page INTEGER DEFAULT 1,
                 title TEXT NOT NULL UNIQUE,

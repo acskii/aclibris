@@ -12,16 +12,16 @@ class DatabaseQuery {
         // Get general info about all books stored
         return database.prepare(
             `
-            SELECT id, title, author, pages, file_path, file_size, collection_id, created_at FROM books
+            SELECT id, title, author, recent_page, recent_read_at, thumbnail, pages, file_path, file_size, collection_id, created_at FROM books
             `
-        ).all().map((o: BookQueryObject) => new Book(o.id, o.title, o.collection_id, o.file_path, o.file_size, o.pages, o.created_at, o.author));
+        ).all().map((o: BookQueryObject) => new Book(o.id, o.title, o.collection_id, o.file_path, o.file_size, o.pages, o.created_at, o.author, o.thumbnail, o.recent_page, o.recent_read_at));
     }
 
     getBookById(id: number) {
         // Get details on a specific book
         const result: BookQueryObject = database.prepare(
             `
-            SELECT id, title, author, pages, file_path, file_size, collection_id, created_at, recent_page, recent_read_at FROM books
+            SELECT id, title, thumbnail, author, pages, file_path, file_size, collection_id, created_at, recent_page, recent_read_at FROM books
             WHERE id = ?
             `
         ).get(id);
@@ -35,6 +35,7 @@ class DatabaseQuery {
             result.pages, 
             result.created_at,
             result.author,
+            result.thumbnail,
             result.recent_page,
             result.recent_read_at
         );
@@ -106,28 +107,29 @@ class DatabaseQuery {
         // Get general info about books within a specific collection
         return database.prepare(
             `
-            SELECT id, title, author, pages, file_path, file_size, collection_id, created_at FROM books
+            SELECT id, title, thumbnail, author, pages, file_path, file_size, collection_id, created_at FROM books
             WHERE collection_id = ?
             `
-        ).all(id).map((o: BookQueryObject) => new Book(o.id, o.title, o.collection_id, o.file_path, o.file_size, o.pages, o.created_at, o.author));
+        ).all(id).map((o: BookQueryObject) => new Book(o.id, o.title, o.collection_id, o.file_path, o.file_size, o.pages, o.created_at, o.author, o.thumbnail));
     }
 
     addBook(title: string, pages: number, file_path: string, 
-            file_size: number, created_at: number, collection_id: number, author: string) {
+            file_size: number, created_at: number, collection_id: number, 
+            author: string, thumbnail: Buffer) {
         // add a new book
         // added values must be validated before calling this function
         try {
             database.prepare(
                 `
-                INSERT INTO books (title, pages, file_path, file_size, created_at, collection_id, author) VALUES 
-                (?, ?, ?, ?, ?, ?, ?);
+                INSERT INTO books (title, pages, thumbnail, file_path, file_size, created_at, collection_id, author) VALUES 
+                (?, ?, ?, ?, ?, ?, ?, ?);
                 `
-            ).run(title, pages, file_path, file_size, created_at, collection_id, author);
+            ).run(title, pages, thumbnail, file_path, file_size, created_at, collection_id, author);
 
             // return object
             const result: BookQueryObject = database.prepare(
                 `
-                SELECT id, title, pages, file_path, file_size, created_at, collection_id, author FROM books
+                SELECT id, title, pages, thumbnail, file_path, file_size, created_at, collection_id, author FROM books
                 WHERE title = ?
                 AND file_path = ?
                 `
@@ -141,7 +143,8 @@ class DatabaseQuery {
                 result.file_size,
                 result.pages,
                 result.created_at,
-                result.author
+                result.author,
+                result.thumbnail
             );
 
         } catch (error: any) {

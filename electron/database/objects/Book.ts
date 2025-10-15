@@ -6,6 +6,7 @@ export class Book {
     public author: string;
     public filePath: string;
     public fileSize: number;
+    public thumbnail: Uint8Array | null;
     public pages: number;
     public createdAtInUnix: number;
     public collectionId: number;
@@ -14,19 +15,23 @@ export class Book {
 
     constructor(id: number, title: string, collectionId: number, 
                 filePath: string, fileSize: number, pages: number,
-                createdAtInUnix: number, author: string = 'N/A', lastReadPage: number = 1,
-                lastVisitedInUnix: number | null = null
+                createdAtInUnix: number, author: string = 'N/A', thumbnail: Buffer | null = null,
+                lastReadPage: number = 1, lastVisitedInUnix: number | null = null, 
             ) {
         this.id = id;
         this.title = title;
         this.author = author;
         this.createdAtInUnix = createdAtInUnix;
         this.filePath = filePath;
-        this.fileSize = fileSize;
+        this.fileSize = fileSize;        
         this.pages = pages;
         this.collectionId = collectionId;
         this.lastReadPage = lastReadPage;
         this.lastVisitedInUnix = lastVisitedInUnix;
+        
+        this.thumbnail = (thumbnail) ? 
+            new Uint8Array(thumbnail.buffer, thumbnail.byteOffset, thumbnail.byteLength)
+            : null;
     }
 }
 
@@ -36,8 +41,9 @@ export type BookObject = {
     author: string;
     filePath: string;
     fileSize: number;
+    thumbnail: Uint8Array | null;
     pages: number;
-    createdAtInUnix: number;
+    createdAtInUnix: number;    
     collectionId: number;
     lastReadPage?: number;
     lastVisitedInUnix?: number | null;
@@ -54,4 +60,5 @@ export type BookQueryObject = {
     created_at: number;
     recent_page?: number;
     recent_read_at?: number;
+    thumbnail?: Buffer;
 };

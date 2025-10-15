@@ -1,6 +1,6 @@
 import FileDropArea from '../components/common/FileDropArea'
 import { useNavigate } from 'react-router-dom'
-import { File, Info, Library, Save, Upload } from 'lucide-react';
+import { File, FileText, Info, Library, Save, Upload } from 'lucide-react';
 import { AutocompleteDropdown, DropdownOption } from '../components/common/dropdown/AutocompleteDropdown';
 import { useEffect, useState } from 'react';
 import { documentCache } from '../service/DocumentCache';
@@ -10,6 +10,7 @@ import { type CollectionObject } from '../../electron/database/objects/Collectio
 import { Spinner } from '../components/common/spinner/Spinner';
 import { formatDate, toUnix } from '../service/util/Date';
 import { formatFileSize } from '../service/util/FileSize';
+import { arrayToBase64 } from '../service/util/Thumbnail';
 
 
 function UploadPage() {
@@ -85,7 +86,7 @@ function UploadPage() {
 
       // TODO: validation for metadata
       // TODO: error view
-
+      
       const error = await window.db.book.add(file.path, data, cn, sn);
       setSaving(false);
 
@@ -173,7 +174,7 @@ function UploadPage() {
     }
   };
 
-
+  
 
   return (
     <div className="min-h-screen p-5 space-y-4">
@@ -225,42 +226,68 @@ function UploadPage() {
             <File className="w-5 h-5" />
             File Information
           </span>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex flex-col bg-indigo-800/20 items-start justify-center rounded-md p-4 gap-2">
-              <h3 className="font-semibold text-white text-nowrap underline decoration-cyan-400">Title</h3>
-              <input 
-                type="text"
-                className="border border-2 rounded-md p-2 w-full border-cyan-400/60 focus:border-violet-800/60 bg-white/10 text-white"
-                value={meta.title || 'N/A'}
-                onChange={(e) => handleMetaChange('title', e.target.value)}
-                placeholder="Enter book title"
-              />
+          
+          <div className="grid grid-cols-2 gap-6 mb-6">
+            <div className="space-y-4">
+              <div className="flex flex-col bg-indigo-800/20 items-start justify-center rounded-md p-4 gap-2">
+                <h3 className="font-semibold text-white text-nowrap underline decoration-cyan-400">Title</h3>
+                <input 
+                  type="text"
+                  className="border border-2 rounded-md p-2 w-full border-cyan-400/60 focus:border-violet-800/60 bg-white/10 text-white"
+                  value={meta.title || 'N/A'}
+                  onChange={(e) => handleMetaChange('title', e.target.value)}
+                  placeholder="Enter book title"
+                />
+              </div>
+              <div className="flex flex-col bg-indigo-800/20 items-start justify-center rounded-md p-4 gap-2">
+                <h3 className="font-semibold text-white text-nowrap underline decoration-cyan-400">Author</h3>
+                <input 
+                  type="text"
+                  className="border border-2 rounded-md p-2 w-full border-cyan-400/60 focus:border-violet-800/60 bg-white/10 text-white"
+                  value={meta.author || 'N/A'}
+                  onChange={(e) => handleMetaChange('author', e.target.value)}
+                  placeholder="Enter author name"
+                />
+              </div>
+              <div className="flex flex-col bg-indigo-800/20 items-start justify-center rounded-md p-4 gap-2">
+                <h3 className="font-semibold text-white text-nowrap underline decoration-cyan-400">Pages</h3>
+                <input 
+                  type="number"
+                  className="border border-2 rounded-md p-2 w-full border-cyan-400/60 focus:border-violet-800/60 bg-gray-600/50 text-white"
+                  value={meta.pages}
+                  disabled={true}
+                />
+              </div>
             </div>
-            <div className="flex flex-col bg-indigo-800/20 items-start justify-center rounded-md p-4 gap-2">
-              <h3 className="font-semibold text-white text-nowrap underline decoration-cyan-400">Author</h3>
-              <input 
-                type="text"
-                className="border border-2 rounded-md p-2 w-full border-cyan-400/60 focus:border-violet-800/60 bg-white/10 text-white"
-                value={meta.author || 'N/A'}
-                onChange={(e) => handleMetaChange('author', e.target.value)}
-                placeholder="Enter author name"
-              />
+            
+            <div className="bg-indigo-800/20 rounded-md p-4 border border-indigo-500/30 w-full max-h-full">
+              <h3 className="font-semibold text-white text-nowrap underline decoration-cyan-400 mb-4">
+                Thumbnail
+              </h3>
+              {meta.thumbnail ? (
+                <img 
+                  src={`data:image/jpeg;base64,${arrayToBase64(meta.thumbnail)}`}
+                  alt="Book cover thumbnail"
+                  className="w-full h-70 object-contain rounded-md"
+                />
+              ) : (
+                <div className="w-full h-full max-h-70 bg-indigo-900/30 rounded-md flex flex-col gap-2 items-center justify-center border-2 border-dashed border-indigo-500/50">
+                  <FileText size={40} />
+                  <span className="text-sm text-center">
+                    No thumbnail available
+                  </span>
+                </div>
+              )}
             </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col bg-indigo-800/20 items-start justify-center rounded-md p-4 gap-2">
-              <h3 className="font-semibold text-white text-nowrap underline decoration-cyan-400">File Size (Bytes)</h3>
+              <h3 className="font-semibold text-white text-nowrap underline decoration-cyan-400">File Size</h3>
               <input 
                 type="text"
                 className="border border-2 rounded-md p-2 w-full border-cyan-400/60 focus:border-violet-800/60 bg-gray-600/50 text-white"
                 value={formatFileSize(meta.filesize)}
-                disabled={true}
-              />
-            </div>
-            <div className="flex flex-col bg-indigo-800/20 items-start justify-center rounded-md p-4 gap-2">
-              <h3 className="font-semibold text-white text-nowrap underline decoration-cyan-400">Pages</h3>
-              <input 
-                type="number"
-                className="border border-2 rounded-md p-2 w-full border-cyan-400/60 focus:border-violet-800/60 bg-gray-600/50 text-white"
-                value={meta.pages}
                 disabled={true}
               />
             </div>

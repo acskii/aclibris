@@ -45,11 +45,11 @@ export function registerDbHandlers() {
 
                 let c = cs.find((c) => c.name === collection_name);
                 if (!c) c = query.addCollection(collection_name, s.id);
-
+                
                 // Save book
                 query.addBook(
                     data.title, data.pages, file_path, data.filesize,
-                    data.createdAt, c.id, data.author
+                    data.createdAt, c.id, data.author, Buffer.from(data.thumbnail)
                 );
             } else {
                 const ns = query.addShelf(shelf_name);
@@ -58,7 +58,7 @@ export function registerDbHandlers() {
                 // Save book
                 query.addBook(
                     data.title, data.pages, file_path, data.filesize,
-                    data.createdAt, nc.id, data.author
+                    data.createdAt, nc.id, data.author, Buffer.from(data.thumbnail)
                 );
             }
 

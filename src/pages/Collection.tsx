@@ -6,6 +6,7 @@ import { CollectionObject } from '../../electron/database/objects/Collection';
 import { BookObject } from '../../electron/database/objects/Book';
 import { fromUnix } from '../service/util/Date';
 import { formatFileSize } from '../service/util/FileSize';
+import { arrayToBase64 } from '../service/util/Thumbnail';
 
 export function CollectionPage() {
   const { id } = useParams<{ id: string }>();
@@ -111,7 +112,7 @@ export function CollectionPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Selected Book Preview */}
         <div className="xl:col-span-1">
           <div className="bg-gray-800/30 backdrop-blur-sm rounded-md p-6 border border-indigo-500/20 sticky top-6">
@@ -122,6 +123,23 @@ export function CollectionPage() {
 
             {selectedBook ? (
               <div className="space-y-4">
+                <div>
+                  {selectedBook.thumbnail ? (
+                    <img 
+                      src={`data:image/jpeg;base64,${arrayToBase64(selectedBook.thumbnail)}`}
+                      alt="Book cover thumbnail"
+                      className="w-full h-full object-contain rounded-md"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-indigo-900/30 rounded-md flex flex-col gap-2 items-center justify-center border-2 border-dashed border-indigo-500/50">
+                      <FileText size={40} />
+                      <span className="text-sm text-center">
+                        No thumbnail available
+                      </span>
+                    </div>
+                  )}
+                </div>  
+
                 <div>
                   <h3 className="text-white font-semibold text-xl mb-2">
                     {selectedBook.title || 'Untitled'}
@@ -169,7 +187,7 @@ export function CollectionPage() {
         </div>      
 
         {/* Books List */}
-        <div className="xl:col-span-2">
+        <div className="lg:col-span-2">
           <div className="bg-gray-800/30 backdrop-blur-sm rounded-md p-6 border border-indigo-500/20">
             <h2 className="text-2xl font-semibold text-white mb-6 flex items-center gap-2">
               <Library size={30} />
@@ -183,7 +201,7 @@ export function CollectionPage() {
                 <p className="text-indigo-300/70 mt-2">Add books from the upload page</p>
               </div>
             ) : (
-              <div className="space-y-4 max-h-90 overflow-y-auto xl:overflow-none xl:max-h-full">
+              <div className="space-y-4 max-h-90 overflow-y-auto lg:max-h-full">
                 {books.map((book: BookObject) => {
                   return <div
                     key={book.id}

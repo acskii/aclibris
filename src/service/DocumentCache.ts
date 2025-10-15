@@ -14,20 +14,20 @@ import { parsePDFDate } from "./util/Date";
 GlobalWorkerOptions.workerSrc = worker;
 
 class DocumentCache {
-    private cache: Map<string, PDFDocumentProxy> = new Map();
+    private cache: PDFDocumentProxy | null = null;
     private currentKey: string | null = null;
 
     async getDocument(filePath: string): Promise<PDFDocumentProxy | null> {
         // Make sure the file has correct extension
         if (!filePath.endsWith(".pdf")) {
-            console.log("[service:document_cache] => File path provided isn't of correct extension: pdf");
+            console.log("[service:document_cache] => File path provided isn't of correct extension: pdf: ", filePath);
             return null;
         }
 
         // If found in cache, return it
-        if (this.cache.has(filePath)) {
+        if (this.cache != null && this.currentKey == filePath) {
             console.log("[service:document_cache] => Retrieved from cache: " + filePath);
-            return this.cache.get(filePath) || null;
+            return this.cache;
         }
 
         console.log("[service:document_cache] => Saving in cache: " + filePath);
@@ -37,11 +37,15 @@ class DocumentCache {
 
         if (response.success == true) {
             // Convery to binary array
+            if (this.currentKey != filePath) {
+                this.clearCurrentDocument();
+            }
             const array = new Uint8Array(response.result);
             const document = await getDocument({ data: array }).promise;
             // Save document to cache
-            this.cache.set(filePath, document);
+            this.cache = document;
             this.currentKey = filePath;
+
             return document;
         } else {
             console.log("[service:document_cache] => Couldn't retrieve PDF from file system");
@@ -50,7 +54,48 @@ class DocumentCache {
     }
 
     getCurrentDocument() {
-        return (this.currentKey != null) ? this.cache.get(this.currentKey) : null;
+        return (this.cache != null) ? this.cache : null;
+    }
+
+    async clearCurrentDocument() {
+        if (this.currentKey) {
+            const document = this.getCurrentDocument();
+            if (document) {
+                await document.cleanup();
+                await document.destroy();
+                console.log("[service:document_cache] => Cleared document for: ", this.currentKey);
+                this.cache = null;
+                this.currentKey = null;
+            }    
+        }
+    }
+
+    private async getThumbnail(doc: PDFDocumentProxy): Promise<Uint8Array | null> {
+        const page = await doc.getPage(1);
+        const viewport = page.getViewport({ scale: 2.0 });
+        const canvas = document.createElement('canvas');
+
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        await page.render({
+            canvas: canvas,
+            viewport: viewport
+        }).promise;
+
+        return new Promise((resolve) => {
+            canvas.toBlob((blob) => {
+                if (blob) {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        const arrayBuffer = reader.result as ArrayBuffer;
+                        resolve(new Uint8Array(arrayBuffer));
+                    };
+                    reader.readAsArrayBuffer(blob);
+                } else {
+                    resolve(null);
+                }
+            }, 'image/jpeg', 0.8); // JPEG with 80% quality
+        });
     }
 
     async getMetadata(filePath: string) {
@@ -61,6 +106,9 @@ class DocumentCache {
 
         const data = await document.getMetadata();
         const info: Map<string, any> = new Map();
+        // Get a screenshot of the first page
+        const thumbnail: Uint8Array | null = await this.getThumbnail(document);
+
         // From data.info you can get Title, Author, CreationDate
         // Then any other meta is from data.metadata
 
@@ -82,19 +130,11 @@ class DocumentCache {
         const result = {
             ...Object.fromEntries(info),
             pages: document.numPages,
-            filesize: fileSize
+            filesize: fileSize,
+            thumbnail: thumbnail
         }
 
         return result;
-    }
-
-    clearCache() {
-        console.log("[service:document_cache] => Clearing document cache..");
-        this.cache.forEach((document, _) => {
-            document.destroy();
-        })
-        this.currentKey = null;
-        this.cache.clear();
     }
 }
 

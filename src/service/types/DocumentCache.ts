@@ -4,5 +4,6 @@ export type PDFMetadata = {
     creationdate?: string;
     pages: number;
     author?: string;
+    thumbnail?: Uint8Array | null;
     filesize: number;
 }
