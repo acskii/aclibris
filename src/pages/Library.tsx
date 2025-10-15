@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { type ShelfObject } from '../../electron/database/objects/Shelf';
 import { type CollectionObject } from '../../electron/database/objects/Collection';
 import { Spinner } from '../components/common/spinner/Spinner';
-import { TriangleAlert, Library, SquareLibrary, Book, BookAlert} from 'lucide-react';
+import { TriangleAlert, Library, Book, BookAlert} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 type LibraryShelf = {
@@ -86,62 +86,68 @@ export function LibraryPage() {
 
             <div className="space-y-6">
                 {data.map((d: LibraryShelf) => (
-                    <div key={d.shelf.id} className="bg-gray-800/30 backdrop-blur-sm rounded-md p-6 border border-indigo-500/20">
-                        {/* Shelf Header */}
-                        <div className="flex items-center justify-between mb-6">
-                            <div>
-                                <h2 className="text-2xl font-semibold text-white flex items-center gap-2">
-                                    <SquareLibrary className="w-6 h-6 text-indigo-300" />
-                                    {d.shelf.name}
+                    <div key={d.shelf.id} className="flex bg-gray-800/50 backdrop-blur-sm rounded-md border border-indigo-500/20">
+                        <div>
+                            <div className="bg-gradient-to-br from-violet-500 to-purple-600 flex flex-auto items-center items-center justify-center border border-3 border-r-5 border-violet-700 h-full w-10">
+                                <h2 className="text-2xl font-semibold text-white">
+                                    {d.shelf.id}
                                 </h2>
-                                <p className="text-indigo-200 text-sm mt-1">
-                                    {d.collections.length} collection{d.collections.length !== 1 ? 's' : ''}
-                                </p>
                             </div>
                         </div>
 
-                        {/* Collections Row */}
-                        <div className="overflow-x-auto pb-4">
-                            <div className="flex gap-6 min-w-max">
-                                {d.collections.map((collection) => (
-                                    <button 
-                                        key={collection.id}
-                                        onClick={() => goToCollection(collection.id)}
-                                        className="group cursor-pointer transform hover:scale-105 transition-transform duration-200"
-                                    >
-                                        {/* Book Stack */}
-                                        <div className="relative w-32 h-40 mb-3">
-                                            {/* Multiple book spines stacked */}
-                                            <div className="absolute inset-0 flex gap-0.5">
-                                                {/* Main book spine */}
-                                                <div className="w-20 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-l-sm shadow-lg" />
-                                                
-                                                {/* Additional book spines peeking out */}
-                                                <div className="w-4 bg-gradient-to-r from-violet-700 to-indigo-700 rounded-l-sm opacity-80" />
-                                                <div className="w-3 bg-gradient-to-r from-violet-800 to-indigo-800 rounded-l-sm opacity-60" />
-                                                <div className="w-2 bg-gradient-to-r from-violet-900 to-indigo-900 rounded-l-sm opacity-40" />
-                                            </div>
-                                        
-                                            {/* Book cover effect */}
-                                            <div className="absolute right-0 top-2 w-12 h-36 bg-gradient-to-l from-violet-500/20 to-indigo-500/10 rounded-r-sm border-l border-indigo-400/30" />
-                                            
-                                            {/* Collection icon overlay */}
-                                            <div className="absolute inset-0 flex items-center justify-center">
-                                                <Book className="w-8 h-8 text-white/60 group-hover:text-white/80 transition-colors" />
-                                            </div>    
-                                        </div>
+                        <div className="px-6 py-4">
+                            {/* Shelf Header */}
+                            <div className="flex items-center justify-start gap-4 mb-6">
+                                <h2 className="text-2xl font-semibold text-white flex items-center gap-2">
+                                    {d.shelf.name}
+                                </h2>
+                                <p className="bg-gradient-to-br from-violet-500 to-purple-600 text-md font-bold px-2 py-1 rounded-md">
+                                    {d.collections.length} collection{d.collections.length !== 1 ? 's' : ''}
+                                </p>
+                            </div>
 
-                                        {/* Collection Info */}
-                                        <div className="text-center">
-                                            <h3 className="font-semibold text-white text-sm mb-1 line-clamp-2 group-hover:text-indigo-200 transition-colors">
-                                                {collection.name}
-                                            </h3>
-                                        </div>
-                                    </button>
-                                ))}
+                            {/* Collections Row */}
+                            <div className="overflow-x-auto pb-4">
+                                <div className="flex gap-6 min-w-max">
+                                    {d.collections.map((collection) => (
+                                        <button 
+                                            key={`${collection.id}`}
+                                            onClick={() => goToCollection(collection.id)}
+                                            className="group flex flex-col items-center justify-center cursor-pointer transform hover:scale-90 transition-transform duration-200"
+                                        >
+                                            {/* Book Stack */}
+                                            <div className="relative w-32 h-40 mb-3">
+                                                {/* Multiple book spines stacked */}
+                                                <div className="absolute inset-0 flex gap-0.5">
+                                                    {/* Main book spine */}
+                                                    <div className="w-40 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-l-sm shadow-lg" />
+                                                    
+                                                    {/* Additional book spines peeking out */}
+                                                    <div className="w-4 bg-gradient-to-r from-violet-700 to-indigo-700 rounded-l-sm opacity-80" />
+                                                    <div className="w-3 bg-gradient-to-r from-violet-800 to-indigo-800 rounded-l-sm opacity-60" />
+                                                    <div className="w-2 bg-gradient-to-r from-violet-900 to-indigo-900 rounded-l-sm opacity-40" />
+                                                </div>
+                                                
+                                                {/* Collection icon overlay */}
+                                                <div className="absolute inset-0 flex items-center justify-center">
+                                                    <Book size={40} className="text-white/60 group-hover:text-white/80 transition-colors" />
+                                                </div>    
+                                            </div>
+
+                                            {/* Collection Info */}
+                                            <div className="bg-black/20 w-full mx-auto rounded-md flex items-center justify-center p-1">
+                                                <div className="text-center">
+                                                    <h3 className="font-semibold text-white text-sm mb-1 line-clamp-2 group-hover:text-indigo-200 transition-colors">
+                                                        {collection.name}
+                                                    </h3>
+                                                </div>
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
                 ))}
 
                 {data.length === 0 && (
