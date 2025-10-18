@@ -53,7 +53,8 @@ export function PDFViewer({ file, page, bookId }: PDFViewerProps) {
 
                     const renderContext = {
                         canvas: canvas,
-                        viewport: viewport
+                        viewport: viewport,
+                        intent: 'print'
                     }
 
                     await documentPage.render(renderContext).promise;
