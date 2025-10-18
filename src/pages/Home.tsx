@@ -100,7 +100,7 @@ export function HomePage() {
                                     </div>
                                 </div>
 
-                                <div className="flex flex-col gap-3 justify-center px-30">
+                                <div className="flex flex-col gap-3 justify-center px-15">
                                     <button
                                         type="button"
                                         onClick={goToView}
