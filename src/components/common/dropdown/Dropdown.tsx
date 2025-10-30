@@ -88,6 +88,7 @@ export function Dropdown({
           onKeyDown={handleInputKeyDown}
           placeholder={placeholder}
           disabled={disabled}
+          readOnly
           className="border border-2 rounded-md p-2 w-full border-cyan-400/60 focus:border-violet-800/60 bg-gray-600/50 text-white"
         />
         
