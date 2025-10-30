@@ -30,7 +30,9 @@ contextBridge.exposeInMainWorld('files', {
 contextBridge.exposeInMainWorld('db', {
   shelf: {
     new: (shelf_name: string) => ipcRenderer.invoke('db:shelf:new', shelf_name),
-    getAll: () => ipcRenderer.invoke('db:shelf:getAll')
+    getAll: () => ipcRenderer.invoke('db:shelf:getAll'),
+    delete: (shelf_id: number) => ipcRenderer.invoke('db:shelf:delete', shelf_id),
+    update: (shelf_id: number, shelf_name: string) => ipcRenderer.invoke('db:shelf:update', shelf_id, shelf_name)
   },
   collection: {
     get: (collection_id: number) => ipcRenderer.invoke('db:collection:get', collection_id),

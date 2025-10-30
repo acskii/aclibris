@@ -299,10 +299,27 @@ class DatabaseQuery {
         
     }
 
+    updateShelf(shelf_id: number, new_name: string) {
+        // update a given shelf's name by its ID
+
+        try {
+            database.prepare(
+                `
+                UPDATE shelfs
+                SET shelf_name = ?
+                WHERE id = ?        
+                `
+            ).run(new_name, shelf_id);
+        } catch (error: any) {
+            console.log("[db:query] => Error occurred when attempting to update shelf name: ", error.message);
+        
+            // re-throw error
+            throw error;
+        }
+    }
+
     // updateCollection
     // updateBook
-    // updateShelf
-    
 }
 
 export const query = new DatabaseQuery();

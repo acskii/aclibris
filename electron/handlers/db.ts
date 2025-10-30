@@ -36,6 +36,11 @@ export function registerDbHandlers() {
     });
 
     ipcMain.handle('db:book:add', async (_, file_path: string, data, collection_name: string, shelf_name: string) => {
+        // KNOWN BUG:
+        // When trying to add a book that already exists in a new shelf/collection
+        // It creates the collection then attempts to add the book where it fails
+        // Error: Empty shelf/collection
+        
         try {
             // Check for shelf and collection 
             // Create collection and/or shelf if needed
@@ -77,11 +82,27 @@ export function registerDbHandlers() {
         }
     });
 
+    ipcMain.handle('db:shelf:update', async (_, shelf_id, shelf_name) => {
+        try {
+            query.updateShelf(shelf_id, shelf_name);
+        } catch (error: any) {
+            console.log("[db:query] => Error occured when handling 'shelf:update': ", error.message);
+        }
+    });
+
     ipcMain.handle('db:shelf:getAll', async (_) => {
         try {
             return query.getShelfs();
         } catch (error: any) {
             console.log("[db:query] => Error occured when handling 'shelf:getAll': ", error.message);
+        }
+    });
+
+    ipcMain.handle('db:shelf:delete', async (_, shelf_id) => {
+        try {
+            query.deleteShelf(shelf_id);
+        } catch (error: any) {
+            console.log("[db:query] => Error occured when handling 'shelf:delete': ", error.message);
         }
     });
 
