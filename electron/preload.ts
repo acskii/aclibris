@@ -37,7 +37,8 @@ contextBridge.exposeInMainWorld('db', {
   collection: {
     get: (collection_id: number) => ipcRenderer.invoke('db:collection:get', collection_id),
     getByShelf: (shelf_id: number) => ipcRenderer.invoke('db:collection:get-by-shelf', shelf_id),
-    getAll: () => ipcRenderer.invoke('db:collection:getAll')
+    getAll: () => ipcRenderer.invoke('db:collection:getAll'),
+    updateName: (collection_id: number, collection_name: string) => ipcRenderer.invoke('db:collection:update-name', collection_id, collection_name)
   },
   book: {
     get: (book_id: number) => ipcRenderer.invoke('db:book:get', book_id),

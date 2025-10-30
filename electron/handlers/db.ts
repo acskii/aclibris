@@ -114,6 +114,14 @@ export function registerDbHandlers() {
         }
     });
 
+    ipcMain.handle('db:collection:update-name', async (_, collection_id, collection_name) => {
+        try {
+            query.updateCollectionName(collection_id, collection_name);
+        } catch (error: any) {
+            console.log("[db:query] => Error occured when handling 'collection:update-name': ", error.message);
+        }
+    });
+
     ipcMain.handle('db:collection:getAll', async (_) => {
         try {
             return  query.getCollections();

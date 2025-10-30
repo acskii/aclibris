@@ -107,10 +107,10 @@ class DatabaseQuery {
         // Get general info about books within a specific collection
         return database.prepare(
             `
-            SELECT id, title, thumbnail, author, pages, file_path, file_size, collection_id, created_at FROM books
+            SELECT id, title, thumbnail, author, pages, file_path, file_size, collection_id, created_at, recent_page, recent_read_at FROM books
             WHERE collection_id = ?
             `
-        ).all(id).map((o: BookQueryObject) => new Book(o.id, o.title, o.collection_id, o.file_path, o.file_size, o.pages, o.created_at, o.author, o.thumbnail));
+        ).all(id).map((o: BookQueryObject) => new Book(o.id, o.title, o.collection_id, o.file_path, o.file_size, o.pages, o.created_at, o.author, o.thumbnail, o.recent_page, o.recent_read_at));
     }
 
     addBook(title: string, pages: number, file_path: string, 
@@ -318,7 +318,24 @@ class DatabaseQuery {
         }
     }
 
-    // updateCollection
+    updateCollectionName(collection_id: number, new_name: string) {
+        // update a given collection's name by its ID
+
+        try {
+            database.prepare(
+                `
+                UPDATE collections
+                SET collection_name = ?
+                WHERE id = ?        
+                `
+            ).run(new_name, collection_id);
+        } catch (error: any) {
+            console.log("[db:query] => Error occurred when attempting to update collection name: ", error.message);
+        
+            // re-throw error
+            throw error;
+        }
+    }
     // updateBook
 }
 
