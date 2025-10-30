@@ -147,8 +147,7 @@ function SearchPage() {
                                     ? getCollectionsForShelf(selectedShelf)
                                     : collections
                                 }
-                                // TODO: change collection with shelf
-                                value={selectedCollection ? collections.find(c => c.id === selectedCollection) || null : null}
+                                value={selectedCollection ? (selectedShelf ? collections.find(c => c.id === selectedCollection) || null : null) : null}
                                 onOptionSelect={(option) => filterByCollection(option ? option.id : null)}
                             />
                         </div>

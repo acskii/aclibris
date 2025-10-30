@@ -32,9 +32,12 @@ export function Dropdown({
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    setInputValue(value?.name ?? placeholder);
+  }, [value]);
+
+  useEffect(() => {
     setFilteredOptions(options);
   }, [options]);
-
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -73,12 +76,14 @@ export function Dropdown({
     setIsOpen(true);
   };
 
+  console.log(value, inputValue);
+
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
       <div className="w-full flex flex-row justify-start">
         <h3 className="font-semibold text-white text-nowrap underline decoration-cyan-400 mb-2">{title}</h3>
       </div>
-      
+
       {/* Input Container */}
       <div className="relative">
         <input
