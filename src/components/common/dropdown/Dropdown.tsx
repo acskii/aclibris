@@ -76,8 +76,6 @@ export function Dropdown({
     setIsOpen(true);
   };
 
-  console.log(value, inputValue);
-
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
       <div className="w-full flex flex-row justify-start">
