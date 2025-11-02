@@ -138,6 +138,14 @@ export function registerDbHandlers() {
         }
     });
 
+    ipcMain.handle('db:collection:delete', async (_, collection_id: number) => {
+        try {
+            query.deleteCollection(collection_id);
+        } catch (error: any) {
+            console.log("[db:query] => Error occured when handling 'collection:delete': ", error.message);
+        }
+    });
+
     ipcMain.handle('db:book:add-recent', async (_, book_id: number, last_page: number, last_visited_at_unix: number) => {
         try {
             query.addRecentBook(book_id, last_page, last_visited_at_unix);

@@ -10,6 +10,7 @@ import {
   Hash,
   Eye,
   PenBox,
+  Trash2,
 } from "lucide-react";
 import { Spinner } from "../components/common/spinner/Spinner";
 import { CollectionObject } from "../../electron/database/objects/Collection";
@@ -18,6 +19,7 @@ import { fromUnix } from "../service/util/Date";
 import { formatFileSize } from "../service/util/FileSize";
 import { arrayToBase64 } from "../service/util/Thumbnail";
 import { EditNameDialog } from "../components/common/dialog/EditNameDialog";
+import DeleteDialog from "../components/common/dialog/DeleteDialog";
 
 export function CollectionPage() {
   const { id } = useParams<{ id: string }>();
@@ -27,6 +29,7 @@ export function CollectionPage() {
   const [selectedBook, setSelectedBook] = useState<BookObject | null>(null);
   const [loading, setLoading] = useState(true);
   const [edit, setEdit] = useState(false);
+  const [deleted, setDeleted] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const goBack = () => {
@@ -34,32 +37,32 @@ export function CollectionPage() {
   };
 
   const loadData = async () => {
-      try {
-        setLoading(true);
+    try {
+      setLoading(true);
 
-        if (!id) {
-          setError("No collection ID was provided, please reload the page..");
-          return;
-        }
-
-        // Load the collection from the database
-        const response1: CollectionObject = await window.db.collection.get(id);
-        if (!response1) {
-          setError("No collection of this ID exists, please choose another..");
-          return;
-        }
-        setCollection(response1);
-
-        // Load all books related to the collection
-        const response2: BookObject[] = await window.db.book.getByCollection(id);
-        setBooks(response2);
-      } catch (error: any) {
-        setError(error.message);
-        setBooks([]);
-      } finally {
-        setLoading(false);
+      if (!id) {
+        setError("No collection ID was provided, please reload the page..");
+        return;
       }
-    };
+
+      // Load the collection from the database
+      const response1: CollectionObject = await window.db.collection.get(id);
+      if (!response1) {
+        setError("No collection of this ID exists, please choose another..");
+        return;
+      }
+      setCollection(response1);
+
+      // Load all books related to the collection
+      const response2: BookObject[] = await window.db.book.getByCollection(id);
+      setBooks(response2);
+    } catch (error: any) {
+      setError(error.message);
+      setBooks([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     loadData();
@@ -79,7 +82,15 @@ export function CollectionPage() {
       setEdit(false);
       loadData();
     }
-  }
+  };
+
+  const handleDelete = async () => {
+    if (deleted && collection) {
+      await window.db.collection.delete(collection.id);
+      setDeleted(false);
+      navigate("/library");
+    }
+  };
 
   return (
     <div className="min-h-screen p-6">
@@ -119,6 +130,15 @@ export function CollectionPage() {
         placeholder="Enter new collection name..."
       />
 
+      <DeleteDialog
+        isOpen={deleted}
+        onClose={() => setDeleted(false)}
+        onConfirm={handleDelete}
+        title="Delete Collection"
+        message={`Are you sure you want to delete the collection "${collection ? collection.name : "N/A"}"?`}
+        warning={`This will also delete ${books.length} book${books.length !== 1 ? "s" : ""}.`}
+      />
+
       <div className="flex flex-col gap-2 mb-8">
         <button
           type="button"
@@ -136,17 +156,33 @@ export function CollectionPage() {
           </h1>
 
           {collection && (
-            <div className="relative group">
-              <button
-                className="bg-sky-600 hover:bg-blue-700 p-2 rounded-md font-bold text-sm cursor-pointer transition-colors duration-200"
-                onClick={() => setEdit(true)}
-              >
-                <PenBox size={18} />
-              </button>
+            <div className="flex flex-row items-center gap-2">
+              <div className="relative group">
+                <button
+                  className="bg-sky-600 hover:bg-blue-700 p-2 rounded-md font-bold text-sm cursor-pointer transition-colors duration-200"
+                  onClick={() => setEdit(true)}
+                >
+                  <PenBox size={18} />
+                </button>
 
-              {/* Hover Tooltip */}
-              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-blue-600 text-white font-semibold text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
-                Edit Name
+                {/* Hover Tooltip */}
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-blue-600 text-white font-semibold text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+                  Edit Name
+                </div>
+              </div>
+
+              <div className="relative group">
+                <button
+                  className="bg-red-600 hover:bg-red-700 p-2 rounded-md font-bold text-sm cursor-pointer transition-colors duration-200"
+                  onClick={() => setDeleted(true)}
+                >
+                  <Trash2 size={18} />
+                </button>
+
+                {/* Hover Tooltip */}
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-red-600 text-white font-semibold text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+                  Delete
+                </div>
               </div>
             </div>
           )}
