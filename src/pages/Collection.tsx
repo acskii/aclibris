@@ -76,6 +76,10 @@ export function CollectionPage() {
     navigate(`/view/${book.id}/${book.lastReadPage ?? 1}`);
   };
 
+  const handleEditBook = (book: BookObject) => {
+    navigate(`/details/book/${book.id}`);
+  }
+
   const handleEdit = async (new_name: string) => {
     if (edit && collection) {
       await window.db.collection.updateName(collection.id, new_name);
@@ -261,8 +265,7 @@ export function CollectionPage() {
                   Read This Book
                 </button>
                 <button
-                  // TODO
-                  onClick={() => console.log("click edit")}
+                  onClick={() => handleEditBook(selectedBook)}
                   className="w-full cursor-pointer bg-gradient-to-r from-sky-600 to-cyan-600 hover:from-blue-700 hover:to-indigo-700 text-white py-3 rounded-md transition-all transform flex items-center justify-center gap-2 font-semibold"
                 >
                   <PenBox size={18} />

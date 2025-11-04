@@ -9,6 +9,7 @@ import { HomePage } from './pages/Home.tsx'
 import { LibraryPage } from './pages/Library.tsx'
 import { CollectionPage } from './pages/Collection.tsx'
 import SearchPage from './pages/Search.tsx'
+import BookDetailsPage from './pages/BookDetails.tsx'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -21,6 +22,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <Route path="/library" element={<LibraryPage />} />
           <Route path="/view/:id/:page" element={<View />} />
           <Route path="/collection/:id" element={<CollectionPage />} />
+          <Route path="/details/book/:id" element={<BookDetailsPage />} />
         </Routes>  
       </SideMenuProvider>
     </HashRouter>
@@ -28,6 +30,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 )
 
 // Use contextBridge
+// @ts-ignore
 window.ipcRenderer.on('main-process-message', (_event, message) => {
   console.log(message)
 })

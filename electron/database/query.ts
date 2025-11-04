@@ -336,7 +336,30 @@ class DatabaseQuery {
             throw error;
         }
     }
-    // updateBook
+
+    updateBook(book_id: number, title: string, author: string, collection_id: number, thumbnail: Buffer) {
+        // updates an existing book with new data
+        // -> only select fields can be changed
+        try {
+            database.prepare(
+                `
+                UPDATE books
+                SET
+                    title = ?,
+                    author = ?,
+                    collection_id = ?,
+                    thumbnail = ?
+                WHERE id = ?
+                `
+            ).run(title, author, collection_id, thumbnail, book_id);
+        } catch(error: any) {
+            console.log("[db:query] => Error occurred when attempting to update book data: ", error.message);
+        
+            // re-throw error
+            throw error;
+        }
+    }
+
 }
 
 export const query = new DatabaseQuery();
