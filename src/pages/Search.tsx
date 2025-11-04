@@ -107,36 +107,37 @@ function SearchPage() {
 
     return (
         <div className="min-h-screen px-5 pb-5">
-            <div className="sticky top-0 z-10 bg-gradient-to-br from-cyan-500 to-sky-600 pb-4 pt-4 -mx-5 px-5 border-b border-indigo-500/20">
-                <h1 className="mb-2 flex gap-3 justify-start">
-                    <Search size={40} />
-                    <span className="text-4xl font-bold text-white">Search</span>
-                </h1>
-                <div className="w-full p-2 mt-4">
-                    <div className="flex flex-row mb-4 items-center gap-2 mx-auto bg-gray-800/30 py-4 px-4 rounded-md">
-                        <Search size={18} />
+            <div className="sticky top-0 z-10 bg-gradient-to-br from-cyan-500 to-sky-600 py-3 -mx-5 px-5 border-b border-indigo-500/20 max-h-[40vh]">
+                <div className="flex items-center justify-between mb-2">
+                    <h1 className="flex gap-2 items-center">
+                        <Search size={28} />
+                        <span className="text-2xl font-bold text-white">Search</span>
+                    </h1>
+                </div>
+                
+                <div className="mb-2">
+                    <div className="flex items-center gap-2 bg-gray-800/30 py-2 px-3 rounded-md">
+                        <Search size={16} className="text-indigo-300" />
                         <input
                             type="text"
-                            placeholder="Search by title, author, shelf, or collection..."
+                            placeholder="Search by title or author"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full py-2 px-2 bg-gray-700/50 border border-indigo-500/30 rounded-md text-white placeholder-indigo-300/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-lg"
+                            className="w-full py-1 px-2 bg-gray-700/50 border border-indigo-500/30 rounded-md text-white placeholder-indigo-300/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-base"
                         />
                     </div>
-                
-                    <div className="z-50 w-full mb-4 bg-gray-800/30 backdrop-blur-sm rounded-md p-4 border border-indigo-500/20">
-                        <div className="flex items-center gap-2 mb-3">
-                            <Filter size={18} />
-                            <span className="text-white font-semibold">Filters</span>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                </div>
+
+                <div className="mb-2">
+                    <div className="bg-gray-800/30 backdrop-blur-sm rounded-md p-2 border border-indigo-500/20">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                             <Dropdown 
                                 title="Shelf"
                                 placeholder="All Shelves"
                                 options={shelves}
-                                // TODO: change shelf with collection
                                 value={selectedShelf ? shelves.find(s => s.id === selectedShelf) || null : null}
                                 onOptionSelect={(option) => filterByShelf(option ? option.id : null)}
+                                className="text-xs"
                             />
 
                             <Dropdown 
@@ -149,20 +150,16 @@ function SearchPage() {
                                 }
                                 value={selectedCollection ? (selectedShelf ? collections.find(c => c.id === selectedCollection) || null : null) : null}
                                 onOptionSelect={(option) => filterByCollection(option ? option.id : null)}
+                                className="text-xs"
                             />
                         </div>
                     </div>
+                </div>
 
-                    <div className="flex flex-col items-start justify-center mt-4 font-semibold text-lg">
-                        <span>
-                            {filteredBooks.length == books.length ? "Showing all books" : `Showing ${filteredBooks.length} of ${books.length} books`}
-                        </span>
-                        {searchQuery && (
-                            <span>
-                            Results for: "{searchQuery}"
-                            </span>
-                        )}
-                    </div>
+                {/* Minimal Stats */}
+                <div className="text-xs text-white">
+                    {filteredBooks.length < books.length ? <span>Showing <span className="font-semibold">{filteredBooks.length}</span> book{`${filteredBooks.length > 1 ? "s" : ""}`}</span> : <span>Showing all books</span>}
+                    {searchQuery && ` • "${searchQuery}"`}
                 </div>
             </div>
 
@@ -241,7 +238,7 @@ function SearchPage() {
                                 </div>
                                 <div className="flex items-center gap-2 text-sm border-t border-indigo-500/20">
                                     <Calendar size={14} />
-                                    <span>Added {fromUnix(book.createdAtInUnix)}</span>
+                                    <span>Created at {fromUnix(book.createdAtInUnix)}</span>
                                 </div>
                             </div>
                         </div>
