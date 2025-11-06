@@ -11,6 +11,7 @@ import { Spinner } from '../components/common/spinner/Spinner';
 import { formatDate, toUnix } from '../service/util/Date';
 import { formatFileSize } from '../service/util/FileSize';
 import { arrayToBase64 } from '../service/util/Thumbnail';
+import { TagManager } from '../components/common/TagManager';
 
 
 function UploadPage() {
@@ -34,6 +35,7 @@ function UploadPage() {
 
   const [shelves, setShelves] = useState<DropdownOption[]>([]);
   const [collections, setCollections] = useState<CollectionObject[]>([]);
+  const [tags, setTags] = useState<string[]>([]);
   const [collectOptions, setCollectOptions] = useState<DropdownOption[]>([]);
   const [selectedShelf, setSelectedShelf] = useState<DropdownOption | null>(null);
   const [selectedCollection, setSelectedCollection] = useState<CollectionObject | null>(null);
@@ -43,6 +45,7 @@ function UploadPage() {
   useEffect(() => {
     const loadShelves = async () => {
       try {
+        // @ts-ignore
         const response: ShelfObject[] = await window.db.shelf.getAll();
         const s = response.map((shelf) => ({id: shelf.id, name: shelf.name}))
 
@@ -55,6 +58,7 @@ function UploadPage() {
 
     const loadCollections = async () => {
       try {
+        // @ts-ignore
         const response: CollectionObject[] = await window.db.collection.getAll();
         const collectionOptions = response.map(collection => ({ 
           id: collection.id, 
@@ -80,13 +84,17 @@ function UploadPage() {
       const sn = selectedShelf ? selectedShelf.name : shelfInput;
 
       let data: any = {
-        ...meta
+        ...meta,
+        tags: tags
       }
+      if (meta.title == null) data.title = "N/A";
+      if (meta.author == null) data.author = "N/A";
       if (meta.creationdate) data.createdAt = toUnix(meta.creationdate);
 
       // TODO: validation for metadata
       // TODO: error view
       
+      // @ts-ignore
       const error = await window.db.book.add(file.path, data, cn, sn);
       setSaving(false);
 
@@ -97,6 +105,10 @@ function UploadPage() {
         navigate('/library');
       }
     }
+  }
+
+  const handleTagChange = (tags: string[]) => {
+    setTags(tags);
   }
 
   const handleMetaChange = (field: keyof PDFMetadata, value: string) => {
@@ -113,6 +125,7 @@ function UploadPage() {
     setFile(file);
     if (file) {
       setLoading(true);
+      // @ts-ignore
       const data = await documentCache.getMetadata(file.path);
       setMeta(data);
       setLoading(false);
@@ -131,6 +144,7 @@ function UploadPage() {
       setSelectedCollection(null);
       setSelectedShelf(null);
       setShelfInput('');
+      setCollectOptions(collections);
     } else {
       const c = collections.find((cc) => cc.id === collection.id);
       setSelectedCollection(c ? c : null);
@@ -161,7 +175,7 @@ function UploadPage() {
           id: collection.id, 
           name: collection.name 
       })));
-      setShelves
+      // setShelves
     }
 
     if (shelf && !selectedCollection) {
@@ -321,6 +335,7 @@ function UploadPage() {
                 onValueChange={handleCollectionInputChange}
                 onOptionSelect={handleCollectionSelect}
               />
+              {!selectedCollection && collectionInput && <span className="mt-2 text-cyan-300 font-semibold text-md">This collection will be created</span>}
             </div>
             {/* Shelf Selection */}
             <div>
@@ -332,25 +347,16 @@ function UploadPage() {
                 onValueChange={handleShelfInputChange}
                 onOptionSelect={handleShelfSelect}
               />
+              {!selectedShelf && shelfInput && <span className="mt-2 text-cyan-300 font-semibold text-md">This shelf will be created</span>}
             </div>
           </div>
-
-          {/* Organization Summary */}
-          {(shelfInput || collectionInput) && (
-            <div className="bg-violet-900/20 rounded-lg p-4 border border-violet-500/30 mt-4">
-              <h4 className="font-semibold text-violet-200 mb-2">Organization Summary:</h4>
-              <div className="text-violet-100/80 text-sm space-y-1">
-                <div>
-                  <strong>Shelf:</strong> {selectedShelf ? selectedShelf.name : shelfInput} 
-                  {!selectedShelf && shelfInput && <span className="text-violet-300 ml-2">(new)</span>}
-                </div>
-                <div>
-                  <strong>Collection:</strong> {selectedCollection ? selectedCollection.name : collectionInput}
-                  {!selectedCollection && collectionInput && <span className="text-violet-300 ml-2">(new)</span>}
-                </div>
-              </div>
-            </div>
-          )}
+          <div>
+            {/* Tag Selection */}
+            <TagManager 
+              currentTags={tags}
+              onTagsChange={handleTagChange}
+            />
+          </div>
         </div>
       )}
 

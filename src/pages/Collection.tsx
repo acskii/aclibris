@@ -46,6 +46,7 @@ export function CollectionPage() {
       }
 
       // Load the collection from the database
+      // @ts-ignore
       const response1: CollectionObject = await window.db.collection.get(id);
       if (!response1) {
         setError("No collection of this ID exists, please choose another..");
@@ -54,6 +55,7 @@ export function CollectionPage() {
       setCollection(response1);
 
       // Load all books related to the collection
+      // @ts-ignore
       const response2: BookObject[] = await window.db.book.getByCollection(id);
       setBooks(response2);
     } catch (error: any) {
@@ -82,6 +84,7 @@ export function CollectionPage() {
 
   const handleEdit = async (new_name: string) => {
     if (edit && collection) {
+      // @ts-ignore
       await window.db.collection.updateName(collection.id, new_name);
       setEdit(false);
       loadData();
@@ -90,6 +93,7 @@ export function CollectionPage() {
 
   const handleDelete = async () => {
     if (deleted && collection) {
+      // @ts-ignore
       await window.db.collection.delete(collection.id);
       setDeleted(false);
       navigate("/library");
@@ -320,6 +324,16 @@ export function CollectionPage() {
                           <h3 className="text-white font-semibold text-lg mb-1 line-clamp-1">
                             {book.title || "Untitled"}
                           </h3>
+                          <div className="flex flex-wrap gap-2 min-h-5 mb-2">
+                            {book.tags.map(tag => (
+                                <span
+                                key={tag.id}
+                                className={`bg-gray-500 text-white font-semibold px-2 py-1 rounded-md text-sm flex items-center gap-2 transition-all`}
+                                >
+                                {tag.name}
+                                </span>
+                            ))}
+                          </div>
                           {book.author && (
                             <p className="text-indigo-200 text-sm mb-2 flex items-center gap-1">
                               <User className="w-3 h-3" />

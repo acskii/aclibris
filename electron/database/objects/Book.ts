@@ -1,5 +1,7 @@
 // An object representation for a book query result
 
+import { TagObject } from "./Tag";
+
 export class Book {
     public id: number;
     public title: string;
@@ -12,11 +14,12 @@ export class Book {
     public collectionId: number;
     public lastReadPage: number = 1;
     public lastVisitedInUnix: number | null = null;
+    public tags: TagObject[];
 
     constructor(id: number, title: string, collectionId: number, 
                 filePath: string, fileSize: number, pages: number,
                 createdAtInUnix: number, author: string = 'N/A', thumbnail: Buffer | null = null,
-                lastReadPage: number = 1, lastVisitedInUnix: number | null = null, 
+                lastReadPage: number = 1, lastVisitedInUnix: number | null = null, tags: TagObject[] = []
             ) {
         this.id = id;
         this.title = title;
@@ -28,6 +31,7 @@ export class Book {
         this.collectionId = collectionId;
         this.lastReadPage = lastReadPage;
         this.lastVisitedInUnix = lastVisitedInUnix;
+        this.tags = tags;
         
         this.thumbnail = (thumbnail) ? 
             new Uint8Array(thumbnail.buffer, thumbnail.byteOffset, thumbnail.byteLength)
@@ -47,6 +51,7 @@ export type BookObject = {
     collectionId: number;
     lastReadPage?: number;
     lastVisitedInUnix?: number | null;
+    tags: TagObject[];
 };
 
 export type BookQueryObject = {
@@ -61,4 +66,6 @@ export type BookQueryObject = {
     recent_page?: number;
     recent_read_at?: number;
     thumbnail?: Buffer;
+    tag_id?: number;
+    tag_name?: string;
 };

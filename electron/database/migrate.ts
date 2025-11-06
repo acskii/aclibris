@@ -40,7 +40,7 @@ class DatabaseMigration {
             `
             CREATE TABLE IF NOT EXISTS tags (
                 id INTEGER PRIMARY KEY,
-                tag_name VARCHAR(40) NOT NULL
+                tag_name VARCHAR(40) NOT NULL UNIQUE
             )
             `    
         ).run();

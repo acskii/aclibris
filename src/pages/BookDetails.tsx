@@ -21,6 +21,7 @@ import {
 import { CollectionObject } from "../../electron/database/objects/Collection";
 import { ShelfObject } from "../../electron/database/objects/Shelf";
 import DeleteDialog from "../components/common/dialog/DeleteDialog";
+import { TagManager } from "../components/common/TagManager";
 
 export default function BookDetailsPage() {
   const params = useParams();
@@ -35,6 +36,7 @@ export default function BookDetailsPage() {
 
   const [shelves, setShelves] = useState<DropdownOption[]>([]);
   const [collections, setCollections] = useState<CollectionObject[]>([]);
+  const [tags, setTags] = useState<string[]>([]);
   const [collectOptions, setCollectOptions] = useState<DropdownOption[]>([]);
   const [selectedShelf, setSelectedShelf] = useState<DropdownOption | null>(null);
   const [selectedCollection, setSelectedCollection] = useState<CollectionObject | null>(null);
@@ -46,9 +48,12 @@ export default function BookDetailsPage() {
       if (!id) return;
 
       setLoading(true);
+      // @ts-ignore
       const response1: BookObject = await window.db.book.get(id);
       setMeta(response1);
+      setTags(response1.tags.map((t) => t.name));
 
+      // @ts-ignore
       const response2: CollectionObject[] = await window.db.collection.getAll();
       const collectionOptions = response2.map((collection) => ({
         id: collection.id,
@@ -65,6 +70,7 @@ export default function BookDetailsPage() {
       setCollectionInput(collection ? collection.name : "");
       setCollectOptions(collectionOptions);
 
+      // @ts-ignore
       const response3: ShelfObject[] = await window.db.shelf.getAll();
       const s = response3.map((shelf) => ({ id: shelf.id, name: shelf.name }));
       setShelves(s);
@@ -75,9 +81,9 @@ export default function BookDetailsPage() {
       setSelectedShelf(shelf);
       setShelfInput(shelf ? shelf.name : "");
     } catch (error: any) {
-      setBook(null);
       setMeta({});
       setShelves([]);
+      setTags([]);
       setCollectOptions([]);
       setCollections([]);
       setSelectedCollection(null);
@@ -93,12 +99,14 @@ export default function BookDetailsPage() {
     if (meta) {
       setSaving(true);
 
+      // @ts-ignore
       const error = await window.db.book.update(meta.id, 
         meta.title ? meta.title : "N/A",
         meta.author ? meta.author : "N/A",
         selectedCollection ? selectedCollection.name : collectionInput, 
         selectedShelf ? selectedShelf.name : shelfInput,
-        meta.thumbnail
+        meta.thumbnail,
+        tags
       );
       setSaving(false);
 
@@ -114,6 +122,10 @@ export default function BookDetailsPage() {
     if (meta) navigate(`/collection/${meta.collectionId}`);
     else navigate("/library");
   };
+
+  const handleTagChange = (tags: string[]) => {
+    setTags(tags);
+  }
 
   const handleMetaChange = (
     field: keyof BookObject,
@@ -197,6 +209,7 @@ export default function BookDetailsPage() {
 
   const handleDelete = async () => {
     if (deleted) {
+      // @ts-ignore
       await window.db.book.delete(meta.id);
       goBack();
     }
@@ -425,6 +438,10 @@ export default function BookDetailsPage() {
             {!selectedShelf && shelfInput && <span className="mt-2 text-cyan-300 font-semibold text-md">This shelf will be created</span>}
           </div>
         </div>
+        <TagManager 
+          currentTags={tags}
+          onTagsChange={handleTagChange}
+        />
       </div>
 
       {!loading && meta && (

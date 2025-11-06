@@ -6,40 +6,91 @@ import TitleAlreadyExistsError from "./exceptions/TitleAlreadyExistsError";
 import FileAlreadyExistsError from "./exceptions/FileAlreadyExistsError";
 import BookDoesNotExistError from "./exceptions/BookDoesNotExistError";
 import { MetaQueryObject } from "./objects/Metadata";
+import { Tag, TagObject, TagQueryObject } from "./objects/Tag";
+import { threadId } from "node:worker_threads";
 
 class DatabaseQuery {
     getBooks() {
         // Get general info about all books stored
-        return database.prepare(
+        const result = database.prepare(
             `
-            SELECT id, title, author, recent_page, recent_read_at, thumbnail, pages, file_path, file_size, collection_id, created_at FROM books
+            SELECT b.id, b.title, b.author, b.recent_page, b.recent_read_at, b.thumbnail, b.pages, b.file_path, b.file_size, b.collection_id, b.created_at, t.id AS tag_id, t.tag_name
+            FROM books AS b
+            LEFT JOIN book_tag AS bt ON b.id == bt.book_id
+            LEFT JOIN tags AS t ON bt.tag_id == t.id
             `
-        ).all().map((o: BookQueryObject) => new Book(o.id, o.title, o.collection_id, o.file_path, o.file_size, o.pages, o.created_at, o.author, o.thumbnail, o.recent_page, o.recent_read_at));
+        ).all();
+        
+        if (result) {
+            const books = new Map();
+            
+            result.forEach((row: BookQueryObject) => {
+                if (!books.has(row.id)) {
+                    books.set(row.id, new Book(
+                        row.id, 
+                        row.title, 
+                        row.collection_id, 
+                        row.file_path, 
+                        row.file_size, 
+                        row.pages, 
+                        row.created_at, 
+                        row.author, 
+                        row.thumbnail, 
+                        row.recent_page, 
+                        row.recent_read_at
+                    ));
+                }
+
+                if (row.tag_id && row.tag_name) {
+                    books.get(row.id).tags.push(
+                        new Tag(row.tag_id, row.tag_name)
+                    );
+                }
+            });
+
+            return Array.from(books.values());
+        } else return [];
     }
 
     getBookById(id: number) {
         // Get details on a specific book
-        const result: BookQueryObject = database.prepare(
+        const result = database.prepare(
             `
-            SELECT id, title, thumbnail, author, pages, file_path, file_size, collection_id, created_at, recent_page, recent_read_at FROM books
-            WHERE id = ?
+            SELECT b.id, b.title, b.author, b.recent_page, b.recent_read_at, b.thumbnail, b.pages, b.file_path, b.file_size, b.collection_id, b.created_at, t.id AS tag_id, t.tag_name
+            FROM books AS b
+            LEFT JOIN book_tag AS bt ON b.id == bt.book_id
+            LEFT JOIN tags AS t ON bt.tag_id == t.id
+            WHERE b.id = ?
             `
-        ).get(id);
+        ).all(id);
 
-        if (result) return new Book(
-            result.id, 
-            result.title, 
-            result.collection_id, 
-            result.file_path, 
-            result.file_size, 
-            result.pages, 
-            result.created_at,
-            result.author,
-            result.thumbnail,
-            result.recent_page,
-            result.recent_read_at
-        );
-        else return null;
+        if (result.length >= 1) {
+            let book: Book | null = null;
+            // Needs testing with books of multiple tags
+            result.forEach((row: BookQueryObject) => {
+                if (!book) {
+                    book = new Book(
+                        row.id, 
+                        row.title, 
+                        row.collection_id, 
+                        row.file_path, 
+                        row.file_size, 
+                        row.pages, 
+                        row.created_at,
+                        row.author,
+                        row.thumbnail,
+                        row.recent_page,
+                        row.recent_read_at
+                    );
+                }
+                if (row.tag_id && row.tag_name && book) {
+                    book.tags.push(
+                        new Tag(row.tag_id, row.tag_name)
+                    );
+                }
+            });
+            return book;
+        } else return null;
     }
 
     getCollectionsByShelfId(id: number) {
@@ -105,35 +156,148 @@ class DatabaseQuery {
 
     getBooksByCollectionId(id: number) {
         // Get general info about books within a specific collection
-        return database.prepare(
+        const result = database.prepare(
             `
-            SELECT id, title, thumbnail, author, pages, file_path, file_size, collection_id, created_at, recent_page, recent_read_at FROM books
+            SELECT b.id, b.title, b.author, b.recent_page, b.recent_read_at, b.thumbnail, b.pages, b.file_path, b.file_size, b.collection_id, b.created_at, t.id AS tag_id, t.tag_name
+            FROM books AS b
+            LEFT JOIN book_tag AS bt ON b.id == bt.book_id
+            LEFT JOIN tags AS t ON bt.tag_id == t.id
             WHERE collection_id = ?
             `
-        ).all(id).map((o: BookQueryObject) => new Book(o.id, o.title, o.collection_id, o.file_path, o.file_size, o.pages, o.created_at, o.author, o.thumbnail, o.recent_page, o.recent_read_at));
+        ).all(id);
+        
+        if (result) {
+            const books = new Map();
+            
+            result.forEach((row: BookQueryObject) => {
+                if (!books.has(row.id)) {
+                    books.set(row.id, new Book(
+                        row.id, 
+                        row.title, 
+                        row.collection_id, 
+                        row.file_path, 
+                        row.file_size, 
+                        row.pages, 
+                        row.created_at, 
+                        row.author, 
+                        row.thumbnail, 
+                        row.recent_page, 
+                        row.recent_read_at
+                    ));
+                }
+
+                if (row.tag_id && row.tag_name) {
+                    books.get(row.id).tags.push(
+                        new Tag(row.tag_id, row.tag_name)
+                    );
+                }
+            });
+
+            return Array.from(books.values());
+        } else return [];
+    }
+
+    addTagToBook(book_id: number, name: string) {
+        const insertIntoBookTag = database.prepare(
+            `
+            INSERT OR IGNORE INTO book_tag (book_id, tag_id) VALUES (?, ?)
+            `
+        );
+        
+        database.prepare(
+            `
+            INSERT OR IGNORE INTO tags (tag_name) VALUES (?)
+            `
+        ).run(name);
+
+        const result = database.prepare(
+            `
+            SELECT id
+            FROM tags
+            WHERE tag_name = ?
+            `
+        ).get(name);
+
+        if (result) {
+            insertIntoBookTag.run(book_id, result.id);
+        } else {
+            const result = database.prepare(
+                `
+                SELECT id FROM tags
+                WHERE tag_name = ?
+                `
+            ).run(name);
+            insertIntoBookTag.run(book_id, result.id);
+        }
+    }
+
+    getTagsForBook(book_id: number) {
+        return database.prepare(
+            `
+            SELECT t.id, t.tag_name
+            FROM tags AS t
+            INNER JOIN book_tag AS bt ON t.id = bt.tag_id
+            WHERE bt.book_id = ?
+            `
+        ).all(book_id).map((t: TagQueryObject) => new Tag(t.id, t.tag_name));
+    }
+
+    getTags() {
+        return database.prepare(
+            `
+            SELECT id, tag_name
+            FROM tags
+            `
+        ).all().map((t: TagQueryObject) => new Tag(t.id, t.tag_name));
+    }
+
+    removeTagFromBook(book_id: number, tag_id: number) {
+        database.prepare(
+            `
+            DELETE FROM book_tag
+            WHERE book_id = ?
+            AND tag_id = ?
+            `
+        ).run(book_id, tag_id);
     }
 
     addBook(title: string, pages: number, file_path: string, 
             file_size: number, created_at: number, collection_id: number, 
-            author: string, thumbnail: Buffer) {
+            author: string, thumbnail: Buffer, tags: string[]) {
         // add a new book
         // added values must be validated before calling this function
         try {
-            database.prepare(
+            const info = database.prepare(
                 `
                 INSERT INTO books (title, pages, thumbnail, file_path, file_size, created_at, collection_id, author) VALUES 
                 (?, ?, ?, ?, ?, ?, ?, ?);
                 `
             ).run(title, pages, thumbnail, file_path, file_size, created_at, collection_id, author);
 
+            const bookId = info.lastInsertRowid;
+
+            if (tags.length > 0) {
+                for (const tag of tags) {
+                    this.addTagToBook(bookId, tag);
+                }
+            }
+
             // return object
             const result: BookQueryObject = database.prepare(
                 `
                 SELECT id, title, pages, thumbnail, file_path, file_size, created_at, collection_id, author FROM books
-                WHERE title = ?
-                AND file_path = ?
+                WHERE id = ?
                 `
-            ).get(title, file_path);
+            ).get(bookId);
+
+            const tagResult: TagQueryObject[] = database.prepare(
+                `
+                SELECT t.id, t.tag_name
+                FROM tags AS t
+                INNER JOIN book_tag AS bt ON t.id = bt.tag_id
+                WHERE bt.book_id = ?
+                `
+            ).all(bookId);
             
             return new Book(
                 result.id,
@@ -144,7 +308,10 @@ class DatabaseQuery {
                 result.pages,
                 result.created_at,
                 result.author,
-                result.thumbnail
+                result.thumbnail,
+                1,      // lastReadPage
+                null,   // lastVisitedInUnix
+                tagResult.map((t) => new Tag(t.id, t.tag_name))
             );
 
         } catch (error: any) {
@@ -337,7 +504,7 @@ class DatabaseQuery {
         }
     }
 
-    updateBook(book_id: number, title: string, author: string, collection_id: number, thumbnail: Buffer) {
+    updateBook(book_id: number, title: string, author: string, collection_id: number, thumbnail: Buffer, tags: string[]) {
         // updates an existing book with new data
         // -> only select fields can be changed
         try {
@@ -352,6 +519,22 @@ class DatabaseQuery {
                 WHERE id = ?
                 `
             ).run(title, author, collection_id, thumbnail, book_id);
+
+            // remove tags that aren't in the tags list
+            const bookTags: TagObject[] = this.getTagsForBook(book_id);
+            for (const tag of bookTags) {
+                if (!tags.includes(tag.name)) {
+                    this.removeTagFromBook(book_id, tag.id);
+                }
+            }
+
+            // add tags that aren't in the book's tags from the tags list
+            for (const tag of tags) {
+                if (!bookTags.find((t) => t.name == tag)) {
+                    this.addTagToBook(book_id, tag);
+                }
+            }
+
         } catch(error: any) {
             console.log("[db:query] => Error occurred when attempting to update book data: ", error.message);
         

@@ -54,7 +54,7 @@ export function registerDbHandlers() {
                 // Save book
                 query.addBook(
                     data.title, data.pages, file_path, data.filesize,
-                    data.createdAt, c.id, data.author, Buffer.from(data.thumbnail)
+                    data.createdAt, c.id, data.author, Buffer.from(data.thumbnail), data.tags
                 );
             } else {
                 const ns = query.addShelf(shelf_name);
@@ -63,7 +63,7 @@ export function registerDbHandlers() {
                 // Save book
                 query.addBook(
                     data.title, data.pages, file_path, data.filesize,
-                    data.createdAt, nc.id, data.author, Buffer.from(data.thumbnail)
+                    data.createdAt, nc.id, data.author, Buffer.from(data.thumbnail), data.tags
                 );
             }
 
@@ -74,7 +74,7 @@ export function registerDbHandlers() {
         }
     })
 
-    ipcMain.handle('db:book:update', async (_, book_id: number, title: string, author: string, collection_name: string, shelf_name: string, thumbnail: Uint8Array) => {
+    ipcMain.handle('db:book:update', async (_, book_id: number, title: string, author: string, collection_name: string, shelf_name: string, thumbnail: Uint8Array, tags: string[]) => {
         try {
             const s = query.getShelfByName(shelf_name);
             if (s) {
@@ -83,12 +83,12 @@ export function registerDbHandlers() {
                 let c = cs.find((c) => c.name === collection_name);
                 if (!c) c = query.addCollection(collection_name, s.id);
                 
-                query.updateBook(book_id, title, author, c.id, Buffer.from(thumbnail));
+                query.updateBook(book_id, title, author, c.id, Buffer.from(thumbnail), tags);
             } else {
                 const ns = query.addShelf(shelf_name);
                 const nc = query.addCollection(collection_name, ns.id);
 
-                query.updateBook(book_id, title, author, nc.id, Buffer.from(thumbnail));
+                query.updateBook(book_id, title, author, nc.id, Buffer.from(thumbnail), tags);
             }
             return null;
         } catch (error: any) {
@@ -182,6 +182,14 @@ export function registerDbHandlers() {
             return query.getRecentBook();
         } catch (error: any) {
             console.log("[db:query] => Error occured when handling 'book:get-recent': ", error.message);
+        }
+    });
+
+    ipcMain.handle('db:tag:getAll', async (_) => {
+        try {
+            return query.getTags();
+        } catch (error: any) {
+            console.log("[db:query] => Error occured when handling 'tag:getAll': ", error.message);
         }
     });
 }
