@@ -1,4 +1,4 @@
-import { Book, Calendar, Eye, Filter, Folder, LibrarySquare, Search, SearchX, User } from "lucide-react";
+import { Book, Calendar, Eye, Folder, LibrarySquare, Search, SearchX, User, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Spinner } from "../components/common/spinner/Spinner";
 import { useEffect, useMemo, useState } from "react";
@@ -8,6 +8,8 @@ import { fromUnix } from "../service/util/Date";
 import { ShelfObject } from "../../electron/database/objects/Shelf";
 import { CollectionObject } from "../../electron/database/objects/Collection";
 import { Dropdown } from "../components/common/dropdown/Dropdown";
+import { TagObject } from "../../electron/database/objects/Tag";
+import { AutocompleteDropdown } from "../components/common/dropdown/AutocompleteDropdown";
 
 function SearchPage() {
     const navigate = useNavigate();
@@ -18,21 +20,33 @@ function SearchPage() {
     const [collections, setCollections] = useState<CollectionObject[]>([]);
     const [selectedShelf, setSelectedShelf] = useState<number | null>(null);
     const [selectedCollection, setSelectedCollection] = useState<number | null>(null);
+    const [tagInput, setTagInput] = useState('');
+    const [allTags, setAllTags] = useState<TagObject[]>([]);
+    const [tagOptions, setTagOptions] = useState<TagObject[]>([]);
+    const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
     useEffect(() => {
         const loadBooks = async () => {
             setLoading(true);
             // Get books
+            // @ts-ignore
             const books: BookObject[] = await window.db.book.getAll();
             // Sort them alphabetically
             books.sort((a, b) => a.title.localeCompare(b.title));
 
+            // @ts-ignore
+            const tags: TagObject[] = await window.db.tag.getAll();
+
+            // @ts-ignore
             const shelves: ShelfObject[] = await window.db.shelf.getAll();
+            // @ts-ignore
             const collections: CollectionObject[] = await window.db.collection.getAll();
 
             setBooks(books);
             setShelves(shelves);
             setCollections(collections);
+            setAllTags(tags);
+            setTagOptions(tags);
             setLoading(false);
         }
 
@@ -79,8 +93,17 @@ function SearchPage() {
             filtered = filtered.filter(book => book.collectionId === selectedCollection);
         }
 
+        // Apply tags filter
+        if (selectedTags.length > 0) {
+            filtered = filtered.filter(book => {
+                return selectedTags.every(selectedTag => 
+                    book.tags.some(bookTag => bookTag.name === selectedTag)
+                );
+            })
+        }
+
         return filtered;
-    }, [books, searchQuery, selectedShelf, selectedCollection]);
+    }, [books, searchQuery, selectedShelf, selectedCollection, selectedTags]);
 
     const getCollectionName = (collectionId: number) => {
         return collections.find(c => c.id === collectionId)?.name;
@@ -100,6 +123,20 @@ function SearchPage() {
         setSelectedCollection(collection_id);
     }
 
+    const filterByTag = (tag: string | null) => {
+        if (tag) {
+            setSelectedTags(prev => [...prev, tag]);
+            setTagOptions(prev => prev.filter((t) => t.name !== tag));
+            setTagInput('');
+        }
+    }
+
+    const removeTag = (tag: string) => {
+        setSelectedTags(prev => prev.filter(t => t !== tag));
+        const nt = allTags.find((t) => t.name == tag) ?? null;
+
+        if (nt && !tagOptions.find((t) => t.name == nt.name)) setTagOptions(prev => [...prev, nt]);
+    }
 
     const handleBookClick = (id: number, page: number | null) => {
         navigate(`/view/${id}/${page ? page : 1}`);
@@ -107,7 +144,7 @@ function SearchPage() {
 
     return (
         <div className="min-h-screen px-5 pb-5">
-            <div className="sticky top-0 z-10 bg-gradient-to-br from-cyan-500 to-sky-600 py-3 -mx-5 px-5 border-b border-indigo-500/20 max-h-[40vh]">
+            <div className="sticky top-0 z-10 bg-gradient-to-br from-cyan-500 to-sky-600 py-3 -mx-5 px-5 border-b border-indigo-500/20 max-h-[45vh]">
                 <div className="flex items-center justify-between mb-2">
                     <h1 className="flex gap-2 items-center">
                         <Search size={28} />
@@ -130,7 +167,7 @@ function SearchPage() {
 
                 <div className="mb-2">
                     <div className="bg-gray-800/30 backdrop-blur-sm rounded-md p-2 border border-indigo-500/20">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                             <Dropdown 
                                 title="Shelf"
                                 placeholder="All Shelves"
@@ -152,7 +189,35 @@ function SearchPage() {
                                 onOptionSelect={(option) => filterByCollection(option ? option.id : null)}
                                 className="text-xs"
                             />
+                            <AutocompleteDropdown
+                                title="Tag"
+                                placeholder="Enter tag"
+                                options={tagOptions}
+                                value={tagInput}
+                                onValueChange={setTagInput}
+                                onOptionSelect={(option) => filterByTag(option ? option.name : null)}
+                                className="text-xs flex-1"
+                            />
+
                         </div>
+                        <div className="flex flex-1 flex-row gap-2 max-height-5 mt-5 overflow-y-auto">
+                            {selectedTags.map((tag) => {
+                                return (
+                                    <span
+                                        key={tag}
+                                        className={`bg-gray-500 text-white font-semibold px-2 rounded-md text-sm flex items-center gap-2`}
+                                    >
+                                        <span>{tag}</span>
+                                        <button
+                                            onClick={() => removeTag(tag)}
+                                            className="transition-colors font-semibold rounded-full hover:bg-black/20 mt-0.5"
+                                        >
+                                            <X size={14} />
+                                        </button>
+                                    </span>
+                                    );
+                                })}
+                            </div>
                     </div>
                 </div>
 
@@ -176,10 +241,10 @@ function SearchPage() {
                 <div className="bg-gray-800/30 backdrop-blur-sm rounded-md p-6 border border-indigo-500/20 text-center">
                     <SearchX size={50} className="mx-auto mb-2" />
                     <h3 className="text-xl font-semibold text-white mb-2">
-                        {searchQuery ? 'No books found' : 'No books in your library'}
+                        {(searchQuery || selectedTags || selectedShelf || selectedCollection) ? 'No books found' : 'No books in your library'}
                     </h3>
                     <p className="text-indigo-200">
-                        {searchQuery 
+                        {(searchQuery || selectedTags || selectedShelf || selectedCollection)
                         ? 'Try different search terms or browse all books'
                         : 'Start by uploading your first book'
                         }
@@ -218,6 +283,17 @@ function SearchPage() {
                             <h3 className="text-white font-semibold text-lg mb-2 group-hover:text-indigo-300 transition-colors">
                                 {book.title}
                             </h3>
+                            
+                            <div className="flex flex-wrap gap-2 min-h-5 mb-2">
+                                {book.tags.map(tag => (
+                                    <span
+                                    key={tag.id}
+                                    className={`bg-gray-500 text-white font-semibold px-2 py-1 rounded-md text-sm flex items-center gap-2 transition-all`}
+                                    >
+                                    {tag.name}
+                                    </span>
+                                ))}
+                            </div>
 
                             {book.author && (
                                 <div className="flex items-center gap-2 text-sm">
