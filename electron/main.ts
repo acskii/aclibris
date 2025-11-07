@@ -11,7 +11,7 @@ import { migrate } from './database/migrate'
 // If path to current directory is needed
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 // const require = createRequire(import.meta.url)
-const isDev = process.env.NODE_ENV !== 'production';
+const isDev = !app.isPackaged;
 
 const MainWindowContext = {
     width: (isDev) ? 1200 : 800,

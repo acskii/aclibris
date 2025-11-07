@@ -9,8 +9,8 @@ import path from 'path';
 const require = createRequire(import.meta.url);
 const Database = require('better-sqlite3');
 
-const isDev = process.env.NODE_ENV !== 'production';
-const fileName = "reader_library.db";   // add in .env soon
+const isDev = !app.isPackaged;
+const fileName = "reader_library.db";
 
 const dbPath = (isDev) 
                 ? fileName
