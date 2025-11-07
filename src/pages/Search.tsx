@@ -284,7 +284,7 @@ function SearchPage() {
                                 {book.title}
                             </h3>
                             
-                            <div className="flex flex-wrap gap-2 min-h-5 mb-2">
+                            <div className="flex flex-wrap gap-2 mb-2">
                                 {book.tags.map(tag => (
                                     <span
                                     key={tag.id}
