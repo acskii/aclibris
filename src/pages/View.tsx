@@ -13,6 +13,8 @@ export function View() {
     const [error, setError] = useState<string | null>('');
     const [file, setFile] = useState<string>('');
     const [totalPages, setTotalPages] = useState<number>(0);
+    const [scale, setScale] = useState<number>(1);
+    const [windowSize, setWindowSize] = useState<number>();
 
     const id = params.id ? parseInt(params.id) : null;
     const page = params.page ? parseInt(params.page) : 1;
@@ -90,7 +92,7 @@ export function View() {
                 if (canvas) {
                     canvas.height = viewport.height;
                     canvas.width = viewport.width;
-
+            
                     const renderContext = {
                         canvas: canvas,
                         viewport: viewport,
@@ -109,12 +111,38 @@ export function View() {
     };
 
     useEffect(() => {
+        const handleResize = () => {
+            setWindowSize(window.innerWidth);
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    useEffect(() => {
+        if (scale > maxZoom()) setScale(maxZoom());
+    }, [windowSize, scale]);
+
+    useEffect(() => {
         if (!pdf || renderLock.current) return;
         renderPage();
     }, [pdf, page]);
     
+    const minZoom = () => 1;
+    const maxZoom = () => {
+        if (!windowSize) return 2;
+
+        if (windowSize > 800) return 2;
+        else return 1.3;
+    }
+
+    const zoomStyle = {
+        transform: `scale(${scale})`,
+        transformOrigin: "top left"
+    }
+
     return (
-        <div>
+        <div className="bg-white">
             {error && (
                 <div className="fixed w-3/5 left-1/2 transform -translate-x-1/2 bg-gradient-to-l from-orange-400 to-yellow-300 top-20 z-50 w-3/5 rounded-xl" role="alert" aria-labelledby="toast-error">
                     <div className="flex p-4 items-center">
@@ -132,7 +160,16 @@ export function View() {
 
             {id && (
                 <div className="flex flex-col">
-                    <PageNavigate current={page} total={totalPages} bookId={id} />
+                    <PageNavigate 
+                        current={page} 
+                        total={totalPages} 
+                        bookId={id} 
+                        scale={scale}
+                        minScale={minZoom()}
+                        maxScale={maxZoom()}
+                        OnZoomIn={() => setScale(prev => Math.min(prev + 0.1, maxZoom()))}
+                        OnZoomOut={() => setScale(prev => Math.max(prev - 0.1, minZoom()))}
+                    />
                 
                     {loading && (
                         <div className="flex flex-row items-center justify-center gap-2 z-30 my-10">
@@ -142,11 +179,11 @@ export function View() {
                             </p>
                         </div>
                     )}
-                
-                    <div className="relative flex justify-center overflow-scroll">
+                    <div className="relative flex justify-center overflow-auto no-scrollbar">
                         <canvas 
                             ref={canvasRef} 
-                            className={`${loading ? "invisible" : "visible"} relative max-w-full h-full shadow-lg`}
+                            style={{ ...zoomStyle }}
+                            className={`${loading ? "invisible" : "visible"} max-w-full max-h-full`}
                         />
                     </div>
                 </div>

@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Library } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Library, Minus, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
@@ -6,9 +6,14 @@ type PageNavigateProps = {
     current: number;
     total: number;
     bookId: number;
+    scale: number;
+    minScale: number;
+    maxScale: number;
+    OnZoomIn: () => void;
+    OnZoomOut: () => void;
 }
 
-export function PageNavigate({ current, total, bookId }: PageNavigateProps) {
+export function PageNavigate({ current, total, bookId, scale, minScale = 1, maxScale = 2, OnZoomIn, OnZoomOut }: PageNavigateProps) {
   const progress = (current / total) * 100;
   const navigate = useNavigate();
   const [page, setPage] = useState<string>('');
@@ -56,13 +61,34 @@ export function PageNavigate({ current, total, bookId }: PageNavigateProps) {
     <div className="sticky top-0 w-full flex justify-center z-30">
       <div className="w-full min-w-[50%] bg-gradient-to-r from-sky-600 via-cyan-500 to-violet-400 overflow-hidden text-white flex flex-col items-center backdrop-blur-md">
         {/* Navigation Controls */}
-        <div className="flex flex-row gap-2 items-center justify-between w-full px-4 py-2">
+        <div className="flex flex-row gap-10 items-center justify-between w-full px-4 py-2">
           <button
               onClick={jumpToLibrary}
               className="bg-gradient-to-br from-blue-800 to-indigo-900 p-2 rounded-md hover:from-violet-400 hover:to-purple-500 text-white transition disabled:opacity-30"
           >
               <Library size={20} />
           </button>
+
+          <div className="flex flex-row gap-2 items-center flex-1 justify-end">
+            <button
+                onClick={OnZoomIn}
+                disabled={scale >= maxScale}
+                className="bg-gradient-to-br from-blue-800 to-indigo-900 p-2 rounded-md hover:from-violet-400 hover:to-purple-500 text-white transition disabled:opacity-30"
+            >
+                <Plus size={20} />
+            </button>
+            <div className="text-nowrap flex flex-row gap-2 text-sm font-bold text-white border border-3 border-purple px-3 py-1 bg-sky-400 rounded-lg">
+              {Math.round(scale*100)}%
+            </div>
+            <button
+                onClick={OnZoomOut}
+                disabled={scale <= minScale}
+                className="bg-gradient-to-br from-blue-800 to-indigo-900 p-2 rounded-md hover:from-violet-400 hover:to-purple-500 text-white transition disabled:opacity-30"
+            >
+                <Minus size={20} />
+            </button>
+          </div>
+
           <div className="flex flex-row gap-2 items-center justify-center">
             <button
               onClick={jumpToStart}
