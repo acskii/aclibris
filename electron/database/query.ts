@@ -419,51 +419,53 @@ class DatabaseQuery {
 
     addRecentBook(book_id: number, page: number, last_visited_unix: number) {
         // update values in the book
-        const info = database.prepare(
-            `
-            UPDATE books
-            SET recent_page = ?,
-                recent_read_at = ?
-            WHERE id = ?
-            `
-        ).run(page, last_visited_unix, book_id);
+        if (this.getBooleanMeta('can_save_recent')) {
+            const info = database.prepare(
+                `
+                UPDATE books
+                SET recent_page = ?,
+                    recent_read_at = ?
+                WHERE id = ?
+                `
+            ).run(page, last_visited_unix, book_id);
 
-        if (info.changes == 0) throw new BookDoesNotExistError("Book was not found");
+            if (info.changes == 0) throw new BookDoesNotExistError("Book was not found");
 
-        // add as the most recent book
-        database.prepare(
-            `
-            UPDATE meta
-            SET value = ?
-            WHERE key = 'last_book'
-            `
-        ).run(`${book_id}`);
+            // add as the most recent book
+            database.prepare(
+                `
+                UPDATE meta
+                SET value = ?
+                WHERE key = 'last_book'
+                `
+            ).run(`${book_id}`);
+        }
     }
 
     getRecentBook() {
         // get the most recently opened book
+        if (this.getBooleanMeta('can_load_recent')) {
+            try {
+                const response: MetaQueryObject = database.prepare(
+                    `
+                    SELECT key, value FROM meta
+                    WHERE key = 'last_book'
+                    `
+                ).get();
 
-        try {
-            const response: MetaQueryObject = database.prepare(
-                `
-                SELECT key, value FROM meta
-                WHERE key = 'last_book'
-                `
-            ).get();
+                if (response.value == 'null') return null;
+                else {
+                    const book_id: number = parseInt(response.value);
+                    return this.getBookById(book_id);
+                }
 
-            if (response.value == 'null') return null;
-            else {
-                const book_id: number = parseInt(response.value);
-                return this.getBookById(book_id);
+            } catch (error: any) {
+                console.log("[db:query] => Error occurred when attempting to get metadata: ", error.message);
+                
+                // re-throw error
+                throw error;
             }
-
-        } catch (error: any) {
-            console.log("[db:query] => Error occurred when attempting to get metadata: ", error.message);
-            
-            // re-throw error
-            throw error;
         }
-        
     }
 
     updateShelf(shelf_id: number, new_name: string) {
@@ -541,6 +543,31 @@ class DatabaseQuery {
             // re-throw error
             throw error;
         }
+    }
+
+    /* Settings */
+    getBooleanMeta(key: string) {
+        // Works with 'can_save_recent', 'can_load_recent', 'thumbnail_on_upload'
+        const result = database.prepare(
+            `
+            SELECT value FROM meta
+            WHERE key = ?
+            `
+        ).get(key);
+
+        if (result) return result.value == 'true' ? true : false;
+        else return null;
+    }
+
+    updateBooleanMeta(key: string, value: boolean) {
+        // Toggle settings 
+        database.prepare(
+            `
+            UPDATE meta
+            SET value = ?
+            WHERE key = ?
+            `
+        ).run((value) ? 'true' : 'false', key);
     }
 
 }

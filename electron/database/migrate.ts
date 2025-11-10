@@ -143,6 +143,25 @@ class DatabaseMigration {
         }
     }
 
+    private add_toggle_settings() {
+        // Will include 'true' if these settings are added for the first time
+        //      may change to 'false' based on user change
+
+        const settings = ['can_save_recent', 'can_load_recent', 'thumbnail_on_upload'];
+    
+        settings.forEach(setting => {
+            const existing = database.prepare(`
+                SELECT value FROM meta WHERE key = ?
+            `).get(setting);
+            
+            if (!existing) {
+                database.prepare(`
+                    INSERT INTO meta (key, value) VALUES (?, 'true')
+                `).run(setting);
+            }
+        });
+   }
+
     init() {
         this.create_shelfs_table();
         this.create_collections_table();
@@ -152,6 +171,7 @@ class DatabaseMigration {
         this.create_meta_table();
         this.seed_default_values();
         this.add_recent_book_read();
+        this.add_toggle_settings();
         console.log("[db:migrate] => Initialised local database schema");
     }
 }

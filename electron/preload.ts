@@ -53,5 +53,11 @@ contextBridge.exposeInMainWorld('db', {
   },
   tag: {
     getAll: () => ipcRenderer.invoke('db:tag:getAll')
+  },
+  settings: {
+    thumbnail: () => ipcRenderer.invoke('db:settings:thumbnail'),
+    loadRecent: () => ipcRenderer.invoke('db:settings:loadRecent'),
+    saveRecent: () => ipcRenderer.invoke('db:settings:saveRecent'),
+    updateBoolean: (key: string, value: boolean) => ipcRenderer.invoke('db:settings:updateBoolean', key, value)
   }
 })

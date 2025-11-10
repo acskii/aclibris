@@ -192,4 +192,36 @@ export function registerDbHandlers() {
             console.log("[db:query] => Error occured when handling 'tag:getAll': ", error.message);
         }
     });
+
+    ipcMain.handle('db:settings:thumbnail', async (_) => {
+        try {
+            return query.getBooleanMeta('thumbnail_on_upload');
+        } catch (error: any) {
+            console.log("[db:query] => Error occured when handling 'settings:thumbnail': ", error.message);
+        }
+    });
+
+    ipcMain.handle('db:settings:loadRecent', async (_) => {
+        try {
+            return query.getBooleanMeta('can_load_recent');
+        } catch (error: any) {
+            console.log("[db:query] => Error occured when handling 'settings:loadRecent': ", error.message);
+        }
+    });
+
+    ipcMain.handle('db:settings:saveRecent', async (_) => {
+        try {
+            return query.getBooleanMeta('can_save_recent');
+        } catch (error: any) {
+            console.log("[db:query] => Error occured when handling 'settings:saveRecent': ", error.message);
+        }
+    });
+
+    ipcMain.handle('db:settings:updateBoolean', async (_, key: string, value: boolean) => {
+        try {
+            query.updateBooleanMeta(key, value);
+        } catch (error: any) {
+            console.log("[db:query] => Error occured when handling 'settings:updateBoolean': ", error.message);
+        }
+    });
 }

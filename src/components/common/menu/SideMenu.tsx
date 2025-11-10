@@ -5,6 +5,7 @@ import {
   MenuIcon,
   HomeIcon,
   SearchIcon,
+  SettingsIcon,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSideMenu } from "../../../contexts/SideMenuContext";
@@ -20,6 +21,7 @@ const pages: PageItem[] = [
   { icon: PlusSquareIcon, label: "Upload Book", url: "/upload" },
   { icon: BookMarkedIcon, label: "Library", url: "/library" },
   { icon: SearchIcon, label: "Search Books", url: "/search" },
+  { icon: SettingsIcon, label: "Settings", url: "/settings" },
 ];
 
 export function SideMenu() {

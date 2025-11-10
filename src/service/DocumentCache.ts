@@ -33,6 +33,7 @@ class DocumentCache {
         console.log("[service:document_cache] => Saving in cache: " + filePath);
 
         // Get file from file system
+        // @ts-ignore
         const response = await window.files.get(filePath);
 
         if (response.success == true) {
@@ -71,31 +72,38 @@ class DocumentCache {
     }
 
     private async getThumbnail(doc: PDFDocumentProxy): Promise<Uint8Array | null> {
-        const page = await doc.getPage(1);
-        const viewport = page.getViewport({ scale: 2.0 });
-        const canvas = document.createElement('canvas');
+        // @ts-ignore
+        const can_get_thumbnail = await window.db.settings.thumbnail();
 
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-        await page.render({
-            canvas: canvas,
-            viewport: viewport
-        }).promise;
+        if (can_get_thumbnail) {
+            const page = await doc.getPage(1);
+            const viewport = page.getViewport({ scale: 2.0 });
+            const canvas = document.createElement('canvas');
 
-        return new Promise((resolve) => {
-            canvas.toBlob((blob) => {
-                if (blob) {
-                    const reader = new FileReader();
-                    reader.onload = () => {
-                        const arrayBuffer = reader.result as ArrayBuffer;
-                        resolve(new Uint8Array(arrayBuffer));
-                    };
-                    reader.readAsArrayBuffer(blob);
-                } else {
-                    resolve(null);
-                }
-            }, 'image/jpeg', 0.8); // JPEG with 80% quality
-        });
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            await page.render({
+                canvas: canvas,
+                viewport: viewport
+            }).promise;
+
+            return new Promise((resolve) => {
+                canvas.toBlob((blob) => {
+                    if (blob) {
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                            const arrayBuffer = reader.result as ArrayBuffer;
+                            resolve(new Uint8Array(arrayBuffer));
+                        };
+                        reader.readAsArrayBuffer(blob);
+                    } else {
+                        resolve(null);
+                    }
+                }, 'image/jpeg', 0.8); // JPEG with 80% quality
+            });
+        } else {
+            return null;
+        }
     }
 
     async getMetadata(filePath: string) {
@@ -123,6 +131,7 @@ class DocumentCache {
             }
         }
     
+        // @ts-ignore
         const response = await window.files.get(filePath);
         const array = new Uint8Array(response.result);
         const fileSize = array.byteLength;
