@@ -49,6 +49,8 @@ export default function FileDropArea({ onFileSelect,className }: FileDropAreaPro
             setUpload(true);
             setFileName(file.name);
         }
+
+        e.target.value = '';
     };
 
     const handleDelete = () => {
