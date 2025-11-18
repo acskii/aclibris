@@ -248,7 +248,7 @@ function UploadPage() {
                 <input 
                   type="text"
                   className="border border-2 rounded-md p-2 w-full border-cyan-400/60 focus:border-violet-800/60 bg-white/10 text-white"
-                  value={meta.title || 'N/A'}
+                  value={meta.title}
                   onChange={(e) => handleMetaChange('title', e.target.value)}
                   placeholder="Enter book title"
                 />
@@ -258,7 +258,7 @@ function UploadPage() {
                 <input 
                   type="text"
                   className="border border-2 rounded-md p-2 w-full border-cyan-400/60 focus:border-violet-800/60 bg-white/10 text-white"
-                  value={meta.author || 'N/A'}
+                  value={meta.author}
                   onChange={(e) => handleMetaChange('author', e.target.value)}
                   placeholder="Enter author name"
                 />
