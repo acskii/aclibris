@@ -369,7 +369,8 @@ export default function BookDetailsPage() {
             </h3>
             <input
               type="text"
-              className="border border-2 rounded-md p-2 w-full border-cyan-400/60 focus:border-violet-800/60 bg-white/10 text-white"
+              disabled={true}
+              className="border border-2 rounded-md p-2 w-full border-cyan-400/60 focus:border-violet-800/60 bg-gray-600/50 text-white"
               value={meta.filePath || ""}
               onChange={(e) => handleMetaChange("filePath", e.target.value)}
               placeholder="Enter file path"
