@@ -6,6 +6,7 @@ import {
   HomeIcon,
   SearchIcon,
   SettingsIcon,
+  HelpCircleIcon,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSideMenu } from "../../../contexts/SideMenuContext";
@@ -33,43 +34,62 @@ export function SideMenu() {
     <div
       className={`h-screen z-40 bg-gradient-to-b from-sky-600 via-cyan-500 via-30% to-violet-400 text-white shadow-xl backdrop-blur-md transition-all duration-300 ${
         collapsed ? "w-20" : "w-64"
-      }`}
+      } flex flex-col justify-between`}
     >
-      {/* Toggle Button */}
-      <div className={`flex p-3 ${collapsed ? "justify-center" : "justify-end"}`}>
+      <div>
+        {/* Toggle Button */}
+        <div className={`flex p-3 ${collapsed ? "justify-center" : "justify-end"}`}>
+          <button
+            onClick={toggleCollapsed}
+            className="text-cyan-300 hover:text-white transition"
+          >
+            <MenuIcon size={30} />
+          </button>
+        </div>
+
+        {/* Navigation Items */}
+        <nav className="flex flex-col gap-2 px-2">
+          {pages.map(({ icon: Icon, label, url }) => {
+            const isActive = location.pathname === url;
+            return (
+              <button
+                key={label}
+                onClick={() => navigate(url)}
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all ${
+                  isActive
+                    ? "bg-gradient-to-r from-violet-500 to-purple-600 text-white"
+                    : "hover:bg-gradient-to-r hover:from-violet-400/30 hover:to-purple-500/30 text-cyan-200"
+                }
+                ${
+                  collapsed 
+                  ? "justify-center" 
+                  : ""
+                }`}
+              >
+                <Icon size={20} />
+                {!collapsed && <span className="font-medium">{label}</span>}
+              </button>
+            );
+          })}
+        </nav>
+      </div>
+      <div>
         <button
-          onClick={toggleCollapsed}
-          className="text-cyan-300 hover:text-white transition"
+          onClick={() => navigate("/documentation")}
+          className={`flex items-center gap-3 px-3 py-2 rounded-lg-b w-full ${
+            location.pathname === "/documentation"
+              ? "bg-gradient-to-r from-violet-600 to-purple-700 text-white"
+              : "hover:bg-gradient-to-r hover:from-violet-600/60 hover:to-purple-700/60 bg-gradient-to-r from-violet-500 to-purple-600 text-cyan-200"
+          } ${
+            collapsed 
+            ? "justify-center" 
+            : ""
+          }`}
         >
-          <MenuIcon size={30} />
+          <HelpCircleIcon size={20} />
+          {!collapsed && <span className="font-medium">Documentation</span>}
         </button>
       </div>
-
-      {/* Navigation Items */}
-      <nav className="flex flex-col gap-2 px-2">
-        {pages.map(({ icon: Icon, label, url }) => {
-          const isActive = location.pathname === url;
-          return (
-            <button
-              key={label}
-              onClick={() => navigate(url)}
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all ${
-                isActive
-                  ? "bg-gradient-to-r from-violet-500 to-purple-600 text-white"
-                  : "hover:bg-gradient-to-r hover:from-violet-400/30 hover:to-purple-500/30 text-cyan-200"
-              }
-              ${
-                collapsed 
-                ? "justify-center" 
-                : ""
-              }`}
-            >
-              <Icon size={20} />
-              {!collapsed && <span className="font-medium">{label}</span>}
-            </button>
-          );
-        })}
-      </nav>
     </div>
   );
 }

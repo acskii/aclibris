@@ -11,6 +11,7 @@ import { CollectionPage } from './pages/Collection.tsx'
 import SearchPage from './pages/Search.tsx'
 import BookDetailsPage from './pages/BookDetails.tsx'
 import SettingsPage from './pages/Settings.tsx'
+import DocumentationPage from './pages/Documentation.tsx'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -22,6 +23,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <Route path="/search" element={<SearchPage />} />
           <Route path="/library" element={<LibraryPage />} />
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/documentation" element={<DocumentationPage />} />
           <Route path="/view/:id/:page" element={<View />} />
           <Route path="/collection/:id" element={<CollectionPage />} />
           <Route path="/details/book/:id" element={<BookDetailsPage />} />
