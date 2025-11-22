@@ -1,30 +1,41 @@
-# React + TypeScript + Vite
+# Aclibris
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Overview
 
-Currently, two official plugins are available:
+Tired of forgetting where you saved your PDF books? Aclibris is a desktop application that does more than just read PDFs. It provides a powerful yet simple system to organize, categorize, and manage your entire digital library, all from one beautiful interface.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Installation
 
-## Expanding the ESLint configuration
+> [!NOTE]
+>
+> Currently only **Windows** installation is supported!
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+Check **Releases** for the latest version.
 
-- Configure the top-level `parserOptions` property like this:
+Available downloads:
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
+- **Installer** (32/64 bit) - Recommended for most users
+- **Portable Zip** (32/64 bit) - No installation required
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+
+## Features
+
+- Organized Library
+    - Import and manage all your PDF books in one place
+    - Smart categorization with shelves, collections, and tags
+    - Automatic metadata extraction from your PDFs
+
+- Smooth Reading
+    - Clean, focused reading interface
+    - Zoom controls and easy page navigation
+    - Remembers your reading progress
+
+- Smart Search
+    - Quick search by title, author, or tags
+    - Filter books by category or collection
+    - Find exactly what you need in seconds
+
+- Easy to Use
+    - Intuitive drag-and-drop upload
+    - Detailed in-app documentation
+    - Simple organization system
