@@ -1,16 +1,57 @@
 {
-  "name": "reader",
-  "private": true,
-  "version": "0.0.0",
+  "name": "aclibris",
+  "author": "Andrew Sameh Adel",
+  "description": "Your organized desktop bookshelf. A PDF reader that helps you manage and categorize your entire collection.",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite --port 3173",
-    "build": "tsc && vite build && electron-builder",
+    "sqlite:rebuild": "electron-rebuild -f -w better-sqlite3",
+    "vite:build": "vite build",
+    "tsc:build": "tsc -p tsconfig.electron.json",
+    "build": "npm run vite:build && npm run tsc:build && electron-builder",
+    "electron-builder": "electron-builder",
+    "package-win": "npx @electron/packager . aclibris --overwrite --asar --platform=win32 --arch=x64 --arch=ia32 --icon=build/icons/icon.ico --out=temp --name=Aclibris",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "postinstall": "electron-builder install-app-deps",
     "preview": "vite preview"
+  },
+  "build": {
+    "appId": "dev.acskii.aclibris",
+    "directories": {
+      "output": "temp",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist-electron/**/*",
+      "dist/**/*",
+      "public/**/*",
+      "docs/**/*",
+      "!build${/*}"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "build/icons/icon.ico",
+      "signAndEditExecutable": true
+    },
+    "productName": "Aclibris",
+    "nsis": {
+      "artifactName": "${productName}-Installer.${ext}",
+      "oneClick": false,
+      "installerIcon": "build/icons/icon.ico",
+      "uninstallerIcon": "build/icons/icon.ico",
+      "uninstallDisplayName": "Aclibris - Uninstall",
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": false
+    }
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.13",
+    "better-sqlite3": "^12.2.0",
+    "dotenv": "^17.2.2",
     "lucide-react": "^0.543.0",
     "pdfjs-dist": "^5.4.149",
     "react": "^18.2.0",
@@ -19,16 +60,19 @@
     "tailwindcss": "^4.1.13"
   },
   "devDependencies": {
+    "@electron/packager": "^19.0.1",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/react": "^18.2.64",
     "@types/react-dom": "^18.2.21",
     "@typescript-eslint/eslint-plugin": "^7.1.1",
     "@typescript-eslint/parser": "^7.1.1",
     "@vitejs/plugin-react": "^4.2.1",
-    "electron": "^30.0.1",
-    "electron-builder": "^24.13.3",
+    "electron": "^29.0.0",
+    "electron-builder": "^25.1.7",
     "eslint": "^8.57.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
+    "tsx": "^4.20.5",
     "typescript": "^5.2.2",
     "vite": "^5.1.6",
     "vite-plugin-electron": "^0.28.6",
