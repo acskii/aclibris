@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { BookObject } from "../../electron/database/objects/Book";
-import { ArrowRight, FileText, Library, Upload, HelpCircle, Globe } from "lucide-react";
+import { ArrowRight, Library, Upload, HelpCircle, Globe } from "lucide-react";
 import { Spinner } from "../components/common/spinner/Spinner";
 import { useNavigate } from "react-router-dom";
 import { fromUnix } from "../service/util/Date";
@@ -13,6 +13,7 @@ export function HomePage() {
     useEffect(() => {
         const loadRecent = async () => {
             setLoading(true);
+            // @ts-ignore
             const response = await window.db.book.getRecent();
             setRecent(response);
             setLoading(false);
@@ -41,7 +42,7 @@ export function HomePage() {
         <div className="min-h-screen flex items-center justify-center p-5">
             <div className="w-full text-center space-y-6">
                 {/* Documentation Help Section */}
-                <div className="hidden bg-indigo-800/20 rounded-md p-4 border border-indigo-500/30">
+                <div className="bg-gray-800/30 rounded-md p-4 border border-indigo-500/30">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <HelpCircle size={18} />
@@ -49,7 +50,7 @@ export function HomePage() {
                         </div>
                         <button
                             onClick={goToDocumentation}
-                            className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 cursor-pointer rounded-md transition-colors text-sm"
+                            className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white cursor-pointer px-4 py-2 rounded-md transition-all transform flex items-center justify-center gap-2 font-semibold text-md"
                         >
                             View Documentation
                         </button>

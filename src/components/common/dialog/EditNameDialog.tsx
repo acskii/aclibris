@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Check, PenBox, X } from 'lucide-react';
+import { Check, PenBox } from 'lucide-react';
 
 interface EditNameDialogProps {
     isOpen: boolean;

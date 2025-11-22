@@ -30,9 +30,11 @@ export function LibraryPage() {
             setLoading(true);
             setError('');
 
+            // @ts-ignore
             const response: ShelfObject[] = await window.db.shelf.getAll();
             const result: LibraryShelf[] = await Promise.all(
             response.map(async (shelf: ShelfObject) => {
+                // @ts-ignore
                 const collections: CollectionObject[] = await window.db.collection.getByShelf(shelf.id)
                 return {
                     shelf: shelf,
@@ -54,6 +56,7 @@ export function LibraryPage() {
 
     const handleDeleteShelf = async () => {
         if (deleteShelf) {
+            // @ts-ignore
             await window.db.shelf.delete(deleteShelf);
             loadData();
             setDeleteShelf(null);
@@ -62,6 +65,7 @@ export function LibraryPage() {
 
     const handleEditShelf = async (new_name: string) => {
         if (editShelf) {
+            // @ts-ignore
             await window.db.shelf.update(editShelf, new_name);
             loadData();
             setEditShelf(null);
