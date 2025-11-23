@@ -2,7 +2,7 @@
 
 ### Introduction
 
-Thanks for installing {appNameHere}!
+Thanks for installing Aclibris!
 
 I hope this application will prove useful and entertaining in some way or another, because it was just as fun developing it as using during its testing period.
 
