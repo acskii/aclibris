@@ -15,6 +15,7 @@ type AutocompleteDropdownProps = {
   onOptionSelect: (option: DropdownOption | null) => void;
   disabled?: boolean;
   className?: string;
+  isUp?: boolean;
 }
 
 export function AutocompleteDropdown({
@@ -25,7 +26,8 @@ export function AutocompleteDropdown({
   onValueChange,
   onOptionSelect,
   disabled = false,
-  className = ''
+  className = '',
+  isUp = false
 }: AutocompleteDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [filteredOptions, setFilteredOptions] = useState<DropdownOption[]>(options);
@@ -48,17 +50,12 @@ export function AutocompleteDropdown({
         setFilteredOptions(filtered);
       }
     }
-  }, [inputValue]);
+  }, [inputValue, options, selectedOption]);
 
   // Sync external value changes
   useEffect(() => {
     setInputValue(value);
   }, [value]);
-
-  useEffect(() => {
-    setFilteredOptions(options);
-  }, [options]);
-
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -78,7 +75,6 @@ export function AutocompleteDropdown({
     onValueChange(newValue);
     setIsOpen(true);
     
-    // Clear selected option when user starts typing
     if (selectedOption && newValue !== selectedOption.name) {
       setSelectedOption(null);
       onOptionSelect(null);
@@ -116,6 +112,11 @@ export function AutocompleteDropdown({
     inputRef.current?.focus();
   };
 
+  // Helper to determine menu positioning classes
+  const menuPositionClasses = isUp 
+    ? "bottom-full mb-1 rounded-t-md" 
+    : "top-full mt-1 rounded-b-md";
+
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
       <div className="w-full flex flex-row justify-start">
@@ -150,9 +151,9 @@ export function AutocompleteDropdown({
         </div>
       </div>
 
-      {/* Dropdown Menu */}
+      {/* Dropdown Menu (Results) */}
       {isOpen && filteredOptions.length > 0 && (
-        <div className="absolute z-10 w-full bg-gray-800/95 backdrop-blur-sm border border-indigo-500/30 rounded-b-md max-h-60 overflow-y-auto">
+        <div className={`absolute z-10 w-full bg-gray-800/95 backdrop-blur-sm border border-indigo-500/30 max-h-60 overflow-y-auto ${menuPositionClasses}`}>
           <div className="py-2">
             {filteredOptions.map((option) => (
               <button
@@ -160,8 +161,8 @@ export function AutocompleteDropdown({
                 onClick={() => handleOptionSelect(option)}
                 className={`w-full text-left px-4 py-2 hover:bg-indigo-600/30 transition-colors`}
               >
-                <div className="font-medium">{option.name}</div>
-                <hr />
+                <div className="font-medium text-white">{option.name}</div>
+                <hr className="border-gray-700/50" />
               </button>
             ))}
           </div>
@@ -170,7 +171,7 @@ export function AutocompleteDropdown({
 
       {/* No results message */}
       {isOpen && inputValue !== selectedOption?.name && filteredOptions.length === 0 && (
-        <div className="absolute z-10 w-full mt-1 bg-gray-800/95 backdrop-blur-sm border border-indigo-500/30 rounded-lg shadow-lg p-4">
+        <div className={`absolute z-10 w-full bg-gray-800/95 backdrop-blur-sm border border-indigo-500/30 shadow-lg p-4 ${menuPositionClasses}`}>
           <div className="text-center text-indigo-200">
             <div className="font-medium mb-1">No {title} found..</div>
             <div className="text-sm text-indigo-300/70">

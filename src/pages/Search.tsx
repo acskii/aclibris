@@ -143,29 +143,131 @@ function SearchPage() {
     }
 
     return (
-        <div className="min-h-screen px-5 pb-5">
-            <div className="sticky top-0 z-10 bg-gradient-to-br from-cyan-500 to-sky-600 py-3 -mx-5 px-5 border-b border-indigo-500/20 max-h-[45vh]">
-                <div className="flex items-center justify-between mb-2">
-                    <h1 className="flex gap-2 items-center">
-                        <Search size={28} />
-                        <span className="text-2xl font-bold text-white">Search</span>
-                    </h1>
-                </div>
-                
-                <div className="mb-2">
-                    <div className="flex items-center gap-2 bg-gray-800/30 py-2 px-3 rounded-md">
-                        <Search size={16} className="text-indigo-300" />
-                        <input
-                            type="text"
-                            placeholder="Search by title or author"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full py-1 px-2 bg-gray-700/50 border border-indigo-500/30 rounded-md text-white placeholder-indigo-300/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-base"
-                        />
-                    </div>
-                </div>
+        <div className="min-h-screen p-5">
+            <div className="mb-8 flex flex-col items-start">
+                <h1 className="mb-2 flex gap-3 justify-start">
+                    <Search size={40} />
+                    <span className="text-4xl font-bold text-white">Search</span>
+                </h1>
+            </div>
 
-                <div className="mb-2">
+            {loading && (
+                <div className="flex bg-indigo-400 p-3 rounded-lg flex-row items-center justify-center gap-2 z-30 my-10">
+                    <Spinner />
+                    <p className="text-violet-900 font-bold text-center text-md">
+                        Loading..
+                    </p>
+                </div>
+            )}
+
+            <div className="sticky z-10 top-5 rounded-md gap-2 flex items-center mb-2 border-4 border-violet-800 bg-gradient-to-r from-purple-700 to-violet-600 via-violet-500 p-3">
+                <div className="w-full">
+                    <input
+                        type="text"
+                        placeholder="Search by title or author"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full py-1 px-2 bg-gray-700 border border-1 border-cyan-400 rounded-md text-white font-semibold placeholder-indigo-300/70 focus:border-3 focus:outline-none text-base"
+                     />
+                </div>
+            </div>
+
+            <div className="my-5">
+                {filteredBooks.length === 0 && !loading ? (
+                    <div className="bg-gray-800/30 backdrop-blur-sm rounded-md p-6 border border-indigo-500/20 text-center">
+                        <SearchX size={50} className="mx-auto mb-2" />
+                        <h3 className="text-xl font-semibold text-white mb-2">
+                            {(searchQuery || selectedTags || selectedShelf || selectedCollection) ? 'No books found' : 'No books in your library'}
+                        </h3>
+                        <p className="text-indigo-200">
+                            {(searchQuery || selectedTags || selectedShelf || selectedCollection)
+                            ? 'Try different search terms or browse all books'
+                            : 'Start by uploading your first book'
+                            }
+                        </p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-3">
+                    {filteredBooks.map((book) => (
+                        <div
+                            key={book.id}
+                            className="bg-gray-800/30 rounded-md border border-indigo-500/20 hover:border-indigo-400/50 cursor-pointer group"
+                            onClick={() => handleBookClick(book.id, book.lastReadPage ?? null)}
+                        >
+                            {/* Thumbnail */}
+                            <div className="relative h-48 bg-indigo-900/20 rounded-t-md overflow-hidden">
+                                {book.thumbnail ? (
+                                    <img 
+                                        src={`data:image/jpeg;base64,${arrayToBase64(book.thumbnail)}`}
+                                        alt={book.title}
+                                        className="w-full"
+                                    />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-900/40 to-violet-900/40">
+                                        <Book size={20} />
+                                    </div>
+                                )}
+                                <div className="absolute top-3 right-3">
+                            <       button className="bg-indigo-600 cursor-pointer hover:bg-indigo-700 text-white p-2 rounded-lg transition-colors opacity-0 group-hover:opacity-100">
+                                        <Eye size={15} />
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div className="mt-auto">
+                                {/* Book Info */}
+                                <div className="p-4 flex flex-col gap-2">
+                                    <h3 className="overflow-hidden text-white font-semibold text-lg mb-2 group-hover:text-indigo-300 transition-colors">
+                                        {book.title.length > 100 
+                                        ? `${book.title.substring(0, 100)}...` 
+                                        : book.title}
+                                    </h3>
+                                    
+                                    {book.tags.length > 0 && (
+                                        <div className="flex flex-wrap gap-2 mb-2">
+                                            {book.tags.map(tag => (
+                                                <span
+                                                key={tag.id}
+                                                className={`bg-gray-500 text-white font-semibold px-2 py-1 rounded-md text-sm flex items-center gap-2 transition-all`}
+                                                >
+                                                {tag.name}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
+                                
+
+                                    {book.author && (
+                                        <div className="flex items-center gap-2 text-sm">
+                                            <User size={18} />
+                                            <span>{book.author}</span>
+                                        </div>
+                                    )}
+
+                                    {/* Shelf and Collection */}
+                                    <div className="space-y-1">
+                                        <div className="flex items-center gap-2 text-sm">
+                                            <LibrarySquare size={14} />
+                                            <span>{getShelfFromCollection(book.collectionId)?.name}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2 text-sm">
+                                            <Folder size={14} />
+                                            <span>{getCollectionName(book.collectionId)}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2 text-sm border-t border-indigo-500/20">
+                                            <Calendar size={14} />
+                                            <span>Created at {fromUnix(book.createdAtInUnix)}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                    </div>
+                )}
+            </div>
+
+            <div className="sticky -mb-5 bottom-0 z-10 border-4 rounded-md border-violet-800 bg-gradient-to-r from-purple-700 to-violet-600 via-violet-500 py-3 px-5">
                     <div className="bg-gray-800/30 backdrop-blur-sm rounded-md p-2 border border-indigo-500/20">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                             <Dropdown 
@@ -175,6 +277,7 @@ function SearchPage() {
                                 value={selectedShelf ? shelves.find(s => s.id === selectedShelf) || null : null}
                                 onOptionSelect={(option) => filterByShelf(option ? option.id : null)}
                                 className="text-xs"
+                                isUp={true}
                             />
 
                             <Dropdown 
@@ -188,6 +291,7 @@ function SearchPage() {
                                 value={selectedCollection ? (selectedShelf ? collections.find(c => c.id === selectedCollection) || null : null) : null}
                                 onOptionSelect={(option) => filterByCollection(option ? option.id : null)}
                                 className="text-xs"
+                                isUp={true}
                             />
                             <AutocompleteDropdown
                                 title="Tag"
@@ -197,6 +301,7 @@ function SearchPage() {
                                 onValueChange={setTagInput}
                                 onOptionSelect={(option) => filterByTag(option ? option.name : null)}
                                 className="text-xs flex-1"
+                                isUp={true}
                             />
 
                         </div>
@@ -219,109 +324,7 @@ function SearchPage() {
                                 })}
                             </div>
                     </div>
-                </div>
-
-                {/* Minimal Stats */}
-                <div className="text-xs text-white">
-                    {filteredBooks.length < books.length ? <span>Showing <span className="font-semibold">{filteredBooks.length}</span> book{`${filteredBooks.length > 1 ? "s" : ""}`}</span> : <span>Showing all books</span>}
-                    {searchQuery && ` • "${searchQuery}"`}
-                </div>
             </div>
-
-            {loading && (
-                <div className="flex bg-indigo-400 p-3 rounded-lg flex-row items-center justify-center gap-2 z-30 my-10">
-                    <Spinner />
-                    <p className="text-violet-900 font-bold text-center text-md">
-                        Loading..
-                    </p>
-                </div>
-            )}
-
-            {filteredBooks.length === 0 && !loading ? (
-                <div className="bg-gray-800/30 backdrop-blur-sm rounded-md p-6 border border-indigo-500/20 text-center">
-                    <SearchX size={50} className="mx-auto mb-2" />
-                    <h3 className="text-xl font-semibold text-white mb-2">
-                        {(searchQuery || selectedTags || selectedShelf || selectedCollection) ? 'No books found' : 'No books in your library'}
-                    </h3>
-                    <p className="text-indigo-200">
-                        {(searchQuery || selectedTags || selectedShelf || selectedCollection)
-                        ? 'Try different search terms or browse all books'
-                        : 'Start by uploading your first book'
-                        }
-                    </p>
-                </div>
-            ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {filteredBooks.map((book) => (
-                    <div
-                        key={book.id}
-                        className="bg-gray-800/30 backdrop-blur-sm rounded-md border border-indigo-500/20 hover:border-indigo-400/50 cursor-pointer group"
-                        onClick={() => handleBookClick(book.id, book.lastReadPage ?? null)}
-                    >
-                        {/* Thumbnail */}
-                        <div className="relative h-48 bg-indigo-900/20 rounded-t-md overflow-hidden">
-                            {book.thumbnail ? (
-                                <img 
-                                    src={`data:image/jpeg;base64,${arrayToBase64(book.thumbnail)}`}
-                                    alt={book.title}
-                                    className="w-full"
-                                />
-                            ) : (
-                                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-900/40 to-violet-900/40">
-                                    <Book size={20} />
-                                </div>
-                            )}
-                            <div className="absolute top-3 right-3">
-                        <       button className="bg-indigo-600 cursor-pointer hover:bg-indigo-700 text-white p-2 rounded-lg transition-colors opacity-0 group-hover:opacity-100">
-                                    <Eye size={15} />
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Book Info */}
-                        <div className="p-4 flex flex-col gap-2">
-                            <h3 className="text-white font-semibold text-lg mb-2 group-hover:text-indigo-300 transition-colors">
-                                {book.title}
-                            </h3>
-                            
-                            <div className="flex flex-wrap gap-2 mb-2">
-                                {book.tags.map(tag => (
-                                    <span
-                                    key={tag.id}
-                                    className={`bg-gray-500 text-white font-semibold px-2 py-1 rounded-md text-sm flex items-center gap-2 transition-all`}
-                                    >
-                                    {tag.name}
-                                    </span>
-                                ))}
-                            </div>
-
-                            {book.author && (
-                                <div className="flex items-center gap-2 text-sm">
-                                    <User size={18} />
-                                    <span>{book.author}</span>
-                                </div>
-                            )}
-
-                            {/* Shelf and Collection */}
-                            <div className="space-y-1">
-                                <div className="flex items-center gap-2 text-sm">
-                                    <LibrarySquare size={14} />
-                                    <span>{getShelfFromCollection(book.collectionId)?.name}</span>
-                                </div>
-                                <div className="flex items-center gap-2 text-sm">
-                                    <Folder size={14} />
-                                    <span>{getCollectionName(book.collectionId)}</span>
-                                </div>
-                                <div className="flex items-center gap-2 text-sm border-t border-indigo-500/20">
-                                    <Calendar size={14} />
-                                    <span>Created at {fromUnix(book.createdAtInUnix)}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                ))}
-                </div>
-            )}
         </div>    
     );
 }

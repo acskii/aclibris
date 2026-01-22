@@ -14,6 +14,7 @@ type DropdownProps = {
   onOptionSelect: (option: DropdownOption | null) => void;
   disabled?: boolean;
   className?: string;
+  isUp?: boolean;
 }
 
 export function Dropdown({
@@ -23,7 +24,8 @@ export function Dropdown({
   options,
   onOptionSelect,
   disabled = false,
-  className = ''
+  className = '',
+  isUp = false
 }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [filteredOptions, setFilteredOptions] = useState<DropdownOption[]>(options);
@@ -33,7 +35,7 @@ export function Dropdown({
 
   useEffect(() => {
     setInputValue(value?.name ?? placeholder);
-  }, [value]);
+  }, [value, placeholder]);
 
   useEffect(() => {
     setFilteredOptions(options);
@@ -82,7 +84,6 @@ export function Dropdown({
         <h3 className="font-semibold text-white text-nowrap underline decoration-cyan-400 mb-2">{title}</h3>
       </div>
 
-      {/* Input Container */}
       <div className="relative">
         <input
           type="text"
@@ -95,7 +96,6 @@ export function Dropdown({
           className="border border-2 rounded-md p-2 w-full border-cyan-400/60 focus:border-violet-800/60 bg-gray-600/50 text-white"
         />
         
-        {/* Clear Button */}
         <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
           {(selectedOption || value) && (
             <button
@@ -109,18 +109,22 @@ export function Dropdown({
         </div>
       </div>
 
-      {/* Dropdown Menu */}
       {isOpen && filteredOptions.length > 0 && (
-        <div className="absolute z-10 w-full bg-gray-800/95 backdrop-blur-sm border border-indigo-500/30 rounded-b-md max-h-60 overflow-y-auto">
+        <div 
+          className={`
+            absolute z-10 w-full bg-gray-800/95 backdrop-blur-sm border border-indigo-500/30 overflow-y-auto max-h-60
+            ${isUp ? 'bottom-full mb-1 rounded-t-md' : 'top-full mt-1 rounded-b-md'}
+          `}
+        >
           <div className="py-2">
             {filteredOptions.map((option) => (
               <button
                 key={option.id}
                 onClick={() => handleOptionSelect(option)}
-                className={`w-full text-left px-4 py-2 hover:bg-indigo-600/30 transition-colors`}
+                className="w-full text-left px-4 py-2 hover:bg-indigo-600/30 transition-colors"
               >
-                <div className="font-medium">{option.name}</div>
-                <hr />
+                <div className="font-medium text-white">{option.name}</div>
+                <hr className="border-gray-700 mt-1" />
               </button>
             ))}
           </div>
