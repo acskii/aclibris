@@ -6,6 +6,7 @@ type PageNavigateProps = {
     current: number;
     total: number;
     bookId: number;
+    bookTitle: string;
     scale: number;
     minScale: number;
     maxScale: number;
@@ -13,10 +14,11 @@ type PageNavigateProps = {
     OnZoomOut: () => void;
 }
 
-export function PageNavigate({ current, total, bookId, scale, minScale = 1, maxScale = 2, OnZoomIn, OnZoomOut }: PageNavigateProps) {
+export function PageNavigate({ current, total, bookId, bookTitle, scale, minScale = 1, maxScale = 2, OnZoomIn, OnZoomOut }: PageNavigateProps) {
   const progress = (current / total) * 100;
   const navigate = useNavigate();
   const [page, setPage] = useState<string>('');
+  
 
   useEffect(() => {
     setPage(String(current));
@@ -68,6 +70,10 @@ export function PageNavigate({ current, total, bookId, scale, minScale = 1, maxS
           >
               <Library size={20} />
           </button>
+
+          <div className="flex flex-row gap-2 items-center flex-1">
+            <h1 className="font-bold text-lg">{bookTitle}</h1>
+          </div>
 
           <div className="flex flex-row gap-2 items-center flex-1 justify-end">
             <button

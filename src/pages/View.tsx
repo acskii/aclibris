@@ -12,6 +12,7 @@ export function View() {
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>('');
     const [file, setFile] = useState<string>('');
+    const [title, setTitle] = useState<string>('');
     const [totalPages, setTotalPages] = useState<number>(0);
     const [scale, setScale] = useState<number>(1);
     const [baseW, setBaseW] = useState<number>(0);
@@ -66,6 +67,7 @@ export function View() {
             // @ts-ignore
             const book: BookObject = await window.db.book.get(id);
             setTotalPages(book.pages);
+            setTitle(book.title);
 
             const file = book.filePath;
 
@@ -185,7 +187,8 @@ export function View() {
                     <PageNavigate 
                         current={page} 
                         total={totalPages} 
-                        bookId={id} 
+                        bookId={id}
+                        bookTitle={title}
                         scale={scale}
                         minScale={minZoom()}
                         maxScale={maxZoom()}
