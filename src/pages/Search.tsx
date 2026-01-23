@@ -1,7 +1,7 @@
-import { Book, Calendar, Eye, Folder, LibrarySquare, Search, SearchX, User, X } from "lucide-react";
+import { Book, Calendar, ChevronLeft, ChevronRight, Eye, Folder, LibrarySquare, Search, SearchX, User, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Spinner } from "../components/common/spinner/Spinner";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { BookObject } from "../../electron/database/objects/Book";
 import { arrayToBase64 } from "../service/util/Thumbnail";
 import { fromUnix } from "../service/util/Date";
@@ -10,11 +10,15 @@ import { CollectionObject } from "../../electron/database/objects/Collection";
 import { Dropdown } from "../components/common/dropdown/Dropdown";
 import { TagObject } from "../../electron/database/objects/Tag";
 import { AutocompleteDropdown } from "../components/common/dropdown/AutocompleteDropdown";
+import { BookFilter } from "../../electron/database/objects/BookFilter";
 
 function SearchPage() {
     const navigate = useNavigate();
     const [loading, setLoading] = useState<boolean>(false);
     const [books, setBooks] = useState<BookObject[]>([]);
+    const [page, setPage] = useState<number>(0);
+    const [asc, setAsc] = useState<boolean>(false);
+    const [total, setTotal] = useState<number>(1);
     const [searchQuery, setSearchQuery] = useState('');
     const [shelves, setShelves] = useState<ShelfObject[]>([]);
     const [collections, setCollections] = useState<CollectionObject[]>([]);
@@ -26,31 +30,24 @@ function SearchPage() {
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
     useEffect(() => {
-        const loadBooks = async () => {
-            setLoading(true);
-            // Get books
-            // @ts-ignore
-            const books: BookObject[] = await window.db.book.getAll();
-            // Sort them alphabetically
-            books.sort((a, b) => a.title.localeCompare(b.title));
-
+        const loadMenus = async () => {
             // @ts-ignore
             const tags: TagObject[] = await window.db.tag.getAll();
-
             // @ts-ignore
             const shelves: ShelfObject[] = await window.db.shelf.getAll();
             // @ts-ignore
             const collections: CollectionObject[] = await window.db.collection.getAll();
+            //@ts-ignore
+            const pages: number = await window.db.book.getPages();
 
-            setBooks(books);
             setShelves(shelves);
             setCollections(collections);
             setAllTags(tags);
             setTagOptions(tags);
-            setLoading(false);
+            setTotal(pages);
         }
 
-        loadBooks();
+        loadMenus();
     }, [])
 
     useEffect(() => {
@@ -71,39 +68,31 @@ function SearchPage() {
         });
     }
 
-    const filteredBooks = useMemo(() => {
-        let filtered = books;
+    const fetchBooks = useCallback(async () => {
+        setLoading(true);
+        
+        const filterObject = new BookFilter(
+            searchQuery,
+            selectedCollection,
+            selectedShelf,
+            selectedTags,
+            asc
+        );
 
-        // Apply search query filter
-        if (searchQuery.trim()) {
-            const query = searchQuery.toLowerCase().trim();
-            filtered = filtered.filter(book => 
-                book.title?.toLowerCase().includes(query) ||
-                book.author?.toLowerCase().includes(query)
-            );
-        }
+        // @ts-ignore
+        const results = await window.db.book.getAll(page, filterObject);
+        
+        setBooks(results);
+        setLoading(false);
+    }, [page, searchQuery, selectedShelf, selectedCollection, selectedTags, asc]);
 
-        // Apply shelf filter
-        if (selectedShelf) {
-            filtered = filtered.filter(book => getShelfFromCollection(book.collectionId)?.id === selectedShelf);
-        }
+    useEffect(() => {
+        fetchBooks();
+    }, [fetchBooks]);
 
-        // Apply collection filter
-        if (selectedCollection) {
-            filtered = filtered.filter(book => book.collectionId === selectedCollection);
-        }
-
-        // Apply tags filter
-        if (selectedTags.length > 0) {
-            filtered = filtered.filter(book => {
-                return selectedTags.every(selectedTag => 
-                    book.tags.some(bookTag => bookTag.name === selectedTag)
-                );
-            })
-        }
-
-        return filtered;
-    }, [books, searchQuery, selectedShelf, selectedCollection, selectedTags]);
+    useEffect(() => {
+        setPage(0);
+    }, [searchQuery, selectedShelf, selectedCollection, selectedTags, asc]);
 
     const getCollectionName = (collectionId: number) => {
         return collections.find(c => c.id === collectionId)?.name;
@@ -151,15 +140,6 @@ function SearchPage() {
                 </h1>
             </div>
 
-            {loading && (
-                <div className="flex bg-indigo-400 p-3 rounded-lg flex-row items-center justify-center gap-2 z-30 my-10">
-                    <Spinner />
-                    <p className="text-violet-900 font-bold text-center text-md">
-                        Loading..
-                    </p>
-                </div>
-            )}
-
             <div className="sticky z-10 top-5 rounded-md gap-2 flex items-center mb-2 border-4 border-violet-800 bg-gradient-to-r from-purple-700 to-violet-600 via-violet-500 p-3">
                 <div className="w-full">
                     <input
@@ -172,8 +152,17 @@ function SearchPage() {
                 </div>
             </div>
 
+            {loading && (
+                <div className="flex bg-indigo-400 p-3 rounded-lg flex-row items-center justify-center gap-2 z-30 my-10">
+                    <Spinner />
+                    <p className="text-violet-900 font-bold text-center text-md">
+                        Loading..
+                    </p>
+                </div>
+            )}
+
             <div className="my-5">
-                {filteredBooks.length === 0 && !loading ? (
+                {books.length === 0 && !loading ? (
                     <div className="bg-gray-800/30 backdrop-blur-sm rounded-md p-6 border border-indigo-500/20 text-center">
                         <SearchX size={50} className="mx-auto mb-2" />
                         <h3 className="text-xl font-semibold text-white mb-2">
@@ -188,7 +177,7 @@ function SearchPage() {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-3">
-                    {filteredBooks.map((book) => (
+                    {books.map((book) => (
                         <div
                             key={book.id}
                             className="bg-gray-800/30 rounded-md border border-indigo-500/20 hover:border-indigo-400/50 cursor-pointer group"
@@ -265,6 +254,26 @@ function SearchPage() {
                     ))}
                     </div>
                 )}
+            </div>
+
+            <div className="gap-2 rounded-md flex flex-row justify-center items-center mb-2 border-4 border-violet-800 bg-gradient-to-r from-purple-700 to-violet-600 via-violet-500 p-3">
+                    <button
+                        onClick={() => setPage(prev => prev - 1)}
+                        disabled={(page + 1) <= 1}
+                        className="bg-gradient-to-br from-blue-800 to-indigo-900 p-2 rounded-md hover:from-violet-400 hover:to-purple-500 text-white transition disabled:opacity-30"
+                        >
+                        <ChevronLeft size={20} />
+                    </button>
+                    <div className="text-nowrap flex flex-row gap-2 text-sm font-bold text-white border border-3 border-purple px-3 py-1 bg-sky-400 rounded-lg">
+                        <p className="grow-1">{page + 1} / {total}</p>
+                    </div>
+                    <button
+                        onClick={() => setPage(prev => prev + 1)}
+                        disabled={(page + 1) >= total}
+                        className="p-2 rounded-md bg-gradient-to-br from-blue-800 to-indigo-900 hover:to-purple-500 text-white transition disabled:opacity-30"
+                    >
+                        <ChevronRight size={20} />
+                    </button>
             </div>
 
             <div className="sticky -mb-5 bottom-0 z-10 border-4 rounded-md border-violet-800 bg-gradient-to-r from-purple-700 to-violet-600 via-violet-500 py-3 px-5">

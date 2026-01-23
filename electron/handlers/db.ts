@@ -1,13 +1,22 @@
 import { ipcMain } from "electron";
 import { query } from "../database/query";
 import { Collection } from "../database/objects/Collection";
+import { BookFilterObject } from "../database/objects/BookFilter";
 
 export function registerDbHandlers() {
-    ipcMain.handle('db:book:getAll', async (_) => {
+    ipcMain.handle('db:book:getAll', async (_, page: number, filter: BookFilterObject) => {
         try {
-            return query.getBooks();
+            return query.getBooks(page, filter);
         } catch (error: any) {
             console.log("[db:query] => Error occured when handling 'book:getAll': ", error.message);
+        }
+    });
+
+    ipcMain.handle('db:book:getPages', async (_) => {
+        try {
+            return query.getTotalBookPages();
+        } catch (error: any) {
+            console.log("[db:query] => Error occured when handling 'book:getPages': ", error.message);
         }
     });
 

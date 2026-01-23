@@ -1,55 +1,133 @@
 import { database } from "./connection";
 import { Book, type BookQueryObject } from "./objects/Book";
-import { Collection, type CollectionQueryObject } from "./objects/Collection";
+import { Collection, CollectionObject, type CollectionQueryObject } from "./objects/Collection";
 import { Shelf, type ShelfQueryObject } from "./objects/Shelf";
 import TitleAlreadyExistsError from "./exceptions/TitleAlreadyExistsError";
 import FileAlreadyExistsError from "./exceptions/FileAlreadyExistsError";
 import BookDoesNotExistError from "./exceptions/BookDoesNotExistError";
 import { MetaQueryObject } from "./objects/Metadata";
 import { Tag, TagObject, TagQueryObject } from "./objects/Tag";
-import { threadId } from "node:worker_threads";
+import { BookFilterObject } from "./objects/BookFilter";
 
 class DatabaseQuery {
-    getBooks() {
+    /* Default page size for book pagination */
+    private bookPageSize: number = 12;
+
+    getBooks(page: number = 0, filter: BookFilterObject | null = null) {
         // Get general info about all books stored
-        const result = database.prepare(
-            `
-            SELECT b.id, b.title, b.author, b.recent_page, b.recent_read_at, b.thumbnail, b.pages, b.file_path, b.file_size, b.collection_id, b.created_at, t.id AS tag_id, t.tag_name
-            FROM books AS b
-            LEFT JOIN book_tag AS bt ON b.id == bt.book_id
-            LEFT JOIN tags AS t ON bt.tag_id == t.id
-            `
-        ).all();
+        // Supports pagination
+        // Supports filtering
+
+        // Build the main query once
+        const baseQuery = `
+            SELECT 
+                b.id, b.title, b.author, b.recent_page, b.recent_read_at, 
+                b.thumbnail, b.pages, b.file_path, b.file_size, 
+                b.collection_id, b.created_at,
+                t.id AS tag_id, t.tag_name
+            FROM books b
+            LEFT JOIN book_tag bt ON b.id = bt.book_id
+            LEFT JOIN tags t ON bt.tag_id = t.id
+        `;
+
+        const whereConditions: string[] = [];
+        const args: any[] = [];
+
+        if (filter) {
+            // Title/Author search
+            if (filter.query) {
+                whereConditions.push('(b.title LIKE ? OR b.author LIKE ?)');
+                args.push(`%${filter.query}%`, `%${filter.query}%`);
+            }
+
+            // Shelf/Collection filter
+            if (filter.shelfId != null) {
+                if (filter.collectionId != null) {
+                    whereConditions.push('b.collection_id = ?');
+                    args.push(filter.collectionId);
+                } else {
+                    const collections = this.getCollectionsByShelfId(filter.shelfId);
+                    const collectIds = collections.map((c: CollectionObject) => c.id);
+                    if (collectIds.length > 0) {
+                        whereConditions.push(`b.collection_id IN (${collectIds.map(() => '?').join(',')})`);
+                        args.push(...collectIds);
+                    } else {
+                        // No collections in this shelf = no books
+                        return [];
+                    }
+                }
+            }
+
+            // Tag filter
+            if (filter.tags && filter.tags.length > 0) {
+                whereConditions.push(`
+                    b.id IN (
+                        SELECT bt2.book_id FROM book_tag bt2
+                        JOIN tags t2 ON bt2.tag_id = t2.id
+                        WHERE t2.tag_name IN (${filter.tags.map(() => '?').join(',')})
+                        GROUP BY bt2.book_id
+                        HAVING COUNT(DISTINCT t2.tag_name) = ${filter.tags.length}
+                    )
+                `);
+                args.push(...filter.tags);
+            }
+        }
+
+        // Build final query
+        let query = baseQuery;
+        if (whereConditions.length > 0) {
+            query += ' WHERE ' + whereConditions.join(' AND ');
+        }
+
+        // Add grouping for deduplication and ordering
+        query += `
+            GROUP BY b.id, t.id
+            ORDER BY b.title ${filter?.asc ? 'ASC' : 'DESC'}
+            LIMIT ? OFFSET ?
+        `;
+
+        args.push(this.bookPageSize, this.bookPageSize * page);
+
+        // Execute single query
+        const result = database.prepare(query).all(...args);
         
-        if (result) {
-            const books = new Map();
-            
-            result.forEach((row: BookQueryObject) => {
-                if (!books.has(row.id)) {
-                    books.set(row.id, new Book(
-                        row.id, 
-                        row.title, 
-                        row.collection_id, 
-                        row.file_path, 
-                        row.file_size, 
-                        row.pages, 
-                        row.created_at, 
-                        row.author, 
-                        row.thumbnail, 
-                        row.recent_page, 
-                        row.recent_read_at
-                    ));
-                }
+        if (result.length === 0) return [];
 
-                if (row.tag_id && row.tag_name) {
-                    books.get(row.id).tags.push(
-                        new Tag(row.tag_id, row.tag_name)
-                    );
-                }
-            });
+        // Process results into Book objects
+        const books = new Map<number, Book>();
+        
+        result.forEach((row: BookQueryObject) => {
+            if (!books.has(row.id)) {
+                books.set(row.id, new Book(
+                    row.id, 
+                    row.title, 
+                    row.collection_id, 
+                    row.file_path, 
+                    row.file_size, 
+                    row.pages, 
+                    row.created_at, 
+                    row.author, 
+                    row.thumbnail, 
+                    row.recent_page, 
+                    row.recent_read_at
+                ));
+            }
 
-            return Array.from(books.values());
-        } else return [];
+            if (row.tag_id && row.tag_name) {
+                books.get(row.id)!.tags.push(new Tag(row.tag_id, row.tag_name));
+            }
+        });
+        
+        return Array.from(books.values());
+    }
+
+    getTotalBookPages() {
+        // Return the total number of pages that all books occupy
+        return Math.ceil((database.prepare(
+            `
+            SELECT COUNT(*) AS total FROM books
+            `
+        ).get() as { total: number }).total / this.bookPageSize);
     }
 
     getBookById(id: number) {
