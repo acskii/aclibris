@@ -61,9 +61,9 @@ export function PageNavigate({ current, total, bookId, bookTitle, scale, minScal
 
   return (
     <div className="sticky top-0 w-full flex justify-center z-30">
-      <div className="w-full min-w-[50%] bg-gradient-to-r from-sky-600 via-cyan-500 to-violet-400 overflow-hidden text-white flex flex-col items-center backdrop-blur-md">
+      <div className="w-full bg-gradient-to-r from-sky-600 via-cyan-500 to-violet-400 overflow-hidden text-white flex flex-col items-center">
         {/* Navigation Controls */}
-        <div className="flex flex-row gap-10 items-center justify-between w-full px-4 py-2">
+        <div className="flex flex-row gap-10 items-center justify-between w-full px-5 py-2">
           <button
               onClick={jumpToLibrary}
               className="bg-gradient-to-br from-blue-800 to-indigo-900 p-2 rounded-md hover:from-violet-400 hover:to-purple-500 text-white transition disabled:opacity-30"
@@ -71,8 +71,13 @@ export function PageNavigate({ current, total, bookId, bookTitle, scale, minScal
               <Library size={20} />
           </button>
 
-          <div className="flex flex-row gap-2 items-center flex-1">
-            <h1 className="font-bold text-lg">{bookTitle}</h1>
+          <div className="flex-1 hidden lg:inline-block">
+            <h1 
+              className="font-bold text-sm md:text-md lg:text-lg line-clamp-1"
+              title={bookTitle}
+            >
+                {bookTitle}
+            </h1>
           </div>
 
           <div className="flex flex-row gap-2 items-center flex-1 justify-end">

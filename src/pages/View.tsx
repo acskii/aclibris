@@ -117,35 +117,35 @@ export function View() {
         }
     };
 
-    const computeBaseScale = (width: number) => {
-        const minW = 800;        // minimum window width
-        const midW = 1200;       // width at which baseScale === 1
-        const minBase = 0.80;    // scale at minW
-        const maxBase = 1.00;    // scale at or above midW
+    // const computeBaseScale = (width: number) => {
+    //     const minW = 800;        // minimum window width
+    //     const midW = 1200;       // width at which baseScale === 1
+    //     const minBase = 0.50;    // scale at minW
+    //     const maxBase = 1.00;    // scale at or above midW
 
-        if (width <= minW) return minBase;
-        if (width >= midW) return maxBase;
-        const t = (width - minW) / (midW - minW);
-        return minBase + t * (maxBase - minBase);
-    };
+    //     if (width <= minW) return minBase;
+    //     if (width >= midW) return maxBase;
+    //     const t = (width - minW) / (midW - minW);
+    //     return minBase + t * (maxBase - minBase);
+    // };
 
-    const [baseScale, setBaseScale] = useState(() => computeBaseScale(window.innerWidth || 1200));
+    // const baseScale = computeBaseScale(window.innerWidth || 1200);
 
-    useEffect(() => {
-        const handleResize = () => {
-            const w = window.innerWidth;
-            const newBase = computeBaseScale(w);
-            // preserve user's relative zoom ratio: r = currentScale / prevBase
-            const ratio = scale / baseW;
-            // compute next absolute scale and clamp to allowed range
-            const nextScale = Math.max(newBase, Math.min(newBase * 2, newBase * ratio)); // example clamp to [newBase, newBase*2]
-            setBaseScale(newBase);
-            setScale(nextScale);
-        };
+    // useEffect(() => {
+    //     const handleResize = () => {
+    //         const w = window.innerWidth;
+    //         const newBase = computeBaseScale(w);
+    //         // preserve user's relative zoom ratio: r = currentScale / prevBase
+    //         const ratio = scale / baseW;
+    //         // compute next absolute scale and clamp to allowed range
+    //         const nextScale = Math.max(newBase, Math.min(newBase * 2, newBase * ratio)); // example clamp to [newBase, newBase*2]
+    //         setBaseScale(newBase);
+    //         setScale(nextScale);
+    //     };
 
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, [scale]);
+    //     window.addEventListener('resize', handleResize);
+    //     return () => window.removeEventListener('resize', handleResize);
+    // }, [scale]);
 
 
     useEffect(() => {
@@ -162,11 +162,11 @@ export function View() {
         containerRef.current?.scrollIntoView({behavior:'instant'})
     }, [pdf, page]);
 
-    const minZoom = () => baseScale;
-    const maxZoom = () => Math.round(baseScale * 1.5);
+    const minZoom = 0.5;
+    const maxZoom = 3;
 
     return (
-        <div className="bg-white">
+        <>
             {error && (
                 <div className="fixed w-3/5 left-1/2 transform -translate-x-1/2 bg-gradient-to-l from-orange-400 to-yellow-300 top-20 z-50 w-3/5 rounded-xl" role="alert" aria-labelledby="toast-error">
                     <div className="flex p-4 items-center">
@@ -190,10 +190,10 @@ export function View() {
                         bookId={id}
                         bookTitle={title}
                         scale={scale}
-                        minScale={minZoom()}
-                        maxScale={maxZoom()}
-                        OnZoomIn={() => setScale(prev => Math.min(prev + 0.1, maxZoom()))}
-                        OnZoomOut={() => setScale(prev => Math.max(prev - 0.1, minZoom()))}
+                        minScale={minZoom}
+                        maxScale={maxZoom}
+                        OnZoomIn={() => setScale(prev => Math.min(prev + 0.1, maxZoom))}
+                        OnZoomOut={() => setScale(prev => Math.max(prev - 0.1, minZoom))}
                     />
                     {loading && (
                         <div className="flex flex-row items-center justify-center gap-2 z-30 my-10">
@@ -216,6 +216,6 @@ export function View() {
                     </div>
                 </div>
             )}
-        </div>
+        </>
     );
 }
