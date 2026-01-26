@@ -33,7 +33,7 @@ export function SideMenu() {
   return (
     <div
       className={`h-screen z-40 bg-gradient-to-b from-sky-600 via-cyan-500 via-30% to-violet-400 text-white shadow-xl backdrop-blur-md transition-all duration-300 ${
-        collapsed ? "w-20" : "w-64"
+        collapsed ? "w-20" : "w-50"
       } flex flex-col justify-between`}
     >
       <div>
