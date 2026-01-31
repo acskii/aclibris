@@ -32,7 +32,9 @@ export function View() {
 
                 const doc = await documentCache.getDocument(file);
                 setPDF(doc);
-                setError(null)
+
+                if (doc) setError(null);
+                else setError("The book you're attempting to read does not exist, please go back to choose another. ");
             } catch (error: any) {
                 setError(error.message);
             } finally {
@@ -57,7 +59,7 @@ export function View() {
     useEffect(() => {
         const loadFilePath = async () => {
             if (!id) {
-                setError("The book you're attempting to book does not exist, please go back to choose another. ");
+                setError("The book you're attempting to read does not exist, please go back to choose another. ");
                 setFile('');
                 return;
             }
@@ -69,17 +71,17 @@ export function View() {
             setTotalPages(book.pages);
             setTitle(book.title);
 
+            // Due to database, a file path for the book will always be there
+            // since editing book details won't allow invalid paths
+            // To check for book existence, we need to attempt to render it first
             const file = book.filePath;
-
-            if (file) {
-                setFile(file);
-                setError(null);
-            } else {
-                setError("The book you're attempting to book does not exist, please go back to choose another. ");
-                setFile('');
-            }
+            setFile(file);
         };
 
+        // Reset from previous book load, and load new one's details
+        setError(null);
+        setScale(1);
+        setBaseW(0);
         loadFilePath();
     }, []);
 
@@ -117,37 +119,6 @@ export function View() {
         }
     };
 
-    // const computeBaseScale = (width: number) => {
-    //     const minW = 800;        // minimum window width
-    //     const midW = 1200;       // width at which baseScale === 1
-    //     const minBase = 0.50;    // scale at minW
-    //     const maxBase = 1.00;    // scale at or above midW
-
-    //     if (width <= minW) return minBase;
-    //     if (width >= midW) return maxBase;
-    //     const t = (width - minW) / (midW - minW);
-    //     return minBase + t * (maxBase - minBase);
-    // };
-
-    // const baseScale = computeBaseScale(window.innerWidth || 1200);
-
-    // useEffect(() => {
-    //     const handleResize = () => {
-    //         const w = window.innerWidth;
-    //         const newBase = computeBaseScale(w);
-    //         // preserve user's relative zoom ratio: r = currentScale / prevBase
-    //         const ratio = scale / baseW;
-    //         // compute next absolute scale and clamp to allowed range
-    //         const nextScale = Math.max(newBase, Math.min(newBase * 2, newBase * ratio)); // example clamp to [newBase, newBase*2]
-    //         setBaseScale(newBase);
-    //         setScale(nextScale);
-    //     };
-
-    //     window.addEventListener('resize', handleResize);
-    //     return () => window.removeEventListener('resize', handleResize);
-    // }, [scale]);
-
-
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -168,13 +139,13 @@ export function View() {
     return (
         <>
             {error && (
-                <div className="fixed w-3/5 left-1/2 transform -translate-x-1/2 bg-gradient-to-l from-orange-400 to-yellow-300 top-20 z-50 w-3/5 rounded-xl" role="alert" aria-labelledby="toast-error">
+                <div className="fixed w-3/5 left-1/2 transform -translate-x-1/2 bg-yellow-300 top-20 z-50 w-3/5 rounded-md" role="alert" aria-labelledby="toast-error">
                     <div className="flex p-4 items-center">
-                        <div className="shrink-0 text-red-500">
+                        <div className="shrink-0 text-orange-500">
                             <TriangleAlert size={30} />
                         </div>
                         <div className="ms-3">
-                            <p className="text-md text-red-400 font-bold ">
+                            <p className="text-md text-orange-400 font-bold">
                                 {error}
                             </p>
                         </div>
@@ -184,6 +155,19 @@ export function View() {
 
             {id && (
                 <div className="flex flex-col">
+                    {error != null ? 
+                    <PageNavigate 
+                        current={0} 
+                        total={0} 
+                        bookId={id}
+                        bookTitle={"Book Not Found"}
+                        scale={1}
+                        minScale={0}
+                        maxScale={0}
+                        OnZoomIn={() => {}}
+                        OnZoomOut={() => {}}
+                    />
+                    : 
                     <PageNavigate 
                         current={page} 
                         total={totalPages} 
@@ -194,7 +178,7 @@ export function View() {
                         maxScale={maxZoom}
                         OnZoomIn={() => setScale(prev => Math.min(prev + 0.1, maxZoom))}
                         OnZoomOut={() => setScale(prev => Math.max(prev - 0.1, minZoom))}
-                    />
+                    />}
                     {loading && (
                         <div className="flex flex-row items-center justify-center gap-2 z-30 my-10">
                             <Spinner />
@@ -203,12 +187,12 @@ export function View() {
                             </p>
                         </div>
                     )}
+                    <div 
+                        ref={containerRef}
+                        className="absolute top-0 left-0 w-1 h-1 opacity-0"
+                        aria-hidden="true"
+                    />
                     <div className="relative text-center overflow-auto no-scrollbar">
-                        <div 
-                            ref={containerRef}
-                            className="absolute top-0 left-0 w-1 h-1 opacity-0"
-                            aria-hidden="true"
-                        />
                         <canvas 
                             ref={canvasRef}
                             className={`${loading ? "invisible" : "visible"} inline-block`}
