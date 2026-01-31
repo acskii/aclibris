@@ -12,14 +12,6 @@ export function registerDbHandlers() {
         }
     });
 
-    ipcMain.handle('db:book:getPages', async (_) => {
-        try {
-            return query.getTotalBookPages();
-        } catch (error: any) {
-            console.log("[db:query] => Error occured when handling 'book:getPages': ", error.message);
-        }
-    });
-
     ipcMain.handle('db:book:get', async (_, book_id) => {
         try {
             return query.getBookById(book_id);

@@ -1,7 +1,7 @@
 import { Book, Calendar, ChevronLeft, ChevronRight, Eye, Folder, LibrarySquare, Search, SearchX, User, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Spinner } from "../components/common/spinner/Spinner";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { BookObject } from "../../electron/database/objects/Book";
 import { arrayToBase64 } from "../service/util/Thumbnail";
 import { fromUnix } from "../service/util/Date";
@@ -11,6 +11,7 @@ import { Dropdown } from "../components/common/dropdown/Dropdown";
 import { TagObject } from "../../electron/database/objects/Tag";
 import { AutocompleteDropdown } from "../components/common/dropdown/AutocompleteDropdown";
 import { BookFilter } from "../../electron/database/objects/BookFilter";
+import { PageObject } from "../../electron/database/objects/Page";
 
 function SearchPage() {
     const navigate = useNavigate();
@@ -28,6 +29,8 @@ function SearchPage() {
     const [allTags, setAllTags] = useState<TagObject[]>([]);
     const [tagOptions, setTagOptions] = useState<TagObject[]>([]);
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
+    const containerRef = useRef<HTMLDivElement>(null);
+    
 
     useEffect(() => {
         const loadMenus = async () => {
@@ -37,14 +40,11 @@ function SearchPage() {
             const shelves: ShelfObject[] = await window.db.shelf.getAll();
             // @ts-ignore
             const collections: CollectionObject[] = await window.db.collection.getAll();
-            //@ts-ignore
-            const pages: number = await window.db.book.getPages();
 
             setShelves(shelves);
             setCollections(collections);
             setAllTags(tags);
             setTagOptions(tags);
-            setTotal(pages);
         }
 
         loadMenus();
@@ -80,15 +80,25 @@ function SearchPage() {
         );
 
         // @ts-ignore
-        const results = await window.db.book.getAll(page, filterObject);
+        const results: PageObject = await window.db.book.getAll(page, filterObject);
         
-        setBooks(results);
+        if (results) {
+            setBooks(results.books);
+            setTotal(results.total);
+        } else {
+            setBooks([]);
+            setTotal(1);
+        }
         setLoading(false);
     }, [page, searchQuery, selectedShelf, selectedCollection, selectedTags, asc]);
 
     useEffect(() => {
         fetchBooks();
     }, [fetchBooks]);
+
+    useEffect(() => {
+        containerRef.current?.scrollIntoView({behavior:'instant'})
+    }, [page]);
 
     useEffect(() => {
         setPage(0);
@@ -133,13 +143,19 @@ function SearchPage() {
 
     return (
         <div className="min-h-screen p-5">
-            <div className="mb-8 flex flex-col items-start">
-                <h1 className="mb-2 flex gap-3 justify-start">
+            <div className="mb-4 flex flex-col items-start">
+                <h1 className="flex gap-3 justify-start">
                     <Search size={40} />
                     <span className="text-4xl font-bold text-white">Search</span>
                 </h1>
             </div>
 
+            <div 
+                ref={containerRef}
+                className="w-1 h-1 opacity-0"
+                aria-hidden="true"
+            />
+            
             <div className="sticky z-10 top-5 rounded-md gap-2 flex items-center mb-2 border-4 border-violet-800 bg-gradient-to-r from-purple-700 to-violet-600 via-violet-500 p-3">
                 <div className="w-full">
                     <input

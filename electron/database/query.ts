@@ -8,6 +8,7 @@ import BookDoesNotExistError from "./exceptions/BookDoesNotExistError";
 import { MetaQueryObject } from "./objects/Metadata";
 import { Tag, TagObject, TagQueryObject } from "./objects/Tag";
 import { BookFilterObject } from "./objects/BookFilter";
+import { Page } from "./objects/Page";
 
 class DatabaseQuery {
     /* Default page size for book pagination */
@@ -20,11 +21,7 @@ class DatabaseQuery {
 
         // Build the main query once
         const baseQuery = `
-            SELECT 
-                b.id, b.title, b.author, b.recent_page, b.recent_read_at, 
-                b.thumbnail, b.pages, b.file_path, b.file_size, 
-                b.collection_id, b.created_at,
-                t.id AS tag_id, t.tag_name
+            SELECT b.id
             FROM books b
             LEFT JOIN book_tag bt ON b.id = bt.book_id
             LEFT JOIN tags t ON bt.tag_id = t.id
@@ -79,24 +76,31 @@ class DatabaseQuery {
             query += ' WHERE ' + whereConditions.join(' AND ');
         }
 
-        // Add grouping for deduplication and ordering
-        query += `
+        const result: { id: number }[] = database.prepare(query).all(...args);
+        if (result.length === 0) return null;
+
+        const ids = result.map((r) => r.id);
+        const placeholders = ids.map(() => '?').join(',');
+
+        const paginated = database.prepare(`
+            SELECT 
+                b.id, b.title, b.author, b.recent_page, b.recent_read_at, 
+                b.thumbnail, b.pages, b.file_path, b.file_size, 
+                b.collection_id, b.created_at,
+                t.id AS tag_id, t.tag_name
+            FROM books b
+            LEFT JOIN book_tag bt ON b.id = bt.book_id
+            LEFT JOIN tags t ON bt.tag_id = t.id
+            WHERE b.id IN (${placeholders})
             GROUP BY b.id, t.id
             ORDER BY b.title ${filter?.asc ? 'ASC' : 'DESC'}
             LIMIT ? OFFSET ?
-        `;
-
-        args.push(this.bookPageSize, this.bookPageSize * page);
-
-        // Execute single query
-        const result = database.prepare(query).all(...args);
-        
-        if (result.length === 0) return [];
+        `).all(...ids, this.bookPageSize, this.bookPageSize * page);
 
         // Process results into Book objects
         const books = new Map<number, Book>();
         
-        result.forEach((row: BookQueryObject) => {
+        paginated.forEach((row: BookQueryObject) => {
             if (!books.has(row.id)) {
                 books.set(row.id, new Book(
                     row.id, 
@@ -118,16 +122,11 @@ class DatabaseQuery {
             }
         });
         
-        return Array.from(books.values());
-    }
-
-    getTotalBookPages() {
-        // Return the total number of pages that all books occupy
-        return Math.ceil((database.prepare(
-            `
-            SELECT COUNT(*) AS total FROM books
-            `
-        ).get() as { total: number }).total / this.bookPageSize);
+        return new Page(
+            page,
+            Math.ceil(ids.length / this.bookPageSize),
+            Array.from(books.values())
+        );
     }
 
     getBookById(id: number) {
