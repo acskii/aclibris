@@ -1,9 +1,8 @@
-
 import { useState, useEffect } from 'react';
 import { type ShelfObject } from '../../electron/database/objects/Shelf';
 import { type CollectionObject } from '../../electron/database/objects/Collection';
 import { Spinner } from '../components/common/spinner/Spinner';
-import { TriangleAlert, Library, Book, BookAlert, Trash2, PenBox} from 'lucide-react';
+import { TriangleAlert, Library, BookAlert, Trash2, PenBox, Crown, Cat, Plus} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import DeleteDialog from '../components/common/dialog/DeleteDialog';
 import { EditNameDialog } from '../components/common/dialog/EditNameDialog';
@@ -109,7 +108,7 @@ export function LibraryPage() {
 
             <div className="space-y-6">
                 {data.map((d: LibraryShelf, index) => (
-                    <div key={index + 1} className="flex bg-gray-800/50 backdrop-blur-sm rounded-md border border-indigo-500/20">
+                    <div key={index} id={`shelf-${index}`} className="flex bg-gray-800/50 rounded-md">
                         <div>
                             <div className="bg-gradient-to-br from-violet-500 to-purple-600 flex flex-auto items-center items-center justify-center border border-3 border-r-5 border-violet-700 h-full w-10">
                                 <h2 className="text-2xl font-semibold text-white">
@@ -118,7 +117,7 @@ export function LibraryPage() {
                             </div>
                         </div>
 
-                        <div className="w-full px-6 py-4">
+                        <div className="w-full px-6 py-4 min-w-0">
                             {/* Shelf Header */}
                             <div className="flex items-center justify-between gap-4 mb-6">
                                 <div className="flex flex-row items-center gap-4">
@@ -182,41 +181,53 @@ export function LibraryPage() {
                             </div>
 
                             {/* Collections Row */}
-                            <div className="overflow-x-auto pb-4">
-                                <div className="flex gap-6 min-w-max">
+                            <div className="overflow-x-auto pb-4 w-full">
+                                <div className="flex gap-6">
                                     {d.collections.map((collection) => (
                                         <button 
                                             key={`${collection.id}`}
                                             onClick={() => goToCollection(collection.id)}
-                                            className="group flex flex-col items-center justify-center cursor-pointer transform hover:scale-90 transition-transform duration-200"
+                                            className="group flex flex-none flex-col items-center cursor-pointer"
                                         >
-                                            {/* Book Stack */}
-                                            <div className="relative w-32 h-40 mb-3">
-                                                {/* Multiple book spines stacked */}
-                                                <div className="absolute inset-0 flex gap-0.5">
-                                                    {/* Main book spine */}
-                                                    <div className="w-40 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-l-sm shadow-lg" />
-                                                    
-                                                    {/* Additional book spines peeking out */}
-                                                    <div className="w-4 bg-gradient-to-r from-violet-700 to-indigo-700 rounded-l-sm opacity-80" />
-                                                    <div className="w-3 bg-gradient-to-r from-violet-800 to-indigo-800 rounded-l-sm opacity-60" />
-                                                    <div className="w-2 bg-gradient-to-r from-violet-900 to-indigo-900 rounded-l-sm opacity-40" />
-                                                </div>
+                                            {/* The Crystal Cat Container */}
+                                            <div className="relative w-28 h-36 mb-6 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]">
                                                 
-                                                {/* Collection icon overlay */}
-                                                <div className="absolute inset-0 flex items-center justify-center">
-                                                    <Book size={40} className="text-white/60 group-hover:text-white/80 transition-colors" />
-                                                </div>    
+                                                {/* The Royal Halo */}
+                                                <div className="absolute -inset-2 bg-gradient-to-t from-amber-500/0 via-cyan-400/20 to-amber-400/40 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+
+                                                {/* Cat Head */}
+                                                <div className="relative h-full w-full bg-white/10 backdrop-blur-2xl rounded-b-[2rem] rounded-t-lg border border-white/20 shadow-2xl overflow-hidden group-hover:border-amber-400/50 transition-colors">
+                                                
+                                                {/* The Ears */}
+                                                <div className="absolute top-0 left-0 w-8 h-8 bg-white/10 border-r border-b border-white/20 -translate-x-2 -translate-y-2 rotate-[15deg]" />
+                                                <div className="absolute top-0 right-0 w-8 h-8 bg-white/10 border-l border-b border-white/20 translate-x-2 -translate-y-2 -rotate-[15deg]" />
+                                                <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/10 via-transparent to-amber-500/10" />
+                                                
+                                                {/* Icons */}
+                                                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                                    {/* Floating Crown */}
+                                                    <div className="relative transform -translate-y-1 group-hover:-translate-y-3 transition-transform duration-500">
+                                                    <Crown size={20} className="text-amber-400 fill-amber-400/20 drop-shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
+                                                    </div>
+                                                    
+                                                    {/* Cat Face */}
+                                                    <div className="relative">
+                                                    <Cat size={40} className="text-cyan-300 drop-shadow-[0_0_12px_rgba(34,211,238,0.6)]" />
+                                                    </div>
+                                                </div>
+
+                                                {/* Effects */}
+                                                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-3/4 h-[2px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_10px_#22d3ee]" /></div>
+                                                <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-16 h-1 bg-amber-500/20 blur-md rounded-full scale-x-50 group-hover:scale-x-100 transition-transform duration-500" />
                                             </div>
 
                                             {/* Collection Info */}
-                                            <div className="bg-black/20 w-full mx-auto rounded-md flex items-center justify-center p-1">
-                                                <div className="text-center">
-                                                    <h3 className="font-semibold text-white text-sm mb-1 line-clamp-2 group-hover:text-indigo-200 transition-colors">
-                                                        {collection.name}
-                                                    </h3>
-                                                </div>
+                                            <div className="bg-black/20 w-full rounded-md flex items-center justify-center p-1">
+                                                <h3 className="font-semibold text-white text-sm mb-1 line-clamp-2 group-hover:text-amber-300 transition-colors">
+                                                    {collection.name.length > 30 ? collection.name.slice(0,28) + "..." : collection.name}
+                                                </h3>
                                             </div>
+                                            <div className="h-[2px] w-0 bg-gradient-to-r from-transparent via-amber-400 to-transparent group-hover:w-full transition-all duration-500 mx-auto mt-1" />
                                         </button>
                                     ))}
                                 </div>
@@ -229,13 +240,13 @@ export function LibraryPage() {
                     <div className="text-center py-16 flex flex-col gap-2">
                         <BookAlert className="w-24 h-24 mx-auto" />
                         <h3 className="text-2xl font-semibold text-white mb-2">Your library is empty</h3>
-                        {/* <p className="text-indigo-200 mb-6">Start by creating your first shelf and adding collections</p> */}
-                        {/* <button 
+                        <p className="text-indigo-200 mb-6">Start by creating your first shelf and adding collections</p>
+                        <button 
                             className="cursor-pointer bg-gradient-to-t border border-3 from-sky-600 to-cyan-300 hover:bg-gradient-to-b hover:from-indigo-600 hover:to-violet-600 hover:border-indigo-800 text-white px-3 py-2 rounded-lg transition-all flex items-center gap-2 mx-auto"
                         >
-                            <Plus className="w-5 h-5" />
+                            <Plus size={20} />
                             <span className="font-bold">Create a Shelf</span>
-                        </button> */}
+                        </button>
                     </div>
                 )}
             </div>  
