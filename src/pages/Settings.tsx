@@ -1,22 +1,28 @@
 import { useState, useEffect } from 'react';
-import { Settings, Save, Book, Image, RotateCcw } from 'lucide-react';
+import { Settings, Save, Book, Image, RotateCcw, Crown, Moon, Leaf, BookOpen } from 'lucide-react';
 import { Spinner } from '../components/common/spinner/Spinner';
 import { ToggleSwitch } from '../components/common/toggle/ToggleSwitch';
 import { TriangleAlert } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
+import { themes } from '../themes';
 
 interface SettingsState {
   can_save_recent: boolean;
   can_load_recent: boolean;
   thumbnail_on_upload: boolean;
+  theme: string;
 }
 
 const defaultSettings: SettingsState = {
     can_save_recent: true,
     can_load_recent: true,
-    thumbnail_on_upload: true
+    thumbnail_on_upload: true,
+    theme: 'default'
 }
 
 export default function SettingsPage() {
+  const { theme, setTheme } = useTheme();
+
   const [settings, setSettings] = useState<SettingsState>(defaultSettings);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -28,19 +34,22 @@ export default function SettingsPage() {
       setLoading(true);
       setError('');
 
-      const [saveRecent, loadRecent, thumbnail] = await Promise.all([
+      const [saveRecent, loadRecent, thumbnail, theme] = await Promise.all([
         // @ts-ignore
         window.db.settings.saveRecent(),
         // @ts-ignore
         window.db.settings.loadRecent(),
         // @ts-ignore
-        window.db.settings.thumbnail()
+        window.db.settings.thumbnail(),
+        // @ts-ignore
+        window.db.settings.theme()
       ]);
 
       setSettings({
         can_save_recent: saveRecent,
         can_load_recent: loadRecent,
-        thumbnail_on_upload: thumbnail
+        thumbnail_on_upload: thumbnail,
+        theme: theme
       });
 
     } catch (error: any) {
@@ -96,9 +105,9 @@ export default function SettingsPage() {
     <div className="min-h-screen flex flex-col p-5">
       {/* Loading State */}
       {loading && (
-        <div className="flex bg-indigo-400 p-3 rounded-lg flex-row items-center justify-center gap-2 z-30 my-10">
+        <div className="flex bg-app-card backdrop-blur-md border border-white/20 p-3 rounded-lg flex-row items-center justify-center gap-2 z-30 my-10 shadow-xl">
           <Spinner />
-          <p className="text-violet-900 font-bold text-center text-md">
+          <p className="text-white font-bold text-center text-md">
             Loading settings...
           </p>
         </div>
@@ -106,13 +115,13 @@ export default function SettingsPage() {
 
       {/* Error Message */}
       {error !== '' && (
-        <div className="bg-gradient-to-l from-orange-400 to-yellow-300 mb-6 rounded-xl" role="alert">
+        <div className="bg-gradient-to-l from-orange-500 to-yellow-400 mb-6 rounded-xl shadow-lg border border-white/20" role="alert">
           <div className="flex p-4 items-center">
-            <div className="shrink-0 text-red-500">
+            <div className="shrink-0 text-white">
               <TriangleAlert size={30} />
             </div>
             <div className="ms-3">
-              <p className="text-md text-red-400 font-bold">
+              <p className="text-md text-white font-bold">
                 {error}
               </p>
             </div>
@@ -122,13 +131,13 @@ export default function SettingsPage() {
 
       {/* Success Message */}
       {success !== '' && (
-        <div className="bg-gradient-to-l from-green-400 to-emerald-300 mb-6 rounded-xl" role="alert">
+        <div className="bg-gradient-to-l from-green-500 to-emerald-400 mb-6 rounded-xl shadow-lg border border-white/20" role="alert">
           <div className="flex p-4 items-center">
-            <div className="shrink-0 text-green-600">
+            <div className="shrink-0 text-white">
               <Save size={30} />
             </div>
             <div className="ms-3">
-              <p className="text-md text-green-700 font-bold">
+              <p className="text-md text-white font-bold">
                 {success}
               </p>
             </div>
@@ -138,61 +147,100 @@ export default function SettingsPage() {
 
       {/* Page Header */}
       <div className="mb-8 flex flex-col items-start">
-        <h1 className="mb-2 flex gap-3 justify-start">
-          <Settings size={40} />
+        <h1 className="mb-2 flex gap-3 justify-start drop-shadow-md">
+          <Settings size={40} className="text-white" />
           <span className="text-4xl font-bold text-white">Settings</span>
         </h1>
-        <p>
+        <p className="text-white/80 font-medium">
           Manage your preferences
         </p>
       </div>
 
-      {/* Settings Card */}
-      <div className="min-w-full bg-gray-800/30 backdrop-blur-sm rounded-md border border-indigo-500/20 p-6 max-w-2xl">
-        {/* Settings Header */}
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-2xl font-semibold text-white flex items-center gap-2">
-            Application Settings
+      {/* Action Bar (Save/Reset) */}
+      <div className="bg-app-card flex justify-between items-center backdrop-blur-md rounded-xl border border-white/20 p-6 mb-6 shadow-xl">
+        <h2 className="text-2xl font-bold text-white drop-shadow-sm">
+          Save Settings?
+        </h2>
+        <div className="flex gap-3">
+          <button
+              className="flex flex-row items-center justify-center gap-2 bg-red-500/80 hover:bg-red-600 p-2 px-4 rounded-lg font-bold text-sm cursor-pointer transition-all duration-200 text-white border border-white/10 shadow-md"
+              onClick={handleReset}
+              disabled={saving}
+          >
+            <RotateCcw size={18} /> Reset to Default
+          </button>
+          <button
+              onClick={handleSave}
+              disabled={saving}
+              className="bg-green-500/80 cursor-pointer hover:bg-green-600 disabled:bg-green-800 text-white px-5 py-2 rounded-lg font-bold transition-all border border-white/10 shadow-md flex items-center gap-2"
+          >
+            {saving ? (
+              <>
+                <Spinner />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save size={18} />
+                Save Changes
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Theme Card */}
+      <div className="bg-app-card backdrop-blur-md rounded-xl border border-white/20 p-6 mb-6 shadow-xl">
+          <h2 className="text-2xl font-bold text-white flex items-center gap-2 mb-6 drop-shadow-sm">
+            Interface Theme
           </h2>
-          <div className="flex gap-2">
-            <button
-                className="flex flex-row items-center justify-center gap-2 bg-red-600 hover:bg-red-700 p-2 rounded-md font-bold text-sm cursor-pointer transition-colors duration-200"
-                onClick={handleReset}
-                disabled={saving}
-            >
-                <RotateCcw size={18} /> Reset to Default
-            </button>
-            <button
-                onClick={handleSave}
-                disabled={saving}
-                className="bg-green-600 hover:bg-green-700 disabled:bg-green-800 text-white px-4 py-1 rounded-md transition-colors flex items-center gap-2"
-            >
-                {saving ? (
-                <>
-                    <Spinner />
-                    Saving...
-                </>
-                ) : (
-                <>
-                    <Save size={18} />
-                    Save
-                </>
-                )}
-            </button>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {themes.map((t) => (
+              <button
+                key={t.id}
+                onClick={() => setTheme(t.id as any)}
+                className={`group relative overflow-hidden rounded-2xl border-4 transition-all duration-300 ${
+                  theme === t.id ? 'border-white scale-105 shadow-2xl z-10' : 'border-white/5 opacity-70 hover:opacity-100 hover:scale-102'
+                }`}
+              >
+                {/* Mini UI Layout Preview */}
+                <div className={`h-32 w-full bg-gradient-to-br ${t.colors} flex`}>
+                  {/* Fake Sidebar */}
+                  <div className="w-1/4 h-full bg-white/20 backdrop-blur-sm border-r border-white/10" />
+                  {/* Fake Content Area */}
+                  <div className="flex-1 p-3 flex flex-col gap-2">
+                    <div className="h-2 w-1/2 bg-white/40 rounded" />
+                    <div className="flex gap-2">
+                        <div className="h-10 w-8 bg-white/30 rounded shadow-sm border border-white/10" />
+                        <div className="h-10 w-8 bg-white/30 rounded shadow-sm border border-white/10" />
+                    </div>
+                  </div>
+                </div>
+                <div className={`absolute bottom-0 w-full backdrop-blur-md py-1.5 text-center font-bold text-white text-[10px] tracking-widest ${theme === t.id ? 'bg-white/30' : 'bg-black/30'}`}>
+                  {t.name.toUpperCase()}
+                </div>
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Settings List */}
-        <div className="space-y-6">
+      {/* Application Settings List Card */}
+      <div className="bg-app-card backdrop-blur-md rounded-xl border border-white/20 p-8 shadow-xl">
+        <h2 className="text-2xl font-bold text-white flex items-center gap-2 mb-8 drop-shadow-sm">
+          Application Preferences
+        </h2>
+
+        <div className="space-y-4">
           {/* Save Recent Setting */}
-          <div className="flex items-center justify-between p-4 bg-gray-700/30 rounded-md border border-gray-600/30">
-            <div className="flex items-center gap-4">
-              <div className="bg-gradient-to-br from-violet-500 to-purple-600 p-3 rounded-md">
+          <div className="flex items-center justify-between p-5 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-colors">
+            <div className="flex items-center gap-5">
+              <div className="bg-gradient-to-br from-stop-1 to-stop-2 p-3 rounded-xl shadow-lg border border-white/20">
                 <Save className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="font-semibold text-white text-lg">Save Last Viewed Pages</h3>
-                <p className="text-gray-400 text-sm">
+                <h3 className="font-bold text-white text-lg">Save Last Viewed Pages</h3>
+                <p className="text-app-secondary/60 text-sm">
                   Save the last page visited in every book viewed.
                 </p>
               </div>
@@ -204,14 +252,14 @@ export default function SettingsPage() {
           </div>
 
           {/* Load Recent Setting */}
-          <div className="flex items-center justify-between p-4 bg-gray-700/30 rounded-md border border-gray-600/30">
-            <div className="flex items-center gap-4">
-              <div className="bg-gradient-to-br from-blue-500 to-cyan-600 p-3 rounded-md">
+          <div className="flex items-center justify-between p-5 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-colors">
+            <div className="flex items-center gap-5">
+              <div className="bg-gradient-to-br from-stop-2 to-stop-3 p-3 rounded-xl shadow-lg border border-white/20">
                 <Book className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="font-semibold text-white text-lg">Load Recent Book</h3>
-                <p className="text-gray-400 text-sm">
+                <h3 className="font-bold text-white text-lg">Load Recent Book</h3>
+                <p className="text-app-secondary/60 text-sm">
                   Show last viewed book in home page.
                 </p>
               </div>
@@ -223,15 +271,15 @@ export default function SettingsPage() {
           </div>
 
           {/* Thumbnail Setting */}
-          <div className="flex items-center justify-between p-4 bg-gray-700/30 rounded-md border border-gray-600/30">
-            <div className="flex items-center gap-4">
-              <div className="bg-gradient-to-br from-emerald-500 to-green-600 p-3 rounded-md">
+          <div className="flex items-center justify-between p-5 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-colors">
+            <div className="flex items-center gap-5">
+              <div className="bg-gradient-to-br from-side-3 to-stop-3 p-3 rounded-xl shadow-lg border border-white/20">
                 <Image className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="font-semibold text-white text-lg">Generate Thumbnails</h3>
-                <p className="text-gray-400 text-sm">
-                  Automatically create thumbnails when uploading new books
+                <h3 className="font-bold text-white text-lg">Generate Thumbnails</h3>
+                <p className="text-app-secondary/60 text-sm">
+                  Automatically create thumbnails when uploading new books.
                 </p>
               </div>
             </div>

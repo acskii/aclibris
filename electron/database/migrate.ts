@@ -160,7 +160,46 @@ class DatabaseMigration {
                 `).run(setting);
             }
         });
-   }
+    }
+
+    private add_value_settings() {
+        // Will include 'default' string value if these settings are added for the first time
+        //      may change to any other string based on user change
+
+        const settings = ['theme'];
+    
+        settings.forEach(setting => {
+            const existing = database.prepare(`
+                SELECT value FROM meta WHERE key = ?
+            `).get(setting);
+            
+            if (!existing) {
+                database.prepare(`
+                    INSERT INTO meta (key, value) VALUES (?, 'default')
+                `).run(setting);
+            }
+        });
+    }
+
+    // private add_indexes() {
+    //     // Add indexes to tables to increase search performance
+    //     //      With checking to not re-add an existing index
+
+    //     try {
+    //         const transaction = database.transaction(() => {
+    //             database.prepare("CREATE INDEX IF NOT EXISTS idx_books_title ON books(title)").run();
+    //             database.prepare("CREATE INDEX IF NOT EXISTS idx_books_author ON books(author)").run();
+    //             database.prepare("CREATE INDEX IF NOT EXISTS idx_book_tag_book ON book_tag(book_id)").run();
+    //             database.prepare("CREATE INDEX IF NOT EXISTS idx_books_collection ON books(collection_id)").run();
+    //             database.prepare("CREATE INDEX IF NOT EXISTS idx_book_tag_tag ON book_tag(tag_id)").run();
+    //             database.prepare("CREATE INDEX IF NOT EXISTS idx_shelf_collection ON collections(shelf_id)").run();
+    //         });
+            
+    //         transaction();
+    //     } catch (error) {
+    //         console.error("Error creating indexes:", error);
+    //     }
+    // }
 
     init() {
         this.create_shelfs_table();
@@ -172,6 +211,7 @@ class DatabaseMigration {
         this.seed_default_values();
         this.add_recent_book_read();
         this.add_toggle_settings();
+        this.add_value_settings();
         console.log("[db:migrate] => Initialised local database schema");
     }
 }

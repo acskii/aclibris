@@ -10,6 +10,42 @@
   }
 }
 
+@theme {
+  --color-app-card: var(--card-bg);
+  --color-stop-1: var(--s1);
+  --color-stop-2: var(--s2);
+  --color-stop-3: var(--s3);
+}
+
+/* Default theme */
+:root, [data-theme='default'] {
+  --card-bg: rgba(255, 255, 255, 0.1); /* Glassmorphism effect */
+  --s1: #06b6d4;      /* cyan-500 */
+  --s2: #0ea5e9;      /* sky-500 */
+  --s3: #8b5cf6;      /* violet-500 */
+}
+
+[data-theme='garden'] {
+  --card-bg: rgba(255, 255, 255, 0.08);
+  --s1: #10b981;      /* emerald-500 */
+  --s2: #14b8a6;      /* teal-500 */
+  --s3: #84cc16;      /* lime-500 (Vibrant finish) */
+}
+
+[data-theme='sepia'] {
+  --card-bg: rgba(255, 255, 255, 0.1);
+  --s1: #f59e0b;      /* amber-500 */
+  --s2: #f97316;      /* orange-500 */
+  --s3: #ef4444;      /* red-500 (Hot finish) */
+}
+
+[data-theme='midnight'] {
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --s1: #3b82f6;      /* blue-500 */
+  --s2: #6366f1;      /* indigo-500 */
+  --s3: #4338ca;      /* indigo-700 */
+}
+
 * {
   box-sizing: border-box;
 }
@@ -29,9 +65,7 @@ body {
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;

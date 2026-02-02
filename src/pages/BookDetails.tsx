@@ -222,25 +222,25 @@ export default function BookDetailsPage() {
   return (
     <div className="min-h-screen flex flex-col p-5">
       {loading && (
-        <div className="flex bg-indigo-400 p-3 rounded-lg flex-row items-center justify-center gap-2 z-30 my-10">
+        <div className="flex bg-stop-1 p-3 rounded-lg flex-row items-center justify-center gap-2 z-30 my-10">
           <Spinner />
-          <p className="text-violet-900 font-bold text-center text-md">
+          <p className="text-white font-bold text-center text-md">
             Loading..
           </p>
         </div>
       )}
       {error != "" && (
         <div
-          className="bg-gradient-to-l from-orange-400 to-yellow-300 mb-10 z-50 w-full rounded-xl"
+          className="bg-red-600 mb-10 z-50 w-full rounded-xl"
           role="alert"
           aria-labelledby="toast-error"
         >
           <div className="flex p-4 items-center">
-            <div className="shrink-0 text-red-500">
+            <div className="shrink-0 text-white">
               <TriangleAlert size={30} />
             </div>
             <div className="ms-3">
-              <p className="text-md text-red-400 font-bold ">{error}</p>
+              <p className="text-md text-white font-bold ">{error}</p>
             </div>
           </div>
         </div>
@@ -258,7 +258,7 @@ export default function BookDetailsPage() {
         <button
           type="button"
           onClick={goBack}
-          className="flex flex-row items-center gap-2 mb-2 cursor-pointer font-semibold text-xl hover:text-violet-800 transition-colors"
+          className="flex flex-row items-center gap-2 mb-2 cursor-pointer font-semibold text-xl hover:text-stop-1 transition-colors text-white"
         >
           <ArrowLeft size={25} />
           Back
@@ -272,64 +272,64 @@ export default function BookDetailsPage() {
       <div className="grid grid-cols-2 gap-6 mb-6">
         <div className="space-y-4">
           <button
-            className="flex flex-row items-center justify-center gap-2 w-full bg-red-600 hover:bg-red-700 p-2 rounded-md font-bold text-sm cursor-pointer transition-colors duration-200"
+            className="flex flex-row items-center justify-center gap-2 w-full bg-red-600 hover:bg-red-700 p-2 rounded-md font-bold text-sm cursor-pointer transition-colors duration-200 text-white"
             onClick={() => setDeleted(true)}
           >
             <Trash2 size={18} /> Delete this book
           </button>
-          <div className="flex flex-col bg-indigo-800/20 items-start justify-center rounded-md p-4 gap-2">
-            <h3 className="font-semibold text-white text-nowrap underline decoration-cyan-400">
+          <div className="flex flex-col bg-gray-800/30 items-start justify-center rounded-md p-4 gap-2">
+            <h3 className="font-semibold text-white text-nowrap underline decoration-stop-1">
               Title
             </h3>
             <input
               type="text"
-              className="border border-2 rounded-md p-2 w-full border-cyan-400/60 focus:border-violet-800/60 bg-white/10 text-white"
+              className="border border-2 rounded-md p-2 w-full border-white/20 focus:border-stop-1 bg-white/10 text-white"
               value={meta.title}
               onChange={(e) => handleMetaChange("title", e.target.value)}
               placeholder="Enter book title"
             />
           </div>
-          <div className="flex flex-col bg-indigo-800/20 items-start justify-center rounded-md p-4 gap-2">
-            <h3 className="font-semibold text-white text-nowrap underline decoration-cyan-400">
+          <div className="flex flex-col bg-gray-800/30 items-start justify-center rounded-md p-4 gap-2">
+            <h3 className="font-semibold text-white text-nowrap underline decoration-stop-1">
               Author
             </h3>
             <input
               type="text"
-              className="border border-2 rounded-md p-2 w-full border-cyan-400/60 focus:border-violet-800/60 bg-white/10 text-white"
+              className="border border-2 rounded-md p-2 w-full border-white/20 focus:border-stop-1 bg-white/10 text-white"
               value={meta.author}
               onChange={(e) => handleMetaChange("author", e.target.value)}
               placeholder="Enter author name"
             />
           </div>
-          <div className="flex flex-col bg-indigo-800/20 items-start justify-center rounded-md p-4 gap-2">
-            <h3 className="font-semibold text-white text-nowrap underline decoration-cyan-400">
+          <div className="flex flex-col bg-gray-800/30 items-start justify-center rounded-md p-4 gap-2">
+            <h3 className="font-semibold text-white text-nowrap underline decoration-stop-1">
               Pages
             </h3>
             <input
               type="number"
-              className="border border-2 rounded-md p-2 w-full border-cyan-400/60 focus:border-violet-800/60 bg-gray-600/50 text-white"
+              className="border border-2 rounded-md p-2 w-full border-white/20 focus:border-stop-1 bg-black/20 text-white"
               value={meta.pages}
               disabled={true}
             />
           </div>
-          <div className="flex flex-col bg-indigo-800/20 items-start justify-center rounded-md p-4 gap-2">
-            <h3 className="font-semibold text-white text-nowrap underline decoration-cyan-400">
+          <div className="flex flex-col bg-gray-800/30 items-start justify-center rounded-md p-4 gap-2">
+            <h3 className="font-semibold text-white text-nowrap underline decoration-stop-1">
               Last Viewed Page
             </h3>
             <input
               type="text"
-              className="border border-2 rounded-md p-2 w-full border-cyan-400/60 focus:border-violet-800/60 bg-gray-600/50 text-white"
+              className="border border-2 rounded-md p-2 w-full border-white/20 focus:border-stop-1 bg-black/20 text-white"
               value={meta.lastReadPage == 1 ? "N/A" : meta.lastReadPage}
               disabled={true}
             />
           </div>
-          <div className="flex flex-col bg-indigo-800/20 items-start justify-center rounded-md p-4 gap-2">
-            <h3 className="font-semibold text-white text-nowrap underline decoration-cyan-400">
+          <div className="flex flex-col bg-gray-800/30 items-start justify-center rounded-md p-4 gap-2">
+            <h3 className="font-semibold text-white text-nowrap underline decoration-stop-1">
               Last Viewed At
             </h3>
             <input
               type="string"
-              className="border border-2 rounded-md p-2 w-full border-cyan-400/60 focus:border-violet-800/60 bg-gray-600/50 text-white"
+              className="border border-2 rounded-md p-2 w-full border-white/20 focus:border-stop-1 bg-black/20 text-white"
               value={
                 meta.lastVisitedInUnix
                   ? fromUnix(meta.lastVisitedInUnix)
@@ -338,39 +338,38 @@ export default function BookDetailsPage() {
               disabled={true}
             />
           </div>
-          <div className="flex flex-col bg-indigo-800/20 items-start justify-center rounded-md p-4 gap-2">
-            <h3 className="font-semibold text-white text-nowrap underline decoration-cyan-400">
+          <div className="flex flex-col bg-gray-800/30 items-start justify-center rounded-md p-4 gap-2">
+            <h3 className="font-semibold text-white text-nowrap underline decoration-stop-1">
               File Size
             </h3>
             <input
               type="text"
-              className="border border-2 rounded-md p-2 w-full border-cyan-400/60 focus:border-violet-800/60 bg-gray-600/50 text-white"
+              className="border border-2 rounded-md p-2 w-full border-white/20 focus:border-stop-1 bg-black/20 text-white"
               value={meta.fileSize ? formatFileSize(meta.fileSize) : "N/A"}
               disabled={true}
             />
           </div>
-          <div className="flex flex-col bg-indigo-800/20 items-start justify-center rounded-md p-4 gap-2">
-            <h3 className="font-semibold text-white text-nowrap underline decoration-cyan-400">
+          <div className="flex flex-col bg-gray-800/30 items-start justify-center rounded-md p-4 gap-2">
+            <h3 className="font-semibold text-white text-nowrap underline decoration-stop-1">
               Created At
             </h3>
             <input
               type="text"
-              className="border border-2 rounded-md p-2 w-full border-cyan-400/60 focus:border-violet-800/60 bg-gray-600/50 text-white"
+              className="border border-2 rounded-md p-2 w-full border-white/20 focus:border-stop-1 bg-black/20 text-white"
               value={
                 meta.createdAtInUnix ? fromUnix(meta.createdAtInUnix) : "N/A"
               }
               disabled={true}
             />
           </div>
-          {/* TODO */}
-          <div className="flex flex-col bg-indigo-800/20 items-start justify-center rounded-md p-4 gap-2">
-            <h3 className="font-semibold text-orange-600 text-nowrap underline decoration-red-400">
+          <div className="flex flex-col bg-gray-800/30 items-start justify-center rounded-md p-4 gap-2">
+            <h3 className="font-semibold text-stop-3 text-nowrap underline decoration-stop-3">
               File Path
             </h3>
             <input
               type="text"
               disabled={true}
-              className="border border-2 rounded-md p-2 w-full border-cyan-400/60 focus:border-violet-800/60 bg-gray-600/50 text-white"
+              className="border border-2 rounded-md p-2 w-full border-white/20 focus:border-stop-1 bg-black/20 text-white"
               value={meta.filePath || ""}
               onChange={(e) => handleMetaChange("filePath", e.target.value)}
               placeholder="Enter file path"
@@ -378,8 +377,8 @@ export default function BookDetailsPage() {
           </div>
         </div>
 
-        <div className="bg-indigo-800/20 rounded-md p-6 order border-indigo-500/30 relative overflow-hidden">
-            <h3 className="font-semibold text-white text-nowrap underline decoration-cyan-400 mb-4">
+        <div className="bg-gray-800/30 rounded-md p-6 border border-white/20 relative overflow-hidden">
+            <h3 className="font-semibold text-white text-nowrap underline decoration-stop-1 mb-4">
                 Thumbnail
             </h3>
             <div className="absolute inset-16 group flex items-center justify-center overflow-hidden">
@@ -390,14 +389,14 @@ export default function BookDetailsPage() {
                 className="h-full w-auto max-w-full object-contain rounded-md"
                 />
             ) : (
-                <div className="w-full h-full bg-indigo-900/30 rounded-md flex flex-col gap-2 items-center justify-center border-2 border-dashed border-indigo-500/50">
-                <FileText size={40} />
-                <span className="text-sm text-center">No thumbnail available</span>
+                <div className="w-full h-full bg-white/5 rounded-md flex flex-col gap-2 items-center justify-center border-2 border-dashed border-white/20">
+                <FileText size={40} className="text-white/40" />
+                <span className="text-sm text-center text-white/40">No thumbnail available</span>
                 </div>
             )}
 
-            <div className="absolute inset-0 bg-black/50 opacity-0 border-dashed group-hover:border-2 border-cyan-400 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
-                <label className="flex flex-col gap-2 items-center justify-center w-full h-full cursor-pointer">
+            <div className="absolute inset-0 bg-black/50 opacity-0 border-dashed group-hover:border-2 border-stop-1 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+                <label className="flex flex-col gap-2 items-center justify-center w-full h-full cursor-pointer text-white">
                 <Upload className="max-w-30" />
                 <span className="text-[1.2cqw]">Upload New</span>
                 <input
@@ -412,9 +411,8 @@ export default function BookDetailsPage() {
         </div>
       </div>
 
-      <div className="bg-indigo-800/20 items-start justify-center w-full rounded-md p-4 gap-2 mb-4">
+      <div className="bg-gray-800/30 items-start justify-center w-full rounded-md p-4 gap-2 mb-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Collection Selection */}
           <div>
             <AutocompleteDropdown
               title="Collection"
@@ -424,9 +422,8 @@ export default function BookDetailsPage() {
               onValueChange={handleCollectionInputChange}
               onOptionSelect={handleCollectionSelect}
             />
-            {!selectedCollection && collectionInput && <span className="mt-2 text-cyan-300 font-semibold text-md">This collection will be created</span>}
+            {!selectedCollection && collectionInput && <span className="mt-2 text-stop-3 font-semibold text-md">This collection will be created</span>}
           </div>
-          {/* Shelf Selection */}
           <div>
             <AutocompleteDropdown
               title="Shelf"
@@ -436,7 +433,7 @@ export default function BookDetailsPage() {
               onValueChange={handleShelfInputChange}
               onOptionSelect={handleShelfSelect}
             />
-            {!selectedShelf && shelfInput && <span className="mt-2 text-cyan-300 font-semibold text-md">This shelf will be created</span>}
+            {!selectedShelf && shelfInput && <span className="mt-2 text-stop-3 font-semibold text-md">This shelf will be created</span>}
           </div>
         </div>
         <TagManager 
@@ -450,7 +447,7 @@ export default function BookDetailsPage() {
           <button
             onClick={saveBook}
             disabled={saving}
-            className="bg-green-600 cursor-pointer hover:bg-green-700 disabled:bg-green-800 text-white px-4 py-1 rounded-md transition-colors flex items-center gap-2"
+            className="bg-stop-1 cursor-pointer hover:opacity-90 disabled:opacity-50 text-white px-4 py-1 rounded-md transition-colors flex items-center gap-2"
           >
             {saving ? (
               <>
@@ -459,7 +456,7 @@ export default function BookDetailsPage() {
               </>
             ) : (
               <>
-                <Save size={18} />
+                <Save size={20} />
                 Add Changes
               </>
             )}

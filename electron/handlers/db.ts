@@ -218,11 +218,27 @@ export function registerDbHandlers() {
         }
     });
 
+    ipcMain.handle('db:settings:theme', async (_) => {
+        try {
+            return query.getValueMeta('theme');
+        } catch (error: any) {
+            console.log("[db:query] => Error occured when handling 'settings:theme': ", error.message);
+        }
+    });
+
     ipcMain.handle('db:settings:updateBoolean', async (_, key: string, value: boolean) => {
         try {
             query.updateBooleanMeta(key, value);
         } catch (error: any) {
             console.log("[db:query] => Error occured when handling 'settings:updateBoolean': ", error.message);
+        }
+    });
+
+    ipcMain.handle('db:settings:updateValue', async (_, key: string, value: string) => {
+        try {
+            query.updateValueMeta(key, value);
+        } catch (error: any) {
+            console.log("[db:query] => Error occured when handling 'settings:updateValue': ", error.message);
         }
     });
 }

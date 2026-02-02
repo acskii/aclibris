@@ -636,6 +636,19 @@ class DatabaseQuery {
         else return null;
     }
 
+    getValueMeta(key: string) {
+        // Works with 'theme'
+        const result = database.prepare(
+            `
+            SELECT value FROM meta
+            WHERE key = ?
+            `
+        ).get(key);
+
+        if (result) return result.value;
+        else return null;
+    }
+
     updateBooleanMeta(key: string, value: boolean) {
         // Toggle settings 
         database.prepare(
@@ -647,6 +660,16 @@ class DatabaseQuery {
         ).run((value) ? 'true' : 'false', key);
     }
 
+    updateValueMeta(key: string, value: string) {
+        // Value settings 
+        database.prepare(
+            `
+            UPDATE meta
+            SET value = ?
+            WHERE key = ?
+            `
+        ).run((value.length > 0) ? value : 'default', key);
+    }
 }
 
 export const query = new DatabaseQuery();

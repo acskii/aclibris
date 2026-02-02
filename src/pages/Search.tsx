@@ -145,7 +145,7 @@ function SearchPage() {
         <div className="min-h-screen p-5">
             <div className="mb-4 flex flex-col items-start">
                 <h1 className="flex gap-3 justify-start">
-                    <Search size={40} />
+                    <Search size={40} className="text-white" />
                     <span className="text-4xl font-bold text-white">Search</span>
                 </h1>
             </div>
@@ -156,22 +156,22 @@ function SearchPage() {
                 aria-hidden="true"
             />
             
-            <div className="sticky z-10 top-5 rounded-md gap-2 flex items-center mb-2 border-4 border-violet-800 bg-gradient-to-r from-purple-700 to-violet-600 via-violet-500 p-3">
+            <div className="sticky z-10 top-5 rounded-md gap-2 flex items-center mb-2 border-4 border-white/20 bg-stop-3 p-3">
                 <div className="w-full">
                     <input
                         type="text"
                         placeholder="Search by title or author"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full py-1 px-2 bg-gray-700 border border-1 border-cyan-400 rounded-md text-white font-semibold placeholder-indigo-300/70 focus:border-3 focus:outline-none text-base"
-                     />
+                        className="w-full py-1 px-2 bg-app-card border border-1 border-white/40 rounded-md text-white font-semibold placeholder-white/50 focus:border-3 focus:outline-none text-base"
+                    />
                 </div>
             </div>
 
             {loading && (
-                <div className="flex bg-indigo-400 p-3 rounded-lg flex-row items-center justify-center gap-2 z-30 my-10">
+                <div className="flex bg-app-card backdrop-blur-md p-3 rounded-lg flex-row items-center justify-center gap-2 z-30 my-10">
                     <Spinner />
-                    <p className="text-violet-900 font-bold text-center text-md">
+                    <p className="text-white font-bold text-center text-md">
                         Loading..
                     </p>
                 </div>
@@ -179,12 +179,12 @@ function SearchPage() {
 
             <div className="my-5">
                 {books.length === 0 && !loading ? (
-                    <div className="bg-gray-800/30 backdrop-blur-sm rounded-md p-6 border border-indigo-500/20 text-center">
-                        <SearchX size={50} className="mx-auto mb-2" />
+                    <div className="bg-app-card backdrop-blur-sm rounded-md p-6 border border-white/20 text-center">
+                        <SearchX size={50} className="mx-auto mb-2 text-white" />
                         <h3 className="text-xl font-semibold text-white mb-2">
                             {(searchQuery || selectedTags || selectedShelf || selectedCollection) ? 'No books found' : 'No books in your library'}
                         </h3>
-                        <p className="text-indigo-200">
+                        <p className="text-white/70">
                             {(searchQuery || selectedTags || selectedShelf || selectedCollection)
                             ? 'Try different search terms or browse all books'
                             : 'Start by uploading your first book'
@@ -196,11 +196,11 @@ function SearchPage() {
                     {books.map((book) => (
                         <div
                             key={book.id}
-                            className="bg-gray-800/30 rounded-md border border-indigo-500/20 hover:border-indigo-400/50 cursor-pointer group"
+                            className="bg-app-card rounded-md border border-4 border-stop-3 hover:border-stop-3/40 cursor-pointer group"
                             onClick={() => handleBookClick(book.id, book.lastReadPage ?? null)}
                         >
                             {/* Thumbnail */}
-                            <div className="relative h-48 bg-indigo-900/20 rounded-t-md overflow-hidden">
+                            <div className="relative h-48 bg-white/5 rounded-t-md overflow-hidden">
                                 {book.thumbnail ? (
                                     <img 
                                         src={`data:image/jpeg;base64,${arrayToBase64(book.thumbnail)}`}
@@ -208,12 +208,12 @@ function SearchPage() {
                                         className="w-full"
                                     />
                                 ) : (
-                                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-900/40 to-violet-900/40">
-                                        <Book size={20} />
+                                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-stop-1/20 to-stop-3/20">
+                                        <Book size={20} className="text-white/50" />
                                     </div>
                                 )}
                                 <div className="absolute top-3 right-3">
-                            <       button className="bg-indigo-600 cursor-pointer hover:bg-indigo-700 text-white p-2 rounded-lg transition-colors opacity-0 group-hover:opacity-100">
+                                    <button className="bg-side-3 cursor-pointer hover:bg-white/40 text-white p-2 rounded-lg transition-colors opacity-0 group-hover:opacity-100">
                                         <Eye size={15} />
                                     </button>
                                 </div>
@@ -222,7 +222,7 @@ function SearchPage() {
                             <div className="mt-auto">
                                 {/* Book Info */}
                                 <div className="p-4 flex flex-col gap-2">
-                                    <h3 className="overflow-hidden text-white font-semibold text-lg mb-2 group-hover:text-indigo-300 transition-colors">
+                                    <h3 className="overflow-hidden text-white font-semibold text-lg mb-2 group-hover:text-white/80 transition-colors">
                                         {book.title.length > 100 
                                         ? `${book.title.substring(0, 100)}...` 
                                         : book.title}
@@ -233,7 +233,7 @@ function SearchPage() {
                                             {book.tags.map(tag => (
                                                 <span
                                                 key={tag.id}
-                                                className={`bg-gray-500 text-white font-semibold px-2 py-1 rounded-md text-sm flex items-center gap-2 transition-all`}
+                                                className="bg-white/10 text-white font-semibold px-2 py-1 rounded-md text-sm flex items-center gap-2 transition-all border border-white/5"
                                                 >
                                                 {tag.name}
                                                 </span>
@@ -243,14 +243,14 @@ function SearchPage() {
                                 
 
                                     {book.author && (
-                                        <div className="flex items-center gap-2 text-sm">
+                                        <div className="flex items-center gap-2 text-sm text-white/80">
                                             <User size={18} />
                                             <span>{book.author}</span>
                                         </div>
                                     )}
 
                                     {/* Shelf and Collection */}
-                                    <div className="space-y-1">
+                                    <div className="space-y-1 text-white/60">
                                         <div className="flex items-center gap-2 text-sm">
                                             <LibrarySquare size={14} />
                                             <span>{getShelfFromCollection(book.collectionId)?.name}</span>
@@ -259,7 +259,7 @@ function SearchPage() {
                                             <Folder size={14} />
                                             <span>{getCollectionName(book.collectionId)}</span>
                                         </div>
-                                        <div className="flex items-center gap-2 text-sm border-t border-indigo-500/20">
+                                        <div className="flex items-center gap-2 text-sm border-t border-white/10 pt-1">
                                             <Calendar size={14} />
                                             <span>Created at {fromUnix(book.createdAtInUnix)}</span>
                                         </div>
@@ -272,28 +272,28 @@ function SearchPage() {
                 )}
             </div>
 
-            <div className="gap-2 rounded-md flex flex-row justify-center items-center mb-2 border-4 border-violet-800 bg-gradient-to-r from-purple-700 to-violet-600 via-violet-500 p-3">
+            <div className="gap-2 rounded-md flex flex-row justify-center items-center mb-2 border-4 border-white/20 bg-stop-3 p-3">
                     <button
                         onClick={() => setPage(prev => prev - 1)}
                         disabled={(page + 1) <= 1}
-                        className="bg-gradient-to-br from-blue-800 to-indigo-900 p-2 rounded-md hover:from-violet-400 hover:to-purple-500 text-white transition disabled:opacity-30"
+                        className="bg-white/10 p-2 rounded-md hover:bg-white/20 text-white transition disabled:opacity-30"
                         >
                         <ChevronLeft size={20} />
                     </button>
-                    <div className="text-nowrap flex flex-row gap-2 text-sm font-bold text-white border border-3 border-purple px-3 py-1 bg-sky-400 rounded-lg">
+                    <div className="text-nowrap flex flex-row gap-2 text-sm font-bold text-white border-2 border-white/20 px-3 py-1 bg-white/10 backdrop-blur-md rounded-lg">
                         <p className="grow-1">{page + 1} / {total}</p>
                     </div>
                     <button
                         onClick={() => setPage(prev => prev + 1)}
                         disabled={(page + 1) >= total}
-                        className="p-2 rounded-md bg-gradient-to-br from-blue-800 to-indigo-900 hover:to-purple-500 text-white transition disabled:opacity-30"
+                        className="p-2 rounded-md bg-white/10 hover:bg-white/20 text-white transition disabled:opacity-30"
                     >
                         <ChevronRight size={20} />
                     </button>
             </div>
 
-            <div className="sticky -mb-5 bottom-0 z-10 border-4 rounded-md border-violet-800 bg-gradient-to-r from-purple-700 to-violet-600 via-violet-500 py-3 px-5">
-                    <div className="bg-gray-800/30 backdrop-blur-sm rounded-md p-2 border border-indigo-500/20">
+            <div className="sticky -mb-5 bottom-0 z-10 border-4 rounded-md border-white/20 bg-stop-3 py-3 px-5">
+                    <div className="bg-app-card backdrop-blur-sm rounded-md p-2 border border-white/10">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                             <Dropdown 
                                 title="Shelf"
@@ -335,7 +335,7 @@ function SearchPage() {
                                 return (
                                     <span
                                         key={tag}
-                                        className={`bg-gray-500 text-white font-semibold px-2 rounded-md text-sm flex items-center gap-2`}
+                                        className="bg-white/20 text-white font-semibold px-2 rounded-md text-sm flex items-center gap-2 border border-white/10"
                                     >
                                         <span>{tag}</span>
                                         <button

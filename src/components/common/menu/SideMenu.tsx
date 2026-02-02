@@ -32,7 +32,7 @@ export function SideMenu() {
 
   return (
     <div
-      className={`h-screen z-40 bg-gradient-to-b from-sky-600 via-cyan-500 via-30% to-violet-400 text-white shadow-xl backdrop-blur-md transition-all duration-300 ${
+      className={`h-screen z-40 bg-gradient-to-b from-stop-1 via-stop-2 via-30% to-stop-3/50 text-white shadow-xl backdrop-blur-md transition-all duration-300 ${
         collapsed ? "w-20" : "w-50"
       } flex flex-col justify-between`}
     >
@@ -41,7 +41,7 @@ export function SideMenu() {
         <div className={`flex p-3 ${collapsed ? "justify-center" : "justify-end"}`}>
           <button
             onClick={toggleCollapsed}
-            className="text-cyan-300 hover:text-white transition"
+            className="text-white hover:text-white/50 transition"
           >
             <MenuIcon size={30} />
           </button>
@@ -57,8 +57,8 @@ export function SideMenu() {
                 onClick={() => navigate(url)}
                 className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all ${
                   isActive
-                    ? "bg-gradient-to-r from-violet-500 to-purple-600 text-white"
-                    : "hover:bg-gradient-to-r hover:from-violet-400/30 hover:to-purple-500/30 text-cyan-200"
+                    ? "bg-stop-3 text-white"
+                    : "hover:bg-stop-1 text-white"
                 }
                 ${
                   collapsed 
@@ -78,8 +78,8 @@ export function SideMenu() {
           onClick={() => navigate("/documentation")}
           className={`flex items-center gap-3 px-3 py-2 rounded-lg-b w-full ${
             location.pathname === "/documentation"
-              ? "bg-gradient-to-r from-violet-600 to-purple-700 text-white"
-              : "hover:bg-gradient-to-r hover:from-violet-600/60 hover:to-purple-700/60 bg-gradient-to-r from-violet-500 to-purple-600 text-cyan-200"
+              ? "bg-stop-1 text-white"
+              : "hover:bg-stop-2 bg-stop-3 text-white"
           } ${
             collapsed 
             ? "justify-center" 

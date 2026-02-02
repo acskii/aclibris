@@ -200,7 +200,7 @@ export function CollectionPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Selected Book Preview */}
         <div className="xl:col-span-1">
-          <div className="bg-gray-800/30 backdrop-blur-sm rounded-md p-6 border border-indigo-500/20 sticky top-6">
+          <div className="bg-gray-800/30 backdrop-blur-sm rounded-md p-6 border border-stop-1/20 sticky top-6">
             <h2 className="text-2xl font-semibold text-white mb-6 flex items-center gap-2">
               <FileText size={30} />
               Details
@@ -218,7 +218,7 @@ export function CollectionPage() {
                       className="w-full h-full object-contain rounded-md"
                     />
                   ) : (
-                    <div className="w-full h-full bg-indigo-900/30 rounded-md flex flex-col gap-2 items-center justify-center border-2 border-dashed border-indigo-500/50">
+                    <div className="w-full h-full bg-stop-1/30 rounded-md flex flex-col gap-2 items-center justify-center border-2 border-dashed border-stop-1/50">
                       <FileText size={40} />
                       <span className="text-sm text-center">
                         No thumbnail available
@@ -232,7 +232,7 @@ export function CollectionPage() {
                     {selectedBook.title || "Untitled"}
                   </h3>
                   {selectedBook.author && (
-                    <p className="text-indigo-200 text-lg mb-3">
+                    <p className="text-white/60 font-semibold text-lg mb-3">
                       by {selectedBook.author}
                     </p>
                   )}
@@ -240,22 +240,22 @@ export function CollectionPage() {
 
                 <div className="space-y-3">
                   <div className="flex justify-between items-center py-2 border-b border-indigo-500/20">
-                    <span className="text-indigo-200">Pages</span>
-                    <span className="text-white font-semibold">
+                    <span className="text-white">Pages</span>
+                    <span className="text-white/80 font-semibold">
                       {selectedBook.pages}
                     </span>
                   </div>
 
                   <div className="flex justify-between items-center py-2 border-b border-indigo-500/20">
-                    <span className="text-indigo-200">File Size</span>
-                    <span className="text-white font-semibold">
+                    <span className="text-white">File Size</span>
+                    <span className="text-white/80 font-semibold">
                       {formatFileSize(selectedBook.fileSize)}
                     </span>
                   </div>
 
                   <div className="flex justify-between items-center py-2 border-b border-indigo-500/20">
-                    <span className="text-indigo-200">Created at</span>
-                    <span className="text-white font-semibold">
+                    <span className="text-white">Created at</span>
+                    <span className="text-white/80 font-semibold">
                       {fromUnix(selectedBook.createdAtInUnix)}
                     </span>
                   </div>
@@ -263,24 +263,24 @@ export function CollectionPage() {
 
                 <button
                   onClick={() => handleReadBook(selectedBook)}
-                  className="w-full cursor-pointer bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white py-3 rounded-md transition-all transform flex items-center justify-center gap-2 font-semibold"
+                  className="w-full cursor-pointer bg-gradient-to-r from-stop-3 to-stop-3/80 hover:from-stop-3/80 hover:to-stop-3/60 text-white py-3 rounded-md transition-all transform flex items-center justify-center gap-2 font-semibold"
                 >
-                  <Eye size={18} />
+                  <Eye size={20} />
                   Read This Book
                 </button>
                 <button
                   onClick={() => handleEditBook(selectedBook)}
-                  className="w-full cursor-pointer bg-gradient-to-r from-sky-600 to-cyan-600 hover:from-blue-700 hover:to-indigo-700 text-white py-3 rounded-md transition-all transform flex items-center justify-center gap-2 font-semibold"
+                  className="w-full cursor-pointer bg-gradient-to-r from-stop-1 to-stop-2 hover:from-stop-1/80 hover:to-stop-2/80 text-white py-3 rounded-md transition-all transform flex items-center justify-center gap-2 font-semibold"
                 >
-                  <PenBox size={18} />
+                  <PenBox size={20} />
                   Edit Details
                 </button>
               </div>
             ) : (
-              <div className="text-center py-8">
+              <div className="text-center py-8 max-h-50">
                 <FileText size={70} className="mx-auto mb-4" />
                 <p className="font-bold">Select a book to view details</p>
-                <p className="text-white/50">
+                <p className="text-white/60">
                   Click on any book in the list to see its information here
                 </p>
               </div>
@@ -297,12 +297,12 @@ export function CollectionPage() {
             </h2>
 
             {books.length === 0 ? (
-              <div className="text-center py-12">
-                <Book className="w-16 h-16 text-indigo-400/50 mx-auto mb-4" />
-                <p className="text-indigo-200 text-lg">
+              <div className="text-center py-12 max-h-50">
+                <Book size={60} className="text-white mx-auto mb-2" />
+                <p className="text-white/80 font-bold text-lg">
                   No books in this collection yet
                 </p>
-                <p className="text-indigo-300/70 mt-2">
+                <p className="text-white/60">
                   Add books from the upload page
                 </p>
               </div>
@@ -312,10 +312,10 @@ export function CollectionPage() {
                   return (
                     <div
                       key={book.id}
-                      className={`bg-gray-700/30 rounded-md p-4 border transition-all cursor-pointer hover:bg-violet-700/60 ${
+                      className={`bg-gray-700/30 rounded-md p-4 border transition-all cursor-pointer hover:bg-stop-3/60 ${
                         selectedBook?.id === book.id
-                          ? "border-indigo-400 bg-indigo-900/60"
-                          : "border-indigo-500/20 hover:border-indigo-400/50"
+                          ? "border-stop-1 bg-stop-1"
+                          : "border-stop-1/20 hover:border-stop-1/50"
                       }`}
                       onClick={() => handleBookClick(book)}
                     >
@@ -328,29 +328,29 @@ export function CollectionPage() {
                             {book.tags.map(tag => (
                                 <span
                                 key={tag.id}
-                                className={`bg-gray-500 text-white font-semibold px-2 py-1 rounded-md text-sm flex items-center gap-2 transition-all`}
+                                className={`bg-stop-3 text-white font-semibold px-2 py-1 rounded-md text-sm flex items-center gap-2 transition-all`}
                                 >
                                 {tag.name}
                                 </span>
                             ))}
                           </div>
                           {book.author && (
-                            <p className="text-indigo-200 text-sm mb-2 flex items-center gap-1">
-                              <User className="w-3 h-3" />
+                            <p className="text-white/80 text-sm mb-2 flex items-center gap-1">
+                              <User size={15} />
                               {book.author}
                             </p>
                           )}
-                          <div className="flex items-center gap-4 text-indigo-300/70 text-xs">
+                          <div className="flex items-center gap-4 text-white/80 text-xs">
                             <span className="flex items-center gap-1">
-                              <FileText className="w-3 h-3" />
+                              <FileText size={15} />
                               {formatFileSize(book.fileSize)}
                             </span>
                             <span className="flex items-center gap-1">
-                              <Hash className="w-3 h-3" />
+                              <Hash size={15} />
                               {book.pages} pages
                             </span>
                             <span className="flex items-center gap-1">
-                              <Calendar className="w-3 h-3" />
+                              <Calendar size={15} />
                               {fromUnix(book.createdAtInUnix)}
                             </span>
                           </div>
