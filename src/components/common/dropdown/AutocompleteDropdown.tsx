@@ -120,7 +120,7 @@ export function AutocompleteDropdown({
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
       <div className="w-full flex flex-row justify-start">
-        <h3 className="font-semibold text-white text-nowrap underline decoration-cyan-400 mb-2">{title}</h3>
+        <h3 className="font-semibold text-white text-nowrap underline decoration-stop-3 mb-2">{title}</h3>
       </div>
       
       {/* Input Container */}
@@ -134,7 +134,7 @@ export function AutocompleteDropdown({
           onKeyDown={handleInputKeyDown}
           placeholder={placeholder}
           disabled={disabled}
-          className="border border-2 rounded-md p-2 w-full border-cyan-400/60 focus:border-violet-800/60 bg-gray-600/50 text-white"
+          className="border border-2 rounded-md p-2 w-full border-stop-2/60 focus:border-stop-2/60 bg-gray-600/50 text-white"
         />
         
         {/* Clear Button */}
@@ -142,10 +142,10 @@ export function AutocompleteDropdown({
           {inputValue && (
             <button
               onClick={clearSelection}
-              className="text-indigo-300/70 hover:text-indigo-200 transition-colors p-1"
+              className="text-white/70 hover:text-white transition-colors p-1"
               type="button"
             >
-              <Ban size={18} />
+              <Ban size={20} />
             </button>
           )}
         </div>
@@ -153,13 +153,13 @@ export function AutocompleteDropdown({
 
       {/* Dropdown Menu (Results) */}
       {isOpen && filteredOptions.length > 0 && (
-        <div className={`absolute z-10 w-full bg-gray-800/95 backdrop-blur-sm border border-indigo-500/30 max-h-60 overflow-y-auto ${menuPositionClasses}`}>
+        <div className={`absolute z-10 w-full bg-gray-800/95 border border-indigo-500/30 max-h-60 overflow-y-auto ${menuPositionClasses}`}>
           <div className="py-2">
             {filteredOptions.map((option) => (
               <button
                 key={option.id}
                 onClick={() => handleOptionSelect(option)}
-                className={`w-full text-left px-4 py-2 hover:bg-indigo-600/30 transition-colors`}
+                className={`w-full text-left px-4 py-2 hover:bg-stop-3/30 transition-colors`}
               >
                 <div className="font-medium text-white">{option.name}</div>
                 <hr className="border-gray-700/50" />
@@ -172,10 +172,10 @@ export function AutocompleteDropdown({
       {/* No results message */}
       {isOpen && inputValue !== selectedOption?.name && filteredOptions.length === 0 && (
         <div className={`absolute z-10 w-full bg-gray-800/95 backdrop-blur-sm border border-indigo-500/30 shadow-lg p-4 ${menuPositionClasses}`}>
-          <div className="text-center text-indigo-200">
+          <div className="text-center text-white">
             <div className="font-medium mb-1">No {title} found..</div>
-            <div className="text-sm text-indigo-300/70">
-              New {title}? (<span className="text-indigo-300">{inputValue}</span>)
+            <div className="text-sm text-white/70">
+              New {title}? (<span className="text-white/80">{inputValue}</span>)
             </div>
           </div>
         </div>

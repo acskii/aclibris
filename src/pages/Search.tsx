@@ -213,7 +213,7 @@ function SearchPage() {
                                     </div>
                                 )}
                                 <div className="absolute top-3 right-3">
-                                    <button className="bg-side-3 cursor-pointer hover:bg-white/40 text-white p-2 rounded-lg transition-colors opacity-0 group-hover:opacity-100">
+                                    <button className="bg-stop-3/60 cursor-pointer hover:bg-stop-3/40 text-white p-2 rounded-lg transition-colors opacity-0 group-hover:opacity-100">
                                         <Eye size={15} />
                                     </button>
                                 </div>

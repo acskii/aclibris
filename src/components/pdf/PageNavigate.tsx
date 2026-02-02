@@ -61,12 +61,12 @@ export function PageNavigate({ current, total, bookId, bookTitle, scale, minScal
 
   return (
     <div className="sticky top-0 w-full flex justify-center z-30">
-      <div className="w-full bg-gradient-to-r from-sky-600 via-cyan-500 to-violet-400 overflow-hidden text-white flex flex-col items-center">
+      <div className="w-full bg-gradient-to-r from-stop-2 to-stop-1 overflow-hidden text-white flex flex-col items-center">
         {/* Navigation Controls */}
         <div className="flex flex-row gap-10 items-center justify-between w-full px-5 py-2">
           <button
               onClick={jumpToLibrary}
-              className="bg-gradient-to-br from-blue-800 to-indigo-900 p-2 rounded-md hover:from-violet-400 hover:to-purple-500 text-white transition disabled:opacity-30"
+              className="bg-stop-3 p-2 cursor-pointer rounded-md hover:bg-stop-3/80 text-white transition disabled:opacity-30"
           >
               <Library size={20} />
           </button>
@@ -84,7 +84,7 @@ export function PageNavigate({ current, total, bookId, bookTitle, scale, minScal
             <button
                 onClick={OnZoomIn}
                 disabled={scale >= maxScale}
-                className="bg-gradient-to-br from-blue-800 to-indigo-900 p-2 rounded-md hover:from-violet-400 hover:to-purple-500 text-white transition disabled:opacity-30"
+                className="bg-stop-3 p-2 rounded-md hover:bg-stop-3/80 text-white transition disabled:opacity-30"
             >
                 <Plus size={20} />
             </button>
@@ -94,7 +94,7 @@ export function PageNavigate({ current, total, bookId, bookTitle, scale, minScal
             <button
                 onClick={OnZoomOut}
                 disabled={scale <= minScale}
-                className="bg-gradient-to-br from-blue-800 to-indigo-900 p-2 rounded-md hover:from-violet-400 hover:to-purple-500 text-white transition disabled:opacity-30"
+                className="bg-stop-3 p-2 rounded-md hover:bg-stop-3/80 text-white transition disabled:opacity-30"
             >
                 <Minus size={20} />
             </button>
@@ -104,14 +104,14 @@ export function PageNavigate({ current, total, bookId, bookTitle, scale, minScal
             <button
               onClick={jumpToStart}
               disabled={current <= 1}
-              className="bg-gradient-to-br from-blue-800 to-indigo-900 p-2 rounded-md hover:from-violet-400 hover:to-purple-500 text-white transition disabled:opacity-30"
+              className="bg-stop-3 p-2 rounded-md hover:bg-stop-3/80 text-white transition disabled:opacity-30"
             >
               <ChevronsLeft size={20} />
             </button>
             <button
               onClick={jumpToPrevious}
               disabled={current <= 1}
-              className="bg-gradient-to-br from-blue-800 to-indigo-900 p-2 rounded-md hover:from-violet-400 hover:to-purple-500 text-white transition disabled:opacity-30"
+              className="bg-stop-3 p-2 rounded-md hover:bg-stop-3/80 text-white transition disabled:opacity-30"
             >
               <ChevronLeft size={20} />
             </button>
@@ -131,14 +131,14 @@ export function PageNavigate({ current, total, bookId, bookTitle, scale, minScal
             <button
               onClick={jumpToNext}
               disabled={current >= total}
-              className="p-2 rounded-md bg-gradient-to-br from-blue-800 to-indigo-900 hover:to-purple-500 text-white transition disabled:opacity-30"
+              className="bg-stop-3 p-2 rounded-md hover:bg-stop-3/80 text-white transition disabled:opacity-30"
             >
               <ChevronRight size={20} />
             </button>
             <button
               onClick={jumpToEnd}
               disabled={current >= total}
-              className="p-2 rounded-md bg-gradient-to-br from-blue-800 to-indigo-900 hover:from-violet-400 hover:to-purple-500 text-white transition disabled:opacity-30"
+              className="bg-stop-3 p-2 rounded-md hover:bg-stop-3/80 text-white transition disabled:opacity-30"
             >
               <ChevronsRight size={20} />
             </button>

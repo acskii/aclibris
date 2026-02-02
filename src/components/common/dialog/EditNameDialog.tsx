@@ -60,11 +60,11 @@ export function EditNameDialog({
 
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-indigo-800 border border-indigo-800/30 rounded-md p-6 max-w-md w-full mx-auto">
+            <div className="bg-stop-3 border border-stop-3/30 rounded-md p-6 max-w-md w-full mx-auto">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
-                        <PenBox className="w-5 h-5 text-blue-400" />
+                        <PenBox size={25} className="text-stop-1" />
                         <h3 className="text-lg font-semibold text-white">{title}</h3>
                     </div>
                 </div>
@@ -73,7 +73,7 @@ export function EditNameDialog({
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4">
                         <label className="block text-indigo-200 text-sm font-medium mb-2">
-                            New Name <span className="text-indigo-300">
+                            New Name <span className="text-white/50">
                                 (Current: "{currentName}")
                             </span>
                         </label>
@@ -83,14 +83,14 @@ export function EditNameDialog({
                             onChange={(e) => setNewName(e.target.value)}
                             onKeyDown={handleKeyDown}
                             placeholder={placeholder}
-                            className="w-full bg-violet-600/50 border border-purple-500/30 rounded-lg px-4 py-3 text-white placeholder-indigo-300/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full bg-stop-2/50 border border-stop-2/30 rounded-lg px-4 py-3 text-white placeholder-stop-2/50 focus:outline-none focus:ring-2 focus:ring-stop-2 focus:border-transparent"
                             autoFocus
                         />
                         <div className="flex justify-between items-center mt-2">
                             
-                            <span className={`text-xs ${
+                            <span className={`text-sm font-semibold ${
                                 newName.length === 0 ? 'text-red-400' : 
-                                newName === currentName ? 'text-blue-400' : 'text-green-400'
+                                newName === currentName ? 'text-stop-1' : 'text-green-400'
                             }`}>
                                 {newName.length === 0 ? 'Name cannot be empty' :
                                  newName === currentName ? 'No changes made' :
@@ -112,7 +112,7 @@ export function EditNameDialog({
                         <button
                             type="submit"
                             disabled={!newName.trim() || newName.trim() === currentName || isSubmitting}
-                            className="px-4 py-2 cursor-pointer bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 disabled:cursor-not-allowed text-white rounded-lg transition-colors flex items-center gap-2"
+                            className="px-4 py-2 cursor-pointer bg-stop-1 hover:bg-stop-1/80 disabled:bg-stop-2/80 disabled:cursor-not-allowed text-white rounded-lg transition-colors flex items-center gap-2"
                         >
                             {isSubmitting ? (
                                 <>
@@ -121,7 +121,7 @@ export function EditNameDialog({
                                 </>
                             ) : (
                                 <>
-                                    <PenBox size={16} />
+                                    <PenBox size={20} />
                                     Save Changes
                                 </>
                             )}

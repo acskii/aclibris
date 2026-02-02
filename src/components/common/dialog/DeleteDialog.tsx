@@ -23,16 +23,16 @@ export default function DeleteDialog ({
 
     return (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-            <div className="bg-indigo-800 border border-indigo-800/30 rounded-md p-6 max-w-md w-full mx-auto">
+            <div className="bg-stop-3 border border-stop-3/30 rounded-md p-6 max-w-md w-full mx-auto">
                 <div className="flex items-center gap-3 mb-4">
-                    <AlertTriangle className="w-6 h-6 text-red-400" />
+                    <AlertTriangle size={25} className="text-red-400" />
                     <h3 className="text-lg font-semibold text-white">{title}</h3>
                 </div>
                 
-                <p className="text-indigo-200 mb-4">{message}</p>
+                <p className="text-white/80 mb-4">{message}</p>
                 
                 {warning && (
-                    <div className="bg-red-900/60 border border-red-500/30 rounded-md p-3 mb-4">
+                    <div className="bg-red-900/60 border border-2 border-red-500/60 rounded-md p-3 mb-4">
                         <p className="text-red-300 text-sm">{warning}</p>
                     </div>
                 )}
@@ -48,7 +48,7 @@ export default function DeleteDialog ({
                         onClick={onConfirm}
                         className={`px-4 py-2 bg-red-600 hover:bg-red-700 cursor-pointer font-semibold text-white rounded-md transition-colors flex items-center gap-2`}
                     >
-                        <Trash2 size={16} />
+                        <Trash2 size={20} />
                         {confirmText}
                     </button>
                 </div>

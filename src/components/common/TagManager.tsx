@@ -67,7 +67,7 @@ export function TagManager({ currentTags, onTagsChange, className = '' }: TagMan
         <div className={`mt-6 ${className}`}>
         {/* Current Tags Display */}
         <div className="mb-6">
-            <label className="font-semibold text-white text-nowrap underline decoration-cyan-400 mb-3 block">Current Tags</label>
+            <label className="font-semibold text-white text-nowrap underline decoration-stop-3 mb-3 block">Current Tags</label>
             <div className="flex flex-wrap gap-2 min-h-10">
             {currentTags.map(tag => (
                 <span
@@ -84,7 +84,7 @@ export function TagManager({ currentTags, onTagsChange, className = '' }: TagMan
                 </span>
             ))}
             {currentTags.length === 0 && (
-                <span className="text-cyan-300/90 font-semibold text-sm">No tags added yet</span>
+                <span className="text-white/90 font-semibold text-sm">No tags added yet</span>
             )}
             </div>
         </div>
@@ -126,9 +126,9 @@ export function TagManager({ currentTags, onTagsChange, className = '' }: TagMan
                     <button
                         key={tag.id}
                         onClick={() => addTag(tag.name)}
-                        className={`${getTagColor(tag.name)} hover:opacity-90 text-white px-3 py-1 rounded-full text-sm transition-all flex items-center gap-1`}
+                        className={`${getTagColor(tag.name)} hover:opacity-90 text-white font-semibold px-3 py-1 rounded-md text-sm transition-all flex items-center gap-1`}
                     >
-                        <Plus size={12} />
+                        <Plus size={15} />
                         {tag.name}
                     </button>
                     ))}

@@ -81,7 +81,7 @@ export function Dropdown({
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
       <div className="w-full flex flex-row justify-start">
-        <h3 className="font-semibold text-white text-nowrap underline decoration-cyan-400 mb-2">{title}</h3>
+        <h3 className="font-semibold text-white text-nowrap underline decoration-stop-3 mb-2">{title}</h3>
       </div>
 
       <div className="relative">
@@ -93,17 +93,17 @@ export function Dropdown({
           placeholder={placeholder}
           disabled={disabled}
           readOnly
-          className="border border-2 rounded-md p-2 w-full border-cyan-400/60 focus:border-violet-800/60 bg-gray-600/50 text-white"
+          className="border border-2 rounded-md p-2 w-full border-stop-2/60 focus:border-stop-3/60 bg-gray-600/50 text-white"
         />
         
         <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
           {(selectedOption || value) && (
             <button
               onClick={clearSelection}
-              className="text-indigo-300/70 hover:text-indigo-200 transition-colors p-1"
+              className="text-white/70 hover:text-white transition-colors p-1"
               type="button"
             >
-              <Ban size={18} />
+              <Ban size={20} />
             </button>
           )}
         </div>
@@ -112,7 +112,7 @@ export function Dropdown({
       {isOpen && filteredOptions.length > 0 && (
         <div 
           className={`
-            absolute z-10 w-full bg-gray-800/95 backdrop-blur-sm border border-indigo-500/30 overflow-y-auto max-h-60
+            absolute z-10 w-full bg-gray-800/95 border border-stop-3/30 overflow-y-auto max-h-60
             ${isUp ? 'bottom-full mb-1 rounded-t-md' : 'top-full mt-1 rounded-b-md'}
           `}
         >
@@ -121,7 +121,7 @@ export function Dropdown({
               <button
                 key={option.id}
                 onClick={() => handleOptionSelect(option)}
-                className="w-full text-left px-4 py-2 hover:bg-indigo-600/30 transition-colors"
+                className="w-full text-left px-4 py-2 hover:bg-stop-3/30 transition-colors"
               >
                 <div className="font-medium text-white">{option.name}</div>
                 <hr className="border-gray-700 mt-1" />

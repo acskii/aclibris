@@ -8,7 +8,7 @@ export function ToggleSwitch({ enabled, onChange }: ToggleSwitchProps) {
     <button
       onClick={() => onChange(!enabled)}
       className={`relative inline-flex h-6 w-11 cursor-pointer items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-900 ${
-        enabled ? 'bg-gradient-to-r from-violet-500 to-purple-600' : 'bg-gray-600'
+        enabled ? 'bg-stop-3' : 'bg-gray-600'
       }`}
     >
       <span

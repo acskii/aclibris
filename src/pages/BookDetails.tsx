@@ -422,7 +422,7 @@ export default function BookDetailsPage() {
               onValueChange={handleCollectionInputChange}
               onOptionSelect={handleCollectionSelect}
             />
-            {!selectedCollection && collectionInput && <span className="mt-2 text-stop-3 font-semibold text-md">This collection will be created</span>}
+            {!selectedCollection && collectionInput && <span className="mt-2 text-white font-semibold text-md">This collection will be created</span>}
           </div>
           <div>
             <AutocompleteDropdown
@@ -433,7 +433,7 @@ export default function BookDetailsPage() {
               onValueChange={handleShelfInputChange}
               onOptionSelect={handleShelfSelect}
             />
-            {!selectedShelf && shelfInput && <span className="mt-2 text-stop-3 font-semibold text-md">This shelf will be created</span>}
+            {!selectedShelf && shelfInput && <span className="mt-2 text-white font-semibold text-md">This shelf will be created</span>}
           </div>
         </div>
         <TagManager 
