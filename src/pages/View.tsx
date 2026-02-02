@@ -187,12 +187,13 @@ export function View() {
                             </p>
                         </div>
                     )}
-                    <div 
-                        ref={containerRef}
-                        className="absolute top-0 left-0 w-1 h-1 opacity-0"
-                        aria-hidden="true"
-                    />
+                    
                     <div className="relative text-center overflow-auto no-scrollbar">
+                        <div 
+                            ref={containerRef}
+                            className="absolute top-0 left-0 w-1 h-1 opacity-0"
+                            aria-hidden="true"
+                        />
                         <canvas 
                             ref={canvasRef}
                             className={`${loading ? "invisible" : "visible"} inline-block`}
