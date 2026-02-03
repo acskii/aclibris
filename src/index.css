@@ -25,25 +25,32 @@
   --s3: #8b5cf6;      /* violet-500 */
 }
 
-[data-theme='garden'] {
-  --card-bg: rgba(255, 255, 255, 0.08);
-  --s1: #10b981;      /* emerald-500 */
-  --s2: #14b8a6;      /* teal-500 */
-  --s3: #84cc16;      /* lime-500 (Vibrant finish) */
+[data-theme='nebula'] {
+  --card-bg: rgba(255, 255, 255, 0.1);
+  --s1: #701a75; /* Deep Plum */
+  --s2: #4c1d95; /* Midnight Violet */
+  --s3: #1e1b4b; /* Deep Indigo */
 }
 
-[data-theme='sepia'] {
-  --card-bg: rgba(255, 255, 255, 0.1);
-  --s1: #f59e0b;      /* amber-500 */
-  --s2: #f97316;      /* orange-500 */
-  --s3: #ef4444;      /* red-500 (Hot finish) */
+[data-theme='cyber'] {
+  --card-bg: rgba(255, 255, 255, 0.12);
+  --s1: #06b6d4; /* Electric Neon Cyan (The "Glow") */
+  --s2: #475569; /* Brushed Steel Blue */
+  --s3: #1e293b; /* Deep Metallic Slate */
+}
+
+[data-theme='espresso'] {
+  --card-bg: rgba(0, 0, 0, 0.05);
+  --s1: #d6bc97; /* Soft Latte */
+  --s2: #b89f81; /* Toasted Almond */
+  --s3: #a38d6d; /* Muted Caramel */
 }
 
 [data-theme='midnight'] {
-  --card-bg: rgba(255, 255, 255, 0.05);
-  --s1: #3b82f6;      /* blue-500 */
-  --s2: #6366f1;      /* indigo-500 */
-  --s3: #4338ca;      /* indigo-700 */
+  --card-bg: rgba(0, 0, 0, 0.25);
+  --s1: #334155; /* Slate Blue-Gray */
+  --s2: #1e293b; /* Deep Obsidian */
+  --s3: #0f172a; /* Rich Charcoal */
 }
 
 * {

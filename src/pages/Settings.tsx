@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Settings, Save, Book, Image, RotateCcw, Crown, Moon, Leaf, BookOpen } from 'lucide-react';
+import { Settings, Save, Book, Image, RotateCcw } from 'lucide-react';
 import { Spinner } from '../components/common/spinner/Spinner';
 import { ToggleSwitch } from '../components/common/toggle/ToggleSwitch';
 import { TriangleAlert } from 'lucide-react';
@@ -195,7 +195,7 @@ export default function SettingsPage() {
             Interface Theme
           </h2>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
             {themes.map((t) => (
               <button
                 key={t.id}
@@ -207,17 +207,19 @@ export default function SettingsPage() {
                 {/* Mini UI Layout Preview */}
                 <div className={`h-32 w-full bg-gradient-to-br ${t.colors} flex`}>
                   {/* Fake Sidebar */}
-                  <div className="w-1/4 h-full bg-white/20 backdrop-blur-sm border-r border-white/10" />
+                  <div className="w-1/4 h-full bg-white/10 backdrop-blur-sm border-r border-white/10" />
                   {/* Fake Content Area */}
                   <div className="flex-1 p-3 flex flex-col gap-2">
                     <div className="h-2 w-1/2 bg-white/40 rounded" />
                     <div className="flex gap-2">
-                        <div className="h-10 w-8 bg-white/30 rounded shadow-sm border border-white/10" />
-                        <div className="h-10 w-8 bg-white/30 rounded shadow-sm border border-white/10" />
+                        <div className="h-10 w-8 bg-white/20 rounded shadow-sm border border-white/10" />
+                        <div className="h-10 w-8 bg-white/20 rounded shadow-sm border border-white/10" />
                     </div>
                   </div>
                 </div>
-                <div className={`absolute bottom-0 w-full backdrop-blur-md py-1.5 text-center font-bold text-white text-[10px] tracking-widest ${theme === t.id ? 'bg-white/30' : 'bg-black/30'}`}>
+                
+                {/* Label with Icon */}
+                <div className={`absolute bottom-0 w-full backdrop-blur-md py-2 flex items-center justify-center gap-2 font-bold text-white text-[10px] tracking-widest ${theme === t.id ? 'bg-white/30' : 'bg-black/40'}`}>
                   {t.name.toUpperCase()}
                 </div>
               </button>
