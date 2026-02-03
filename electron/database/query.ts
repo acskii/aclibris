@@ -21,10 +21,12 @@ class DatabaseQuery {
 
         // Build the main query once
         const baseQuery = `
-            SELECT b.id
+            SELECT DISTINCT b.id
             FROM books b
-            LEFT JOIN book_tag bt ON b.id = bt.book_id
-            LEFT JOIN tags t ON bt.tag_id = t.id
+            ${(filter?.tags && filter.tags.length > 0) ? `
+                JOIN book_tag bt_filter ON b.id = bt_filter.book_id
+                JOIN tags t_filter ON bt_filter.tag_id = t_filter.id
+            ` : ""}
         `;
 
         const whereConditions: string[] = [];
@@ -57,16 +59,10 @@ class DatabaseQuery {
 
             // Tag filter
             if (filter.tags && filter.tags.length > 0) {
-                whereConditions.push(`
-                    b.id IN (
-                        SELECT bt2.book_id FROM book_tag bt2
-                        JOIN tags t2 ON bt2.tag_id = t2.id
-                        WHERE t2.tag_name IN (${filter.tags.map(() => '?').join(',')})
-                        GROUP BY bt2.book_id
-                        HAVING COUNT(DISTINCT t2.tag_name) = ${filter.tags.length}
-                    )
-                `);
-                args.push(...filter.tags);
+                if (filter.tags && filter.tags.length > 0) {
+                    whereConditions.push(`t_filter.tag_name IN (${filter.tags.map(() => '?').join(',')})`);
+                    args.push(...filter.tags);
+                }
             }
         }
 
@@ -76,11 +72,22 @@ class DatabaseQuery {
             query += ' WHERE ' + whereConditions.join(' AND ');
         }
 
+        // If filtering by tags, we need the HAVING clause to ensure it matches ALL tags, not just ANY
+        if (filter?.tags && filter.tags.length > 0) {
+            query += ` GROUP BY b.id HAVING COUNT(DISTINCT t_filter.tag_name) = ${filter.tags.length}`;
+        }
+        query += ` ORDER BY b.title ${filter?.asc ? 'ASC' : 'DESC'}`;
+
         const result: { id: number }[] = database.prepare(query).all(...args);
         if (result.length === 0) return null;
 
         const ids = result.map((r) => r.id);
-        const placeholders = ids.map(() => '?').join(',');
+        const start = page * this.bookPageSize;
+        const paginatedIds = ids.slice(start, start + this.bookPageSize);
+
+        if (paginatedIds.length === 0) return null;
+
+        const placeholders = paginatedIds.map(() => '?').join(',');
 
         const paginated = database.prepare(`
             SELECT 
@@ -92,10 +99,8 @@ class DatabaseQuery {
             LEFT JOIN book_tag bt ON b.id = bt.book_id
             LEFT JOIN tags t ON bt.tag_id = t.id
             WHERE b.id IN (${placeholders})
-            GROUP BY b.id, t.id
             ORDER BY b.title ${filter?.asc ? 'ASC' : 'DESC'}
-            LIMIT ? OFFSET ?
-        `).all(...ids, this.bookPageSize, this.bookPageSize * page);
+        `).all(...paginatedIds);
 
         // Process results into Book objects
         const books = new Map<number, Book>();
