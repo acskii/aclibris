@@ -14,7 +14,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const isDev = !app.isPackaged;
 
 const MainWindowContext = {
-    width: (isDev) ? 1200 : 800,
+    width: 800,
     height: 600,
     minWidth: 800,
     minHeight: 600,    
