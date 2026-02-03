@@ -2,7 +2,7 @@
   "name": "aclibris",
   "author": "Andrew Sameh Adel",
   "description": "Your organized desktop bookshelf. A PDF reader that helps you manage and categorize your entire collection.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite --port 3173",
