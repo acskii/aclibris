@@ -7,6 +7,8 @@ import {
   Plus,
   Minus,
   FileMinus,
+  TriangleAlert,
+  Info,
 } from "lucide-react";
 
 export default function DocumentationPage() {
@@ -30,9 +32,9 @@ export default function DocumentationPage() {
       </div>
       <div className="max-w-5xl mx-auto">
         {/* Introduction */}
-        <section className="mb-12">
+        <section id="introduction" className="mb-12">
           <h2 className="text-2xl font-semibold mb-4">Introduction</h2>
-          <p className="mb-4">Thanks for installing reader!</p>
+          <p className="mb-4">Thanks for installing Aclibris!</p>
           <p className="mb-4">
             I hope this application will prove useful and entertaining in some
             way or another, because it was just as fun developing it as using
@@ -49,56 +51,32 @@ export default function DocumentationPage() {
           <h2 className="text-2xl font-semibold mb-4">Table of Contents</h2>
           <ul className="list-disc pl-6 space-y-1">
             <li>
-              <a
-                href="#introduction"
-                onClick={(e) => handleLinkClick(e, "introduction")}
-                className="text-white/80 hover:text-white hover:underline cursor-pointer"
-              >
+              <a href="#introduction" onClick={(e) => handleLinkClick(e, "introduction")} className="text-white/80 hover:text-white hover:underline cursor-pointer">
                 Introduction
               </a>
             </li>
             <li>
-              <a
-                href="#adding-your-first-book"
-                onClick={(e) => handleLinkClick(e, "adding-your-first-book")}
-                className="text-white/80 hover:text-white hover:underline cursor-pointer"
-              >
+              <a href="#adding-your-first-book" onClick={(e) => handleLinkClick(e, "adding-your-first-book")} className="text-white/80 hover:text-white hover:underline cursor-pointer">
                 Adding your first book
               </a>
             </li>
             <li>
-              <a
-                href="#smooth-read"
-                onClick={(e) => handleLinkClick(e, "smooth-read")}
-                className="text-white/80 hover:text-white hover:underline cursor-pointer"
-              >
+              <a href="#smooth-read" onClick={(e) => handleLinkClick(e, "smooth-read")} className="text-white/80 hover:text-white hover:underline cursor-pointer">
                 Smooth read
               </a>
             </li>
             <li>
-              <a
-                href="#organisation"
-                onClick={(e) => handleLinkClick(e, "organisation")}
-                className="text-white/80 hover:text-white hover:underline cursor-pointer"
-              >
+              <a href="#organisation" onClick={(e) => handleLinkClick(e, "organisation")} className="text-white/80 hover:text-white hover:underline cursor-pointer">
                 Organisation
               </a>
             </li>
             <li>
-              <a
-                href="#search-and-filter"
-                onClick={(e) => handleLinkClick(e, "search-and-filter")}
-                className="text-white/80 hover:text-white hover:underline cursor-pointer"
-              >
+              <a href="#search-and-filter" onClick={(e) => handleLinkClick(e, "search-and-filter")} className="text-white/80 hover:text-white hover:underline cursor-pointer">
                 Search & Filter
               </a>
             </li>
             <li>
-              <a
-                href="#settings"
-                onClick={(e) => handleLinkClick(e, "settings")}
-                className="text-white/80 hover:text-white hover:underline cursor-pointer"
-              >
+              <a href="#settings" onClick={(e) => handleLinkClick(e, "settings")} className="text-white/80 hover:text-white hover:underline cursor-pointer">
                 Settings
               </a>
             </li>
@@ -389,8 +367,7 @@ export default function DocumentationPage() {
               Library
             </code>{" "}
             <Library className="inline align-text-bottom" size={20} /> button,
-            which returns you to the{" "}
-            <strong className="font-semibold">Library</strong> page. You can
+            which returns you to the <strong className="font-semibold">Library</strong> page. You can
             consider it the exit button of the page.
           </p>
           <p className="mb-4">
@@ -468,9 +445,8 @@ export default function DocumentationPage() {
           </ul>
 
           <p className="mb-4">
-            There is also a <strong className="font-semibold">zoom</strong> in
-            and out feature, which you can control using the buttons
-            highlighted.
+            There is also a <strong>zoom</strong> in and out feature, which you
+            can controls using the buttons highlighted.
           </p>
 
           <DocumentationImage
@@ -478,7 +454,7 @@ export default function DocumentationPage() {
             alt="Preview controls with zoom highlighted"
           />
 
-          <ul className="list-disc pl-6 mb-4 space-y-2">
+          <ul className="list-disc pl-6 mb-4 space-y-1">
             <li>
               The minimum zoom is <strong>100%</strong> and the maximum is{" "}
               <strong>200%</strong> when the window is fullscreen.
@@ -488,243 +464,105 @@ export default function DocumentationPage() {
               the maximum is <strong>100%</strong>.
             </li>
             <li>
-              Click the <Plus className="inline align-text-bottom" size={15} />{" "}
+              Click the <Plus className="inline align-middle" size={15} />{" "}
               (plus) button to zoom in.
             </li>
             <li>
-              Click the <Minus className="inline align-text-bottom" size={15} />{" "}
+              Click the <Minus className="inline align-middle" size={15} />{" "}
               (minus) button to zoom out.
             </li>
           </ul>
 
-          <p>
-            These are all the current features on the{" "}
-            <strong className="font-semibold">View</strong> page, more are
-            expected to come.
+          <p className="mb-4">
+            These are all the current features on the <strong className="font-semibold">View</strong> page, more are expected to come.
           </p>
-          <p className="font-medium mt-4">Happy reading!</p>
+          <p className="mb-4">Happy reading!</p>
         </section>
 
         {/* Organisation */}
         <section id="organisation" className="mb-12">
           <h3 className="text-xl font-semibold mb-4">Organisation</h3>
           <p className="mb-4">
-            In this application, there are currently <strong>3</strong>{" "}
-            different methods that you can utilise to organise your books.
+            In this application, there are currently <strong>3</strong> different methods that you can utilise to organise your books.
           </p>
           <p className="mb-4">
-            The inspiration is from a library shelf.{" "}
-            <strong className="font-semibold">Shelves</strong> represent genres,{" "}
-            <strong className="font-semibold">Collections</strong> represent
-            series and <strong className="font-semibold">Tags</strong> are,
-            well, tags.
+            The inspiration is from a library shelf. <strong>Shelves</strong> represent genres, <strong>Collections</strong> represent series and <strong>Tags</strong> are well ....tags.
           </p>
           <p className="mb-4">
-            You are not obligated to follow this analogy strictly, but it
-            provides a useful framework.
+            You are not obligated to follow this analogy strictly, but it provides a useful framework.
           </p>
           <p className="mb-4">
-            The <strong className="font-semibold">Library</strong> page will by
-            default have one shelf{" "}
-            <code className="bg-white/20 px-1 py-0.5 rounded text-sm font-mono">
-              Default
-            </code>{" "}
-            and within it one collection{" "}
-            <code className="bg-white/20 px-1 py-0.5 rounded text-sm font-mono">
-              Default
-            </code>
-            .
+            The <strong>Library</strong> page will by default have one shelf <code className="bg-white/20 px-1 py-0.5 rounded text-sm font-mono">Default</code> and within it one collection <code className="bg-white/20 px-1 py-0.5 rounded text-sm font-mono">Default</code>.
           </p>
           <p className="mb-4">
-            <strong className="font-semibold">Shelves</strong> and{" "}
-            <strong className="font-semibold">Collections</strong> can only be
-            created in the <strong className="font-semibold">Upload</strong>{" "}
-            page or on{" "}
-            <a
-              href="#book-details"
-              onClick={(e) => handleLinkClick(e, "book-details")}
-              className="text-white/80 hover:text-white hover:underline cursor-pointer"
-            >
-              book details
-            </a>{" "}
-            edit. When selecting a shelf or a collection, you can choose from
-            existing ones using the drop-down menu. Alternatively, typing a{" "}
-            <em>new name</em> will automatically create it for you.
+            <strong>Shelves</strong> and <strong>Collections</strong> can only be created in the <strong>Upload</strong> page or on <a href="#book-details" onClick={(e) => handleLinkClick(e, "book-details")} className="text-white/80 hover:text-white hover:underline cursor-pointer"><strong>book details</strong></a> edit. When selecting a shelf or a collection, you can choose from existing ones using the drop-down menu. Alternatively, typing a <em>new name</em> will automatically create it for you.
           </p>
+
           <ul className="list-disc pl-6 mb-4 space-y-4">
             <li>
-              Each <strong className="font-semibold">shelf</strong> can hold
-              multiple <strong className="font-semibold">collections</strong>.
-              You can rename or delete a shelf using the buttons highlighted
-              below.
-              <DocumentationImage
-                src="./docs/organisation/library_page_shelf.png"
-                alt="Edit and rename shelf buttons"
-              />
+              Each <strong>shelf</strong> can hold multiple <strong>collections</strong>. You can rename or delete a shelf using the buttons highlighted below.
+              <DocumentationImage src="./docs/organisation/library_page_shelf.png" alt="Edit and rename shelf buttons" />
             </li>
             <li>
-              Each <strong className="font-semibold">collection</strong> can
-              contain multiple books. You can rename or delete a collection
-              using the buttons highlighted below.
-              <DocumentationImage
-                src="./docs/organisation/collection_page_buttons.png"
-                alt="Edit and rename collection buttons"
-              />
+              Each <strong>collection</strong> can contain multiple books. You can rename or delete a collection using the buttons highlighted below.
+              <DocumentationImage src="./docs/organisation/collection_page_buttons.png" alt="Edit and rename collection buttons" />
             </li>
           </ul>
 
           <Alert type="important">
-            Deleting a shelf or a collection will{" "}
-            <strong>
-              <em>permanently remove</em>
-            </strong>{" "}
-            <strong>all</strong> books contained within it from your library.
+            Deleting a shelf or a collection will <strong><em>permanently remove</em></strong> <strong>all</strong> books contained within it from your library.
           </Alert>
 
+          <p className="mb-4 mt-8"><strong>Tags</strong> are <em>labels</em> that can be attached to books individually.</p>
           <p className="mb-4">
-            <strong className="font-semibold">Tags</strong> are <em>labels</em>{" "}
-            that can be attached to books individually.
+            Tags are flexible labels you can attach to individual books. They are useful for identifying themes and content, which helps with searching and filtering on the <strong>Search</strong> page. See <a href="#search-and-filter" onClick={(e) => handleLinkClick(e, "search-and-filter")} className="text-white/80 hover:text-white hover:underline cursor-pointer">Search & Filter</a> for more information.
           </p>
           <p className="mb-4">
-            Tags are flexible labels you can attach to individual books. They
-            are useful for identifying themes and content, which helps with
-            searching and filtering on the{" "}
-            <strong className="font-semibold">Search</strong> page. See{" "}
-            <a
-              href="#search-and-filter"
-              onClick={(e) => handleLinkClick(e, "search-and-filter")}
-              className="text-white/80 hover:text-white hover:underline cursor-pointer"
-            >
-              Search & Filter
-            </a>{" "}
-            for more information.
+            Similar to <strong>shelves</strong> and <strong>collections</strong>, <strong>tags</strong> can be added from the <strong>Upload</strong> page or the <a href="#book-details" onClick={(e) => handleLinkClick(e, "book-details")} className="text-white/80 hover:text-white hover:underline cursor-pointer"><strong>book details</strong></a>. 
           </p>
           <p className="mb-4">
-            Similar to <strong className="font-semibold">shelves</strong> and{" "}
-            <strong className="font-semibold">collections</strong>,{" "}
-            <strong className="font-semibold">tags</strong> can be added from
-            the <strong className="font-semibold">Upload</strong> page or the{" "}
-            <a
-              href="#book-details"
-              onClick={(e) => handleLinkClick(e, "book-details")}
-              className="text-white/80 hover:text-white hover:underline cursor-pointer"
-            >
-              book details
-            </a>
-            .
-          </p>
-          <p className="mb-4">
-            To add a <strong className="font-semibold">tag</strong>, type its
-            name into the field and click the{" "}
-            <Plus className="inline align-text-bottom" size={15} /> (plus)
-            button. You can also quickly add previously created tags from the{" "}
-            <code className="bg-white/20 px-1 py-0.5 rounded text-sm font-mono">
-              Quick Add
-            </code>{" "}
-            section or the drop-down menu.
+            To add a <strong>tag</strong>, type its name into the field and click the <Plus className="inline align-middle" size={15} /> (plus) button. You can also quickly add previously created tags from the <code className="bg-white/20 px-1 py-0.5 rounded text-sm font-mono">Quick Add</code> section or the drop-down menu.
           </p>
 
-          <DocumentationImage
-            src="./docs/organisation/book_details_tag_editor.png"
-            alt="Tag editor section"
-          />
+          <DocumentationImage src="./docs/organisation/book_details_tag_editor.png" alt="Tag editor section" />
 
-          <div id="book-details"></div>
+          <h4 id="book-details" className="text-lg font-semibold mt-12 mb-4">Book Details</h4>
           <p className="mb-4">
-            To access a{" "}
-            <strong className="font-semibold">book's details</strong>, select it
-            from a <strong className="font-semibold">Collection</strong> page
-            and click the{" "}
-            <code className="bg-white/20 px-1 py-0.5 rounded text-sm font-mono">
-              Edit Book
-            </code>{" "}
-            button in the details section, as highlighted below.
+            To access a <strong>book's details</strong>, select it from a <strong>Collection</strong> page and click the <code className="bg-white/20 px-1 py-0.5 rounded text-sm font-mono">Edit Book</code> button in the details section, as highlighted below.
           </p>
+          
+          <DocumentationImage src="./docs/organisation/collection_details_edit.png" alt="Collection page with edit book button highlighted" />
 
-          <DocumentationImage
-            src="./docs/organisation/collection_details_edit.png"
-            alt="Collection page with edit book button highlighted"
-          />
-
+          <p className="mb-4">Within the <strong>book details</strong>, you can modify the book's <em>title</em>, <em>author</em>, <em>thumbnail</em>, <strong>shelf</strong>, <strong>collection</strong> and <strong>tags</strong>. </p>
+          
           <p className="mb-4">
-            Within the <strong className="font-semibold">book details</strong>,
-            you can modify the book's <em>title</em>, <em>author</em>,{" "}
-            <em>thumbnail</em>, <strong className="font-semibold">shelf</strong>
-            , <strong className="font-semibold">collection</strong> and{" "}
-            <strong className="font-semibold">tags</strong>.
-          </p>
-          <p className="mb-4">
-            You can also delete the book from your library by clicking the{" "}
-            <code className="bg-white/20 px-1 py-0.5 rounded text-sm font-mono">
-              Delete this book
-            </code>{" "}
-            button, as shown below.
+            You can also delete the book from your library by clicking the <code className="bg-white/20 px-1 py-0.5 rounded text-sm font-mono">Delete this book</code> button, as shown below.
           </p>
 
           <Alert type="important">
-            Deleting a book from the library will <strong>not</strong> delete
-            the <em>original</em> PDF file from your computer.
+            Deleting a book from the library will <strong>not</strong> delete the <em>original</em> PDF file from your computer.
           </Alert>
 
-          <DocumentationImage
-            src="./docs/organisation/book_details_delete.png"
-            alt="Book details page with delete button zoomed in"
-          />
+          <DocumentationImage src="./docs/organisation/book_details_delete.png" alt="Book details page with delete button zoomed in" />
 
-          <p className="mb-4">
-            You can replace the book's thumbnail by hovering over the current
-            one, and clicking to upload a new image.
-          </p>
-
-          <DocumentationImage
-            src="./docs/organisation/book_details_thumbnail.png"
-            alt="Book details page with thumbnail zoomed in"
-          />
-
-          <p>
-            Remember to click on the{" "}
-            <code className="bg-white/20 px-1 py-0.5 rounded text-sm font-mono">
-              Add Changes
-            </code>{" "}
-            button at the bottom of the page to persist changes.
-          </p>
-
-          <DocumentationImage
-            src="./docs/organisation/book_details_add_changes.png"
-            alt="Book details page with tag section zoomed in"
-          />
+          <p className="mb-4">You can replace the book's thumbnail by hovering over the current one, and clicking to upload a new image.</p>
+          <DocumentationImage src="./docs/organisation/book_details_thumbnail.png" alt="Book details page with thumbnail zoomed in" />
+          
+          <p className="mb-4">Remember to click on the <code className="bg-white/20 px-1 py-0.5 rounded text-sm font-mono">Add Changes</code> button at the bottom of the page to persist changes.</p>
+          <DocumentationImage src="./docs/organisation/book_details_add_changes.png" alt="Book details page with tag section zoomed in" />
         </section>
 
-        {/* Search and Filter */}
+        {/* Search & Filter */}
         <section id="search-and-filter" className="mb-12">
           <h3 className="text-xl font-semibold mb-4">Search and Filter</h3>
-          <p className="mb-4">
-            You can navigate to the{" "}
-            <strong className="font-semibold">Search</strong> page using the{" "}
-            <code className="bg-white/20 px-1 py-0.5 rounded text-sm font-mono">
-              Search
-            </code>{" "}
-            <strong className="font-semibold">side menu</strong> button. Then
-            you are directed to a page as shown below.
-          </p>
+          <p className="mb-4">You can navigate to the <strong>Search</strong> page using the <code className="bg-white/20 px-1 py-0.5 rounded text-sm font-mono">Search</code> <strong>side menu</strong> button. Then you are directed to a page as shown below.</p>
+          
+          <DocumentationImage src="./docs/search/search_page.png" alt="Search page" />
+          
+          <p className="mb-4">All books that have been uploaded are shown here, each as a card.</p>
+          <DocumentationImage src="./docs/search/book_card.png" alt="Book Card" />
 
-          <DocumentationImage
-            src="./docs/search/search_page.png"
-            alt="Search page"
-          />
-
-          <p className="mb-4">
-            All books that have been uploaded are shown here, each as a card.
-          </p>
-
-          <DocumentationImage
-            src="./docs/search/book_card.png"
-            alt="Book Card"
-          />
-
-          <p className="mb-4">
-            Here are the information placements, in order from top:
-          </p>
+          <p className="mb-4">Here are the information placements, in order from top:</p>
           <ul className="list-disc pl-6 mb-4 space-y-1">
             <li>Title</li>
             <li>Tags</li>
@@ -733,192 +571,88 @@ export default function DocumentationPage() {
             <li>Collection</li>
             <li>Creation date</li>
           </ul>
-          <p className="mb-4">
-            Clicking on a book card will redirect you to the{" "}
-            <strong className="font-semibold">View</strong> page to start
-            reading.
-          </p>
 
-          <h4 className="text-lg font-semibold mb-4">Using Filters</h4>
-          <p className="mb-4">
-            Use the search filters to narrow down the results and find a
-            specific book or a group of similar books.
-          </p>
-          <ul className="list-disc pl-6 mb-4 space-y-4">
+          <p className="mb-4">Clicking on a book card will redirect you to the <strong>View</strong> page to start reading.</p>
+
+          <h4 className="font-semibold mb-4 mt-8">Using Filters</h4>
+          <p className="mb-4">Use the search filters to narrow down the results and find a specific book or a group of similar books.</p>
+          <ul className="space-y-6">
             <li>
-              <strong className="font-semibold">Search Bar</strong>
-              <br />
-              <span>
-                Use this to find books by their{" "}
-                <strong className="font-semibold">title</strong> or{" "}
-                <em>
-                  <strong className="font-semibold">author</strong>
-                </em>
-                .
-              </span>
-              <DocumentationImage
-                src="./docs/search/search_page_bar.png"
-                alt="Search filters - search bar"
-              />
+              <strong>Search Bar</strong>
+              <p className="mb-2">Use this to find books by their <strong>title</strong> or <strong><em>author</em></strong>. </p>
+              <DocumentationImage src="./docs/search/search_page_bar.png" alt="Search filters - search bar" />
             </li>
             <li>
-              <strong className="font-semibold">Shelf filter</strong>
-              <br />
-              <span>
-                Use this to show only the books belonging to a specific shelf.
-                You can select from your existing shelves.
-              </span>
-              <DocumentationImage
-                src="./docs/search/search_filter_shelf.png"
-                alt="Search filters - shelf filter"
-              />
+              <strong>Shelf</strong> filter 
+              <p className="mb-2">Use this to show only the books belonging to a specific shelf. You can select from your existing shelves.</p>
+              <DocumentationImage src="./docs/search/search_filter_shelf.png" alt="Search filters - shelf filter" />
             </li>
             <li>
-              <strong className="font-semibold">Collection filter</strong>
-              <br />
-              <span>
-                Use this to show only the books belonging to a specific
-                collection. You can select from your existing collections.
-              </span>
-              <DocumentationImage
-                src="./docs/search/search_filter_collection.png"
-                alt="Search filters - collection filter"
-              />
+              <strong>Collection</strong> filter
+              <p className="mb-2">Use this to show only the books belonging to a specific collection. You can select from your existing collections.</p>
+              <DocumentationImage src="./docs/search/search_filter_collection.png" alt="Search filters - collection filter" />
             </li>
           </ul>
-
-          <p className="mb-4">
-            Selecting a collection first will{" "}
-            <strong className="font-semibold">automatically select</strong> the
-            shelf it belongs to, and selecting a shelf will{" "}
-            <strong className="font-semibold">limit</strong> the collections
-            that you can filter to only the ones within it.
-          </p>
-
-          <ul className="list-disc pl-6 mb-4 space-y-4">
+          <p className="mb-4 mt-6">Selecting a collection first will <strong>automatically select</strong> the shelf it belongs to, and selecting a shelf will <strong>limit</strong> the collections that you can filter to only the ones within it.</p>
+          <ul className="space-y-6">
             <li>
-              <strong className="font-semibold">Tag filter</strong>
-              <br />
-              <span>
-                Use this to show only books that contain{" "}
-                <strong className="font-semibold">all</strong> of the selected
-                tags. You can select one or more tags from your existing list.
-              </span>
-              <DocumentationImage
-                src="./docs/search/search_filter_tags.png"
-                alt="Search filters - tag filter"
-              />
+              <strong>Tag</strong> filter 
+              <p className="mb-2">Use this to show only books that contain <strong>all</strong> of the selected tags. You can select one or more tags from your existing list.</p>
+              <DocumentationImage src="./docs/search/search_filter_tags.png" alt="Search filters - tag filter" />
             </li>
           </ul>
-
-          <p>
-            You can apply any combination of these filters to refine your
-            search. Only apply the filters you need to find your books.
-          </p>
+          <p className="mt-4">You can apply any combination of these filters to refine your search. Only apply the filters you need to find your books.</p>
         </section>
 
         {/* Settings */}
         <section id="settings" className="mb-12">
           <h3 className="text-xl font-semibold mb-4">Settings</h3>
-
-          <Alert type="note">
-            The number of adjustable settings is currently limited, but more
-            options are planned for future updates.
+          <Alert type="info">
+            The number of adjustable settings is currently limited, but more options are planned for future updates.
           </Alert>
 
-          <p className="mb-4">
-            You can navigate to the{" "}
-            <strong className="font-semibold">Settings</strong> page using the{" "}
-            <code className="bg-white/20 px-1 py-0.5 rounded text-sm font-mono">
-              Settings
-            </code>{" "}
-            <strong className="font-semibold">side menu</strong> button. Then
-            you are directed to a page as shown below.
-          </p>
+          <p className="mb-4 mt-6">You can navigate to the <strong>Settings</strong> page using the <code className="bg-white/20 px-1 py-0.5 rounded text-sm font-mono">Settings</code> <strong>side menu</strong> button.</p>
+          <p className="mb-4">The first section you encounter is the <strong>Interface Themes</strong>, which offers a range of themes to alter the application's color pallete.</p>
+          <DocumentationImage src="./docs/settings/settings_page_themes.png" alt="Interface settings section" />
 
-          <DocumentationImage
-            src="./docs/settings/settings_page.png"
-            alt="Settings page"
-          />
+          <p className="mb-4">Choosing one of the themes will change the application's pallete for your <strong><em>current</em></strong> session.</p>
+          <p className="mb-4">To persist a theme, you must save your changes.</p>
+          <p className="mb-4 mt-8">The section shown below is the <strong>Application Preferences</strong>, which give control over application-wide changes.</p>
+          <DocumentationImage src="./docs/settings/settings_page_application.png" alt="Application settings section" />
 
-          <p className="mb-4">
-            The section shown above is the{" "}
-            <strong className="font-semibold">Application Settings</strong>,
-            which give control over application-wide changes.
-          </p>
-          <p className="mb-4">At the top, you will find two buttons:</p>
+          <p className="mb-4 mt-8">At the top of the page, you will find two buttons:</p>
           <ul className="list-disc pl-6 mb-4 space-y-1">
-            <li>
-              <code className="bg-white/20 px-1 py-0.5 rounded text-sm font-mono">
-                Reset to Default
-              </code>{" "}
-              reverts all settings to their original values.
-            </li>
-            <li>
-              <code className="bg-white/20 px-1 py-0.5 rounded text-sm font-mono">
-                Save
-              </code>{" "}
-              saves any new changes you have made.
-            </li>
+            <li><code className="bg-white/20 px-1 py-0.5 rounded text-sm font-mono">Reset to Default</code> reverts all settings to their original values.</li>
+            <li><code className="bg-white/20 px-1 py-0.5 rounded text-sm font-mono">Save</code> saves any new changes you have made.</li>
           </ul>
+          <DocumentationImage src="./docs/settings/settings_page_save.png" alt="Save settings section" />
 
-          <p className="mb-4">The following settings are available:</p>
-          <ul className="list-disc pl-6 space-y-3">
+          <p className="mb-4 mt-8">The following settings are available:</p>
+          <ul className="space-y-8">
             <li>
-              <strong>
-                <code className="bg-white/20 px-1 py-0.5 rounded text-sm font-mono">
-                  Save Last Viewed Pages
-                </code>
-              </strong>
-              <br />
-              <span>
-                When{" "}
-                <em>
-                  <strong>toggled</strong>
-                </em>{" "}
-                on, the application will remember the last page you were viewing
-                in a book. When you reopen that book, it will automatically
-                return to that page.
-              </span>
+              <strong>Save Last Viewed Pages</strong>
+              <p className="mb-2">When <strong><em>toggled</em></strong> on, the application will remember the last page you were viewing in a book. When you reopen that book, it will automatically return to that page.</p>
             </li>
             <li>
-              <strong>
-                <code className="bg-white/20 px-1 py-0.5 rounded text-sm font-mono">
-                  Load Recent Book
-                </code>
-              </strong>
-              <br />
-              <span>
-                When{" "}
-                <em>
-                  <strong>toggled</strong>
-                </em>{" "}
-                on, the Home page will display a section with your most recently
-                viewed book, allowing you to quickly resume reading.
-              </span>
-              <DocumentationImage
-                src="./docs/settings/last_viewed_page.png"
-                alt="Last viewed page section"
-              />
+              <strong>Load Recent Book</strong>
+              <p className="mb-2">When <strong><em>toggled</em></strong> on, the Home page will display a section with your most recently viewed book, allowing you to quickly resume reading.</p>
+              <DocumentationImage src="./docs/settings/last_viewed_page.png" alt="Last viewed page section" />
             </li>
             <li>
-              <strong>
-                <code className="bg-white/20 px-1 py-0.5 rounded text-sm font-mono">
-                  Generate Thumbnails
-                </code>
-              </strong>
-              <br />
-              <span>
-                When{" "}
-                <em>
-                  <strong>toggled</strong>
-                </em>{" "}
-                on, a <em>thumbnail</em>, a screenshot of the first page, will
-                be automatically generated for every book you upload.
-              </span>
+              <strong>Generate Thumbnails</strong>
+              <p className="mb-2">When <strong><em>toggled</em></strong> on, a <em>thumbnail</em>, a screenshot of the first page, will be automatically generated for every book you upload.</p>
             </li>
           </ul>
         </section>
+
+        <p className="text-white">
+          Congrats on reaching the end of the documentation (if you actually read this far)!
+        </p>
+        <p className="text-white pb-12">
+          Be sure to know that any changes that would occur in the application will be documented here for future use.
+        </p>
+
+        <p className="text-center text-white/50 pb-12">Happy reading!</p>
       </div>
     </div>
   );
@@ -928,31 +662,23 @@ export default function DocumentationPage() {
 
 function DocumentationImage({ src, alt }: { src: string; alt: string }) {
   return (
-    <div className="my-6 border border-gray-300 rounded-md overflow-hidden max-w-2xl mx-auto">
-      <img src={src} alt={alt} className="w-full h-auto" />
-      <div className="px-4 py-2 bg-gray-100 text-sm text-gray-600 border-t border-gray-300">
-        {alt}
-      </div>
+    <div className="my-6 rounded-lg overflow-hidden border border-white/10 bg-white/5 p-2 shadow-lg">
+      <img src={src} alt={alt} className="w-full h-auto rounded" />
+      <p className="text-xs text-white font-semibold mt-2 text-center">{alt}</p>
     </div>
   );
 }
 
-function Alert({ type, children }: { type: string; children: any }) {
-  const baseClasses = "my-6 p-4 rounded-md border-l-4";
-
+function Alert({ children, type }: { children: React.ReactNode; type: 'important' | 'info' }) {
+  const styles = type === 'important' ? 'bg-red-500/20 border-red-500/50' : 'bg-blue-500/20 border-blue-500/50';
+  const Icon = type === 'important' ? TriangleAlert : Info;
+  
   return (
-    <div
-      className={`${baseClasses} ${
-        type == "important"
-          ? "bg-red-50 border-red-400 text-red-700"
-          : "bg-blue-50 border-blue-400 text-blue-700"
-      }`}
-    >
-      <div className="font-semibold mb-1">
-        {type === "important" && "Important"}
-        {type === "note" && "Note"}
+    <div className={`p-4 rounded-lg border my-4 flex gap-3 items-start ${styles}`}>
+      <Icon size={20} className="shrink-0 mt-0.5" />
+      <div className="text-sm leading-relaxed">
+        {children}
       </div>
-      <div>{children}</div>
     </div>
   );
 }

@@ -261,15 +261,26 @@ You can apply any combination of these filters to refine your search. Only apply
 > 
 > The number of adjustable settings is currently limited, but more options are planned for future updates.
 
-You can navigate to the **Settings** page using the `Settings` **side menu** button. Then you are directed to a page as shown below.
+You can navigate to the **Settings** page using the `Settings` **side menu** button.
 
-![Settings page](./public/docs/settings/settings_page.png)
+The first section you encounter is the **Interface Themes**, which offers a range of themes to alter the application's color pallete.
 
-The section shown above is the **Application Settings**, which give control over application-wide changes.
+![Interface settings section](./public/docs/settings/settings_page_themes.png)
 
-At the top, you will find two buttons:
+Choosing one of the themes will change the application's pallete for your **_current_** session.
+
+To persist a theme, you must save your changes.
+
+The section shown below is the **Application Preferences**, which give control over application-wide changes.
+
+![Application settings section](./public/docs/settings/settings_page_application.png)
+
+
+At the top of the page, you will find two buttons:
 - `Reset to Default` reverts all settings to their original values.
 - `Save` saves any new changes you have made.
+
+![Save settings section](./public/docs/settings/settings_page_save.png)
 
 The following settings are available:
 
