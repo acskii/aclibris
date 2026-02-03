@@ -20,6 +20,7 @@ import { formatFileSize } from "../service/util/FileSize";
 import { arrayToBase64 } from "../service/util/Thumbnail";
 import { EditNameDialog } from "../components/common/dialog/EditNameDialog";
 import DeleteDialog from "../components/common/dialog/DeleteDialog";
+import { ButtonTip } from "../components/common/ButtonTip";
 
 export function CollectionPage() {
   const { id } = useParams<{ id: string }>();
@@ -165,33 +166,18 @@ export function CollectionPage() {
 
           {collection && (
             <div className="flex flex-row items-center gap-2">
-              <div className="relative group">
-                <button
-                  className="bg-sky-600 hover:bg-blue-700 p-2 rounded-md font-bold text-sm cursor-pointer transition-colors duration-200"
-                  onClick={() => setEdit(true)}
-                >
-                  <PenBox size={18} />
-                </button>
-
-                {/* Hover Tooltip */}
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-blue-600 text-white font-semibold text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
-                  Edit Name
-                </div>
-              </div>
-
-              <div className="relative group">
-                <button
-                  className="bg-red-600 hover:bg-red-700 p-2 rounded-md font-bold text-sm cursor-pointer transition-colors duration-200"
-                  onClick={() => setDeleted(true)}
-                >
-                  <Trash2 size={18} />
-                </button>
-
-                {/* Hover Tooltip */}
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-red-600 text-white font-semibold text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
-                  Delete
-                </div>
-              </div>
+              <ButtonTip
+                icon={<PenBox size={20} />}
+                tip={"Edit Name"}
+                colorClass='bg-stop-1'
+                onClick={() => setEdit(true)}
+              />
+              <ButtonTip
+                icon={<Trash2 size={20} />}
+                tip={"Delete Shelf"}
+                colorClass='bg-red-600'
+                onClick={() => setDeleted(true)}
+              />
             </div>
           )}
         </div>

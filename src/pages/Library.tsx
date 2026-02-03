@@ -6,6 +6,7 @@ import { TriangleAlert, Library, BookAlert, Trash2, PenBox, Crown, Cat, Plus} fr
 import { useNavigate } from 'react-router-dom';
 import DeleteDialog from '../components/common/dialog/DeleteDialog';
 import { EditNameDialog } from '../components/common/dialog/EditNameDialog';
+import { ButtonTip } from '../components/common/ButtonTip';
 
 type LibraryShelf = {
     shelf: ShelfObject;
@@ -129,33 +130,18 @@ export function LibraryPage() {
                                     </p>
                                 </div>
                                 <div className="flex flex-row items-center gap-2">
-                                    <div className="relative group">
-                                        <button
-                                            className="bg-red-600 hover:bg-red-700 p-2 rounded-md font-bold text-sm cursor-pointer transition-colors duration-200"
-                                            onClick={() => setDeleteShelf(d.shelf.id)}
-                                        >
-                                            <Trash2 size={18} />
-                                        </button>
-
-                                        {/* Hover Tooltip */}
-                                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-red-600 text-white font-semibold text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
-                                            Delete Shelf
-                                        </div>
-                                    </div>
-
-                                    <div className="relative group">
-                                        <button
-                                            className="bg-sky-600 hover:bg-blue-700 p-2 rounded-md font-bold text-sm cursor-pointer transition-colors duration-200"
-                                            onClick={() => setEditShelf(d.shelf.id)}
-                                        >
-                                            <PenBox size={18} />
-                                        </button>
-
-                                        {/* Hover Tooltip */}
-                                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-blue-600 text-white font-semibold text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
-                                            Edit Name
-                                        </div>
-                                    </div>
+                                    <ButtonTip
+                                        icon={<Trash2 size={20} />}
+                                        tip={"Delete Shelf"}
+                                        colorClass='bg-red-600'
+                                        onClick={() => setDeleteShelf(d.shelf.id)}
+                                    />
+                                    <ButtonTip
+                                        icon={<PenBox size={20} />}
+                                        tip={"Edit Name"}
+                                        colorClass='bg-stop-1'
+                                        onClick={() => setEditShelf(d.shelf.id)}
+                                    />
                                 </div>
 
                                 <DeleteDialog
@@ -191,41 +177,38 @@ export function LibraryPage() {
                                         >
                                             {/* The Crystal Cat Container */}
                                             <div className="relative w-28 h-36 mb-6 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]">
-                                                {/* The Royal Halo */}
-                                                <div className="absolute -inset-2 bg-gradient-to-t from-amber-500/0 via-cyan-400/20 to-amber-400/40 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-
                                                 {/* Cat Head */}
                                                 <div className="relative h-full w-full bg-white/10 backdrop-blur-2xl rounded-b-[2rem] rounded-t-lg border border-white/20 shadow-2xl overflow-hidden group-hover:border-amber-400/50 transition-colors">
 
-                                                {/* The Ears */}
-                                                <div className="absolute top-0 left-0 w-8 h-8 bg-white/10 border-r border-b border-white/20 -translate-x-2 -translate-y-2 rotate-[15deg]" />
-                                                <div className="absolute top-0 right-0 w-8 h-8 bg-white/10 border-l border-b border-white/20 translate-x-2 -translate-y-2 -rotate-[15deg]" />
-                                                <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/10 via-transparent to-amber-500/10" />
+                                                    {/* The Ears */}
+                                                    <div className="absolute top-0 left-0 w-8 h-8 bg-white/10 border-r border-b border-white/20 -translate-x-2 -translate-y-2 rotate-[15deg]" />
+                                                    <div className="absolute top-0 right-0 w-8 h-8 bg-white/10 border-l border-b border-white/20 translate-x-2 -translate-y-2 -rotate-[15deg]" />
+                                                    <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/10 via-transparent to-amber-500/10" />
 
-                                                {/* Icons */}
-                                                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                                                    {/* Floating Crown */}
-                                                    <div className="relative transform -translate-y-1 group-hover:-translate-y-3 transition-transform duration-500">
-                                                        <Crown size={20} className="text-amber-400 fill-amber-400/20 drop-shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
+                                                    {/* Icons */}
+                                                    <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                                        {/* Floating Crown */}
+                                                        <div className="relative transform -translate-y-1 group-hover:-translate-y-3 transition-transform duration-500">
+                                                            <Crown size={20} className="text-amber-400 fill-amber-400/20" />
+                                                        </div>
+
+                                                        {/* Cat Face */}
+                                                        <div className="relative">
+                                                        <Cat size={40} className="text-stop-1 drop-shadow-[0_0_12px_rgba(34,211,238,0.6)]" />
+                                                        </div>
                                                     </div>
 
-                                                    {/* Cat Face */}
-                                                    <div className="relative">
-                                                    <Cat size={40} className="text-cyan-300 drop-shadow-[0_0_12px_rgba(34,211,238,0.6)]" />
-                                                    </div>
+                                                    {/* Effects */}
+                                                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-3/4 h-[2px] bg-gradient-to-r from-transparent via-stop-1 to-transparent" /></div>
+                                                    <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-16 h-1 bg-amber-500/20 blur-md rounded-full scale-x-50 group-hover:scale-x-100 transition-transform duration-500" />
                                                 </div>
 
-                                                {/* Effects */}
-                                                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-3/4 h-[2px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_10px_#22d3ee]" /></div>
-                                                <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-16 h-1 bg-amber-500/20 blur-md rounded-full scale-x-50 group-hover:scale-x-100 transition-transform duration-500" />
-                                            </div>
-
-                                            {/* Collection Info */}
-                                            <div className="bg-black/20 w-full rounded-md flex items-center justify-center p-1">
-                                                <h3 className="font-semibold text-white text-sm mb-1 line-clamp-2 group-hover:text-amber-300 transition-colors">
-                                                    {collection.name.length > 30 ? collection.name.slice(0,28) + "..." : collection.name}
-                                                </h3>
-                                            </div>
+                                                {/* Collection Info */}
+                                                <div className="bg-black/20 w-full rounded-md flex items-center justify-center p-1">
+                                                    <h3 className="font-semibold text-white text-sm mb-1 line-clamp-2 group-hover:text-amber-300 transition-colors">
+                                                        {collection.name.length > 30 ? collection.name.slice(0,28) + "..." : collection.name}
+                                                    </h3>
+                                                </div>
                                             <div className="h-[2px] w-0 bg-gradient-to-r from-transparent via-amber-400 to-transparent group-hover:w-full transition-all duration-500 mx-auto mt-1" />
                                         </button> 
                                     ))}

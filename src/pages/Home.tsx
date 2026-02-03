@@ -84,8 +84,8 @@ export function HomePage() {
                                     <div className="font-semibold text-lg rounded-md px-2 py-1 bg-stop-1 text-white">
                                         Previously
                                     </div>
-                                    <div className="text-left flex-1">
-                                        <h3 className="text-white font-semibold text-lg text-wrap truncate">
+                                    <div className="text-left flex-1 overflow-hidden">
+                                        <h3 className="text-white font-semibold text-lg text-wrap line-clamp-2">
                                             {recent.title}  {recent.author && (
                                                 <span className="text-white/60 text-md font-normal ml-1">
                                                     by {recent.author}
