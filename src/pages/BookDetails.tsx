@@ -22,6 +22,7 @@ import { CollectionObject } from "../../electron/database/objects/Collection";
 import { ShelfObject } from "../../electron/database/objects/Shelf";
 import DeleteDialog from "../components/common/dialog/DeleteDialog";
 import { TagManager } from "../components/common/TagManager";
+import SocialLayout from "../layouts/SocialLayout";
 
 export default function BookDetailsPage() {
   const params = useParams();
@@ -220,7 +221,7 @@ export default function BookDetailsPage() {
   }, [id]);
 
   return (
-    <div className="min-h-screen flex flex-col p-5">
+    <SocialLayout>
       {loading && (
         <div className="flex bg-stop-1 p-3 rounded-lg flex-row items-center justify-center gap-2 z-30 my-10">
           <Spinner />
@@ -463,6 +464,6 @@ export default function BookDetailsPage() {
           </button>
         </div>
       )}
-    </div>
+    </SocialLayout>
   );
 }

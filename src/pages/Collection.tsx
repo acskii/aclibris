@@ -21,6 +21,7 @@ import { arrayToBase64 } from "../service/util/Thumbnail";
 import { EditNameDialog } from "../components/common/dialog/EditNameDialog";
 import DeleteDialog from "../components/common/dialog/DeleteDialog";
 import { ButtonTip } from "../components/common/ButtonTip";
+import SocialLayout from "../layouts/SocialLayout";
 
 export function CollectionPage() {
   const { id } = useParams<{ id: string }>();
@@ -102,7 +103,7 @@ export function CollectionPage() {
   };
 
   return (
-    <div className="min-h-screen p-6">
+    <SocialLayout>
       {loading && (
         <div className="flex bg-indigo-400 p-3 rounded-md flex-row items-center justify-center gap-2 z-30 my-10">
           <Spinner />
@@ -350,6 +351,6 @@ export function CollectionPage() {
           </div>
         </div>
       </div>
-    </div>
+    </SocialLayout>
   );
 }

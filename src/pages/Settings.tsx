@@ -5,6 +5,7 @@ import { ToggleSwitch } from '../components/common/toggle/ToggleSwitch';
 import { TriangleAlert } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { themes } from '../themes';
+import SocialLayout from '../layouts/SocialLayout';
 
 interface SettingsState {
   can_save_recent: boolean;
@@ -102,7 +103,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col p-5">
+    <SocialLayout>
       {/* Loading State */}
       {loading && (
         <div className="flex bg-app-card backdrop-blur-md border border-white/20 p-3 rounded-lg flex-row items-center justify-center gap-2 z-30 my-10 shadow-xl">
@@ -292,6 +293,6 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
-    </div>
+    </SocialLayout>
   );
 }

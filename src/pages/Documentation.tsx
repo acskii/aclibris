@@ -10,6 +10,7 @@ import {
   TriangleAlert,
   Info,
 } from "lucide-react";
+import SocialLayout from "../layouts/SocialLayout";
 
 export default function DocumentationPage() {
   // Function to handle smooth scrolling to elements
@@ -23,7 +24,7 @@ export default function DocumentationPage() {
   };
 
   return (
-    <div className="min-h-screen p-8 text-white">
+    <SocialLayout>
       <div className="mb-8 flex flex-col items-start">
         <h1 className="mb-2 flex gap-3 justify-start">
           <FileMinus size={40} />
@@ -654,7 +655,7 @@ export default function DocumentationPage() {
 
         <p className="text-center text-white/50 pb-12">Happy reading!</p>
       </div>
-    </div>
+    </SocialLayout>
   );
 }
 

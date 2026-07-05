@@ -12,6 +12,7 @@ import { TagObject } from "../../electron/database/objects/Tag";
 import { AutocompleteDropdown } from "../components/common/dropdown/AutocompleteDropdown";
 import { BookFilter } from "../../electron/database/objects/BookFilter";
 import { PageObject } from "../../electron/database/objects/Page";
+import SocialLayout from "../layouts/SocialLayout";
 
 function SearchPage() {
     const navigate = useNavigate();
@@ -142,7 +143,7 @@ function SearchPage() {
     }
 
     return (
-        <div className="min-h-screen p-5">
+        <SocialLayout>
             <div className="mb-4 flex flex-col items-start">
                 <h1 className="flex gap-3 justify-start">
                     <Search size={40} className="text-white" />
@@ -350,7 +351,7 @@ function SearchPage() {
                             </div>
                     </div>
             </div>
-        </div>    
+        </SocialLayout>    
     );
 }
 
