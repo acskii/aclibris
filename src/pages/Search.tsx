@@ -35,11 +35,8 @@ function SearchPage() {
 
     useEffect(() => {
         const loadMenus = async () => {
-            // @ts-ignore
             const tags: TagObject[] = await window.db.tag.getAll();
-            // @ts-ignore
             const shelves: ShelfObject[] = await window.db.shelf.getAll();
-            // @ts-ignore
             const collections: CollectionObject[] = await window.db.collection.getAll();
 
             setShelves(shelves);
@@ -80,7 +77,6 @@ function SearchPage() {
             asc
         );
 
-        // @ts-ignore
         const results: PageObject = await window.db.book.getAll(page, filterObject);
         
         if (results) {

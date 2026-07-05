@@ -33,7 +33,6 @@ class DocumentCache {
         console.log("[service:document_cache] => Saving in cache: " + filePath);
 
         // Get file from file system
-        // @ts-ignore
         const response = await window.files.get(filePath);
 
         if (response.success == true) {
@@ -72,7 +71,6 @@ class DocumentCache {
     }
 
     private async getThumbnail(doc: PDFDocumentProxy): Promise<Uint8Array | null> {
-        // @ts-ignore
         const can_get_thumbnail = await window.db.settings.thumbnail();
 
         if (can_get_thumbnail) {
@@ -131,7 +129,6 @@ class DocumentCache {
             }
         }
     
-        // @ts-ignore
         const response = await window.files.get(filePath);
         const array = new Uint8Array(response.result);
         const fileSize = array.byteLength;

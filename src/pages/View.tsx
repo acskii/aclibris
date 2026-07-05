@@ -48,7 +48,7 @@ export function View() {
         const saveAsRecent = async () => {
             // This specific line will always run at every page turn
             // TODO: here or another place?
-            // @ts-ignore
+            if (!id) return;
             await window.db.book.addRecent(id, page, Date.now());
             // ^^^
         };
@@ -66,7 +66,6 @@ export function View() {
 
             // Electron specific
             // Calls the database to query on the book corresponding to the id requested
-            // @ts-ignore
             const book: BookObject = await window.db.book.get(id);
             setTotalPages(book.pages);
             setTitle(book.title);

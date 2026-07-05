@@ -36,13 +36,9 @@ export default function SettingsPage() {
       setError('');
 
       const [saveRecent, loadRecent, thumbnail, theme] = await Promise.all([
-        // @ts-ignore
         window.db.settings.saveRecent(),
-        // @ts-ignore
         window.db.settings.loadRecent(),
-        // @ts-ignore
         window.db.settings.thumbnail(),
-        // @ts-ignore
         window.db.settings.theme()
       ]);
 
@@ -77,11 +73,8 @@ export default function SettingsPage() {
 
       // Update each setting individually
       await Promise.all([
-        // @ts-ignore
         window.db.settings.updateBoolean('can_save_recent', settings.can_save_recent),
-        // @ts-ignore
         window.db.settings.updateBoolean('can_load_recent', settings.can_load_recent),
-        // @ts-ignore
         window.db.settings.updateBoolean('thumbnail_on_upload', settings.thumbnail_on_upload)
       ]);
 

@@ -49,12 +49,10 @@ export default function BookDetailsPage() {
       if (!id) return;
 
       setLoading(true);
-      // @ts-ignore
       const response1: BookObject = await window.db.book.get(id);
       setMeta(response1);
       setTags(response1.tags.map((t) => t.name));
 
-      // @ts-ignore
       const response2: CollectionObject[] = await window.db.collection.getAll();
       const collectionOptions = response2.map((collection) => ({
         id: collection.id,
@@ -71,7 +69,6 @@ export default function BookDetailsPage() {
       setCollectionInput(collection ? collection.name : "");
       setCollectOptions(collectionOptions);
 
-      // @ts-ignore
       const response3: ShelfObject[] = await window.db.shelf.getAll();
       const s = response3.map((shelf) => ({ id: shelf.id, name: shelf.name }));
       setShelves(s);

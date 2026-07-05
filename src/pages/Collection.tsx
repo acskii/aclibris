@@ -47,9 +47,9 @@ export function CollectionPage() {
         return;
       }
 
+
       // Load the collection from the database
-      // @ts-ignore
-      const response1: CollectionObject = await window.db.collection.get(id);
+      const response1: CollectionObject = await window.db.collection.get(parseInt(id));
       if (!response1) {
         setError("No collection of this ID exists, please choose another..");
         return;
@@ -57,8 +57,7 @@ export function CollectionPage() {
       setCollection(response1);
 
       // Load all books related to the collection
-      // @ts-ignore
-      const response2: BookObject[] = await window.db.book.getByCollection(id);
+      const response2: BookObject[] = await window.db.book.getByCollection(parseInt(id));
       setBooks(response2);
     } catch (error: any) {
       setError(error.message);
@@ -86,7 +85,6 @@ export function CollectionPage() {
 
   const handleEdit = async (new_name: string) => {
     if (edit && collection) {
-      // @ts-ignore
       await window.db.collection.updateName(collection.id, new_name);
       setEdit(false);
       loadData();
@@ -95,7 +93,6 @@ export function CollectionPage() {
 
   const handleDelete = async () => {
     if (deleted && collection) {
-      // @ts-ignore
       await window.db.collection.delete(collection.id);
       setDeleted(false);
       navigate("/library");

@@ -21,7 +21,60 @@ declare namespace NodeJS {
   }
 }
 
+export interface FilesAPI {
+  get: (filePath: string) => Promise<any>;
+}
+
+export interface DatabaseAPI {
+  shelf: {
+    new: (shelf_name: string) => Promise<any>;
+    getAll: () => Promise<any>;
+    delete: (shelf_id: number) => Promise<any>;
+    update: (shelf_id: number, shelf_name: string) => Promise<any>;
+  };
+  collection: {
+    get: (collection_id: number) => Promise<any>;
+    delete: (collection_id: number) => Promise<any>;
+    getByShelf: (shelf_id: number) => Promise<any>;
+    getAll: () => Promise<any>;
+    updateName: (collection_id: number, collection_name: string) => Promise<any>;
+  };
+  book: {
+    get: (book_id: number) => Promise<any>;
+    getAll: (page: number, filter: BookFilterObject) => Promise<any>;
+    getByCollection: (collection_id: number) => Promise<any>;
+    add: (file_path: string, data: any, collection_name: string, shelf_name: string) => Promise<any>;
+    update: (
+      book_id: number, 
+      title: string, 
+      author: string, 
+      collection_name: string, 
+      shelf_name: string, 
+      thumbnail: Uint8Array, 
+      tags: string[]
+    ) => Promise<any>;
+    delete: (book_id: number) => Promise<any>;
+    addRecent: (book_id: number, last_page: number, last_visited_at_unix: number) => Promise<any>;
+    getRecent: () => Promise<any>;
+  };
+  tag: {
+    getAll: () => Promise<any>;
+  };
+  settings: {
+    thumbnail: () => Promise<any>;
+    loadRecent: () => Promise<any>;
+    saveRecent: () => Promise<any>;
+    theme: () => Promise<any>;
+    updateBoolean: (key: string, value: boolean) => Promise<any>;
+    updateValue: (key: string, value: string) => Promise<any>;
+  };
+}
+
 // Used in Renderer process, expose in `preload.ts`
-interface Window {
-  ipcRenderer: import('electron').IpcRenderer
+declare global {
+  interface Window {
+    ipcRenderer: import('electron').IpcRenderer;
+    files: FilesAPI;
+    db: DatabaseAPI;
+  }
 }

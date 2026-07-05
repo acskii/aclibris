@@ -46,7 +46,6 @@ function UploadPage() {
   useEffect(() => {
     const loadShelves = async () => {
       try {
-        // @ts-ignore
         const response: ShelfObject[] = await window.db.shelf.getAll();
         const s = response.map((shelf) => ({id: shelf.id, name: shelf.name}))
 
@@ -59,7 +58,6 @@ function UploadPage() {
 
     const loadCollections = async () => {
       try {
-        // @ts-ignore
         const response: CollectionObject[] = await window.db.collection.getAll();
         const collectionOptions = response.map(collection => ({ 
           id: collection.id, 
@@ -95,7 +93,6 @@ function UploadPage() {
       // TODO: validation for metadata
       // TODO: error view
       
-      // @ts-ignore
       const error = await window.db.book.add(file.path, data, cn, sn);
       setSaving(false);
 
@@ -126,7 +123,6 @@ function UploadPage() {
     setFile(file);
     if (file) {
       setLoading(true);
-      // @ts-ignore
       const data = await documentCache.getMetadata(file.path);
       setMeta(data);
       setLoading(false);

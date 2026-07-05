@@ -16,7 +16,6 @@ export function HomePage() {
     useEffect(() => {
         const loadRecent = async () => {
             setLoading(true);
-            // @ts-ignore
             const response = await window.db.book.getRecent();
             setRecent(response);
             setLoading(false);

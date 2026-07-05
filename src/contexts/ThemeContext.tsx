@@ -14,7 +14,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     // Load from DB on init
     useEffect(() => {
         const initTheme = async () => {
-            // @ts-ignore
             const savedTheme = await window.db.settings.theme(); 
             setThemeState(savedTheme);
             document.documentElement.setAttribute('data-theme', savedTheme);
@@ -25,7 +24,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const setTheme = (newTheme: ThemeType) => {
         setThemeState(newTheme);
         document.documentElement.setAttribute('data-theme', newTheme);
-        // @ts-ignore
         window.db.settings.updateValue('theme', newTheme);
     };
 
