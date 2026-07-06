@@ -24,7 +24,7 @@ import { ButtonTip } from "../components/common/ButtonTip";
 import SocialLayout from "../layouts/SocialLayout";
 
 export function CollectionPage() {
-  const { id } = useParams<{ id: string }>();
+  const params = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [collection, setCollection] = useState<CollectionObject>();
   const [books, setBooks] = useState<BookObject[]>([]);
@@ -33,6 +33,8 @@ export function CollectionPage() {
   const [edit, setEdit] = useState(false);
   const [deleted, setDeleted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const id = params.id ? parseInt(params.id) : null; 
 
   const goBack = () => {
     navigate("/library");
@@ -49,7 +51,7 @@ export function CollectionPage() {
 
 
       // Load the collection from the database
-      const response1: CollectionObject = await window.db.collection.get(parseInt(id));
+      const response1: CollectionObject = await window.db.collection.get(id);
       if (!response1) {
         setError("No collection of this ID exists, please choose another..");
         return;
@@ -57,7 +59,7 @@ export function CollectionPage() {
       setCollection(response1);
 
       // Load all books related to the collection
-      const response2: BookObject[] = await window.db.book.getByCollection(parseInt(id));
+      const response2: BookObject[] = await window.db.book.getByCollection(id);
       setBooks(response2);
     } catch (error: any) {
       setError(error.message);

@@ -13,23 +13,26 @@ import SearchPage from './pages/Search.tsx'
 import BookDetailsPage from './pages/BookDetails.tsx'
 import SettingsPage from './pages/Settings.tsx'
 import DocumentationPage from './pages/Documentation.tsx'
+import { ToastProvider } from './contexts/ToastContext.tsx'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <HashRouter>
       <ThemeProvider>
         <SideMenuProvider>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/upload" element={<UploadPage />} />
-            <Route path="/search" element={<SearchPage />} />
-            <Route path="/library" element={<LibraryPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/documentation" element={<DocumentationPage />} />
-            <Route path="/view/:id/:page" element={<View />} />
-            <Route path="/collection/:id" element={<CollectionPage />} />
-            <Route path="/details/book/:id" element={<BookDetailsPage />} />
-          </Routes>  
+          <ToastProvider>
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/upload" element={<UploadPage />} />
+                <Route path="/search" element={<SearchPage />} />
+                <Route path="/library" element={<LibraryPage />} />
+                <Route path="/settings" element={<SettingsPage />} />
+                <Route path="/documentation" element={<DocumentationPage />} />
+                <Route path="/view/:id/:page" element={<View />} />
+                <Route path="/collection/:id" element={<CollectionPage />} />
+                <Route path="/details/book/:id" element={<BookDetailsPage />} />
+              </Routes>  
+          </ToastProvider>
         </SideMenuProvider>
       </ThemeProvider>
     </HashRouter>

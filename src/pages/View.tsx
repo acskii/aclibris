@@ -1,16 +1,21 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { TriangleAlert } from "lucide-react";
 import { PageNavigate } from "../components/pdf/PageNavigate";
 import { BookObject } from "../../electron/database/objects/Book";
 import { PDFDocumentProxy } from "pdfjs-dist";
 import { documentCache } from "../service/DocumentCache";
 import { Spinner } from "../components/common/spinner/Spinner";
+import { useToast } from "../contexts/ToastContext";
+
+// TODO: On any page view, the error of Book Not Found is shown before page is loaded
+//       Then only removed if page is loaded
+//       Behavior must be loading first then error if not found.
 
 export function View() {
     const params = useParams();
+    const { showToast, clearToast } = useToast();
+
     const [loading, setLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string | null>('');
     const [file, setFile] = useState<string>('');
     const [title, setTitle] = useState<string>('');
     const [totalPages, setTotalPages] = useState<number>(0);
@@ -33,10 +38,12 @@ export function View() {
                 const doc = await documentCache.getDocument(file);
                 setPDF(doc);
 
-                if (doc) setError(null);
-                else setError("The book you're attempting to read does not exist, please go back to choose another. ");
+                if (doc) clearToast();
+                // TODO: Error shows even if document exists, delayed error message removal issue
+                else showToast("The book you're attempting to read does not exist, please go back to choose another.", 'error');
             } catch (error: any) {
-                setError(error.message);
+                console.error(`[client:view] => Error occurred while loading document: ${error.message}`);
+                showToast(error.message, 'error');
             } finally {
                 setLoading(false);
             }
@@ -59,7 +66,7 @@ export function View() {
     useEffect(() => {
         const loadFilePath = async () => {
             if (!id) {
-                setError("The book you're attempting to read does not exist, please go back to choose another. ");
+                showToast("The book you're attempting to read does not exist", 'error');
                 setFile('');
                 return;
             }
@@ -78,7 +85,7 @@ export function View() {
         };
 
         // Reset from previous book load, and load new one's details
-        setError(null);
+        clearToast();
         setScale(1);
         setBaseW(0);
         loadFilePath();
@@ -87,7 +94,8 @@ export function View() {
     const renderPage = async () => {
         try {
             setLoading(true);
-            if (pdf != null) {
+            clearToast();
+            if (pdf != null && !renderLock.current) {
                 renderLock.current = true;
                 const documentPage = await pdf.getPage(page);
                 const viewport = documentPage.getViewport({ scale: 1.5 });
@@ -111,7 +119,8 @@ export function View() {
                 }
             }
         } catch (error: any) {
-            setError(error.message);
+            console.error(`[client:view] => Error occurred while rendering page: ${error.message}`);
+            showToast(error.message, 'error');
         } finally {
             renderLock.current = false;
             setLoading(false);
@@ -127,7 +136,6 @@ export function View() {
     }, [scale]);
 
     useEffect(() => {
-        if (!pdf || renderLock.current) return;
         renderPage();
         containerRef.current?.scrollIntoView({behavior:'instant'})
     }, [pdf, page]);
@@ -137,37 +145,21 @@ export function View() {
 
     return (
         <>
-            {error && (
-                <div className="fixed w-3/5 left-1/2 transform -translate-x-1/2 bg-yellow-300 top-20 z-50 w-3/5 rounded-md" role="alert" aria-labelledby="toast-error">
-                    <div className="flex p-4 items-center">
-                        <div className="shrink-0 text-orange-500">
-                            <TriangleAlert size={30} />
-                        </div>
-                        <div className="ms-3">
-                            <p className="text-md text-orange-400 font-bold">
-                                {error}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            )}
-
             {id && (
                 <div className="flex flex-col">
-                    {error != null ? 
-                    <PageNavigate 
-                        current={0} 
-                        total={0} 
-                        bookId={id}
-                        bookTitle={"Book Not Found"}
-                        scale={1}
-                        minScale={0}
-                        maxScale={0}
-                        OnZoomIn={() => {}}
-                        OnZoomOut={() => {}}
-                    />
-                    : 
-                    <PageNavigate 
+                    {pdf == null ? 
+                        <PageNavigate 
+                            current={0} 
+                            total={0} 
+                            bookId={id}
+                            bookTitle={"Book Not Found"}
+                            scale={1}
+                            minScale={0}
+                            maxScale={0}
+                            OnZoomIn={() => {}}
+                            OnZoomOut={() => {}}
+                        />
+                    : <PageNavigate 
                         current={page} 
                         total={totalPages} 
                         bookId={id}
@@ -178,6 +170,7 @@ export function View() {
                         OnZoomIn={() => setScale(prev => Math.min(prev + 0.1, maxZoom))}
                         OnZoomOut={() => setScale(prev => Math.max(prev - 0.1, minZoom))}
                     />}
+
                     {loading && (
                         <div className="flex flex-row items-center justify-center gap-2 z-30 my-10">
                             <Spinner />

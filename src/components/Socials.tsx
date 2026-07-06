@@ -13,7 +13,7 @@ const PORTFOLIO_LINK = import.meta.env.VITE_PUBLIC_SOCIAL_PORTFOLIO;
 
 export default function Socials() {
     return (
-        <div className="w-full bg-gray-800/30 p-3 flex rounded-md justify-between">       
+        <div className="w-full bg-app-card p-3 flex rounded-md justify-between">       
             <div className="grid grid-cols-2 gap-4">
                 {/* GitHub Profile */}
                 {GITHUB_LINK && (

@@ -14,14 +14,18 @@ import { arrayToBase64 } from '../service/util/Thumbnail';
 import { TagManager } from '../components/common/TagManager';
 import SocialLayout from '../layouts/SocialLayout';
 
+import { useToast } from '../contexts/ToastContext';
+
 
 function UploadPage() {
   const navigate = useNavigate();
+  const { showToast } = useToast();
+
   const [file, setFile] = useState<File | null>(null);
   const [meta, setMeta] = useState<PDFMetadata | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [saving, setSaving] = useState<boolean>(false);
-  const [error, setError] = useState<string>('');
+  const [saveError, setSaveError] = useState<string>('');
   
   /*
     INFO DUMP:
@@ -51,7 +55,8 @@ function UploadPage() {
 
         setShelves(s);
       } catch (error: any) {
-        // Error message
+        console.error(`[client:upload] => Error occurred while loading shelves for select: ${error.message}`);
+        showToast(error.message, 'error');
         setShelves([]);
       }
     }
@@ -66,7 +71,8 @@ function UploadPage() {
         setCollections(response);
         setCollectOptions(collectionOptions);
       } catch (error: any) {
-        // Error message
+        console.error(`[client:upload] => Error occurred while loading collections for select: ${error.message}`);
+        showToast(error.message, 'error');
         setCollections([]);
         setCollectOptions([]);
       }
@@ -91,14 +97,13 @@ function UploadPage() {
       if (meta.creationdate) data.createdAt = toUnix(meta.creationdate);
 
       // TODO: validation for metadata
-      // TODO: error view
       
       const error = await window.db.book.add(file.path, data, cn, sn);
       setSaving(false);
 
       if (error) {
-        // error
-        setError(error);
+        console.error(`[client:upload] => Error occurred while saving book: ${error.message}`);
+        setSaveError(error);
       } else {
         navigate('/library');
       }
@@ -333,7 +338,7 @@ function UploadPage() {
                   onValueChange={handleCollectionInputChange}
                   onOptionSelect={handleCollectionSelect}
                 />
-                {!selectedCollection && collectionInput && <span className="mt-2 text-stop-1 font-bold text-sm block italic">This collection will be created</span>}
+                {!selectedCollection && collectionInput && <span className="mt-2 text-white font-bold text-sm block italic">This collection will be created</span>}
               </div>
               {/* Shelf Selection */}
               <div>
@@ -345,7 +350,7 @@ function UploadPage() {
                   onValueChange={handleShelfInputChange}
                   onOptionSelect={handleShelfSelect}
                 />
-                {!selectedShelf && shelfInput && <span className="mt-2 text-stop-1 font-bold text-sm block italic">This shelf will be created</span>}
+                {!selectedShelf && shelfInput && <span className="mt-2 text-white font-bold text-sm block italic">This shelf will be created</span>}
               </div>
             </div>
             <div className="mt-6">
@@ -360,9 +365,9 @@ function UploadPage() {
 
         {file && meta && (collectionInput && shelfInput) && (
           <div className="flex justify-end items-center mt-4">
-            {error != '' && (
+            {saveError != '' && (
               <p className="bg-red-500 text-sm text-white font-bold px-3 py-1.5 rounded-md mr-4 shadow-lg">
-                {error}
+                {saveError}
               </p>
             )}
             <button

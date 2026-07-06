@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import { Settings, Save, Book, Image, RotateCcw } from 'lucide-react';
 import { Spinner } from '../components/common/spinner/Spinner';
 import { ToggleSwitch } from '../components/common/toggle/ToggleSwitch';
-import { TriangleAlert } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { themes } from '../themes';
 import SocialLayout from '../layouts/SocialLayout';
+
+import { useToast } from '../contexts/ToastContext';
 
 interface SettingsState {
   can_save_recent: boolean;
@@ -23,17 +24,16 @@ const defaultSettings: SettingsState = {
 
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
+  const { showToast, clearToast } = useToast();
 
   const [settings, setSettings] = useState<SettingsState>(defaultSettings);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string>('');
-  const [success, setSuccess] = useState<string>('');
 
   const loadSettings = async () => {
     try {
       setLoading(true);
-      setError('');
+      clearToast();
 
       const [saveRecent, loadRecent, thumbnail, theme] = await Promise.all([
         window.db.settings.saveRecent(),
@@ -50,7 +50,8 @@ export default function SettingsPage() {
       });
 
     } catch (error: any) {
-      setError(error.message);
+      console.error(`[client:settings] => Error occurred while loading settings: ${error.message}`);
+      showToast(error.message, 'error');
     } finally {
       setLoading(false);
     }
@@ -68,8 +69,7 @@ export default function SettingsPage() {
   const handleSave = async () => {
     try {
       setSaving(true);
-      setError('');
-      setSuccess('');
+      clearToast();
 
       // Update each setting individually
       await Promise.all([
@@ -78,13 +78,11 @@ export default function SettingsPage() {
         window.db.settings.updateBoolean('thumbnail_on_upload', settings.thumbnail_on_upload)
       ]);
 
-      setSuccess('Settings saved successfully!');
-      
-      // Clear success message after 3 seconds
-      setTimeout(() => setSuccess(''), 3000);
+      showToast('Settings saved successfully!', 'success');
 
     } catch (error: any) {
-      setError(error.message);
+      console.error(`[client:settings] => Error occurred while loading settings: ${error.message}`);
+      showToast(error.message, 'error');
     } finally {
       setSaving(false);
     }
@@ -104,38 +102,6 @@ export default function SettingsPage() {
           <p className="text-white font-bold text-center text-md">
             Loading settings...
           </p>
-        </div>
-      )}
-
-      {/* Error Message */}
-      {error !== '' && (
-        <div className="bg-gradient-to-l from-orange-500 to-yellow-400 mb-6 rounded-xl shadow-lg border border-white/20" role="alert">
-          <div className="flex p-4 items-center">
-            <div className="shrink-0 text-white">
-              <TriangleAlert size={30} />
-            </div>
-            <div className="ms-3">
-              <p className="text-md text-white font-bold">
-                {error}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Success Message */}
-      {success !== '' && (
-        <div className="bg-gradient-to-l from-green-500 to-emerald-400 mb-6 rounded-xl shadow-lg border border-white/20" role="alert">
-          <div className="flex p-4 items-center">
-            <div className="shrink-0 text-white">
-              <Save size={30} />
-            </div>
-            <div className="ms-3">
-              <p className="text-md text-white font-bold">
-                {success}
-              </p>
-            </div>
-          </div>
         </div>
       )}
 
