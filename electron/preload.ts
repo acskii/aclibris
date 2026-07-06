@@ -46,6 +46,7 @@ contextBridge.exposeInMainWorld('db', {
     get: (book_id: number) => ipcRenderer.invoke('db:book:get', book_id),
     getAll: (page: number, filter: BookFilterObject) => ipcRenderer.invoke('db:book:getAll', page, filter),
     getByCollection: (collection_id: number) => ipcRenderer.invoke('db:book:get-by-collection', collection_id),
+    exist: () => ipcRenderer.invoke('db:book:exist'),
     add: (file_path: string, data: any, collection_name: string, shelf_name: string) => ipcRenderer.invoke('db:book:add', file_path, data, collection_name, shelf_name),
     update: (book_id: number, title: string, author: string, collection_name: string, shelf_name: string, thumbnail: Uint8Array, tags: string[]) => ipcRenderer.invoke('db:book:update', book_id, title, author, collection_name, shelf_name, thumbnail, tags),
     delete: (book_id: number) => ipcRenderer.invoke('db:book:delete', book_id),

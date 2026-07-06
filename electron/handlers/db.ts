@@ -20,6 +20,14 @@ export function registerDbHandlers() {
         }
     });
 
+    ipcMain.handle('db:book:exist', async (_) => {
+        try {
+            return query.existsBook();
+        } catch (error: any) {
+            console.log("[db:query] => Error occured when handling 'book:exist': ", error.message);
+        }
+    });
+
     ipcMain.handle('db:book:get-by-collection', async (_, collection_id: number) => {
         try {
             return query.getBooksByCollectionId(collection_id);

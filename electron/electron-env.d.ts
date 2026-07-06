@@ -43,6 +43,7 @@ export interface DatabaseAPI {
     get: (book_id: number) => Promise<any>;
     getAll: (page: number, filter: BookFilterObject) => Promise<any>;
     getByCollection: (collection_id: number) => Promise<any>;
+    exist: () => Promise<any>;
     add: (file_path: string, data: any, collection_name: string, shelf_name: string) => Promise<any>;
     update: (
       book_id: number, 

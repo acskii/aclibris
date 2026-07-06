@@ -175,6 +175,17 @@ class DatabaseQuery {
         } else return null;
     }
 
+    existsBook() {
+        // Checks if at least one book exists
+        const result = database.prepare(
+            `
+            SELECT COUNT(*) FROM books
+            LIMIT 1
+            `
+        ).get();
+        return result["COUNT(*)"] ?? null;
+    }
+
     getCollectionsByShelfId(id: number) {
         // Get all collections on a specific shelf
         return database.prepare(
