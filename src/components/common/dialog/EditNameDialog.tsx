@@ -37,14 +37,9 @@ export function EditNameDialog({
         }
 
         setIsSubmitting(true);
-        try {
-            onSave(newName.trim());
-            onClose();
-        } catch (error) {
-            console.error('Error updating name:', error);
-        } finally {
-            setIsSubmitting(false);
-        }
+        onSave(newName.trim());
+        onClose();
+        setIsSubmitting(false);
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -60,20 +55,18 @@ export function EditNameDialog({
 
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-stop-3 border border-stop-3/30 rounded-md p-6 max-w-md w-full mx-auto">
+            <div className="bg-stop-3 border border-stop-3 rounded-md p-6 max-w-lg w-full mx-auto">
                 {/* Header */}
-                <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                        <PenBox size={25} className="text-stop-1" />
-                        <h3 className="text-lg font-semibold text-white">{title}</h3>
-                    </div>
+                <div className="flex items-center justify-center gap-3 mb-4">
+                    <PenBox size={40} className="text-stop-1" />
+                    <h3 className="text-lg font-bold text-white">{title}</h3>
                 </div>
 
                 {/* Form */}
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4">
                         <label className="block text-indigo-200 text-sm font-medium mb-2">
-                            New Name <span className="text-white/50">
+                            Enter New Name <span className="text-white/50">
                                 (Current: "{currentName}")
                             </span>
                         </label>
@@ -82,11 +75,12 @@ export function EditNameDialog({
                             value={newName}
                             onChange={(e) => setNewName(e.target.value)}
                             onKeyDown={handleKeyDown}
+                            maxLength={100}     // Based on schema max length
                             placeholder={placeholder}
-                            className="w-full bg-stop-2/50 border border-stop-2/30 rounded-lg px-4 py-3 text-white placeholder-stop-2/50 focus:outline-none focus:ring-2 focus:ring-stop-2 focus:border-transparent"
+                            className="w-full bg-stop-2/50 border border-stop-2/30 rounded-md px-4 py-3 text-white placeholder-stop-2/50 focus:outline-none focus:ring-2 focus:ring-stop-2 focus:border-transparent"
                             autoFocus
                         />
-                        <div className="flex justify-between items-center mt-2">
+                        <div className="flex justify-between items-center mt-4">
                             
                             <span className={`text-sm font-semibold ${
                                 newName.length === 0 ? 'text-red-400' : 
@@ -94,13 +88,13 @@ export function EditNameDialog({
                             }`}>
                                 {newName.length === 0 ? 'Name cannot be empty' :
                                  newName === currentName ? 'No changes made' :
-                                 <Check size={15} />}
+                                 <Check size={20} />}
                             </span>
                         </div>
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex gap-3 justify-end">
+                    <div className="flex gap-3 justify-center">
                         <button
                             type="button"
                             onClick={onClose}
@@ -112,7 +106,7 @@ export function EditNameDialog({
                         <button
                             type="submit"
                             disabled={!newName.trim() || newName.trim() === currentName || isSubmitting}
-                            className="px-4 py-2 cursor-pointer bg-stop-1 hover:bg-stop-1/80 disabled:bg-stop-2/80 disabled:cursor-not-allowed text-white rounded-lg transition-colors flex items-center gap-2"
+                            className="px-4 py-2 font-semibold cursor-pointer bg-stop-1 hover:bg-stop-1/80 disabled:bg-stop-2/50 disabled:cursor-not-allowed text-white rounded-md transition-colors flex items-center gap-2"
                         >
                             {isSubmitting ? (
                                 <>

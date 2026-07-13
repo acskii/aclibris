@@ -78,29 +78,46 @@ export function LibraryPage() {
 
     const handleDeleteShelf = async () => {
         if (deleteShelf) {
-            await window.db.shelf.delete(deleteShelf);
-            loadData();
-            setDeleteShelf(null);
+            try {
+                await window.db.shelf.delete(deleteShelf);
+                await loadData();
+            } catch (error: any) {
+                showToast("Problem occurred while deleting shelf..", 'error');
+                console.error(`[client:library] => Error occurred while deleting shelf: ${error.message}`);
+            } finally {
+                setDeleteShelf(null);
+            }
         }
     }
 
     const handleEditShelf = async (new_name: string) => {
         if (editShelf) {
-            const shelf = data.find((s) => s.shelf.id === editShelf)?.shelf;
-            if (shelf) {
-                await window.db.shelf.update(editShelf, new_name, shelf.pinned);
-                loadData();
-                setEditShelf(null);
+            try {
+                const shelf = data.find((s) => s.shelf.id === editShelf)?.shelf;
+                if (shelf) {
+                    await window.db.shelf.update(editShelf, new_name, shelf.pinned);
+                    await loadData();
+                }
+            } catch (error: any) {
+                showToast("Problem occurred while renaming shelf..", 'error');
+                console.error(`[client:library] => Error occurred while renaming shelf: ${error.message}`);
+            } finally {
+               setEditShelf(null);
             }
         }
     }
 
     const handlePinShelf = async (id: number) => {
-        const shelf = data.find((s) => s.shelf.id === id)?.shelf;
+        try {
+            const shelf = data.find((s) => s.shelf.id === id)?.shelf;
 
-        if (shelf) {
-            await window.db.shelf.update(id, shelf.name, !shelf.pinned);
-            loadData();
+            if (shelf) {
+                await window.db.shelf.update(id, shelf.name, !shelf.pinned);
+                await loadData();
+            }
+        } catch (error: any) {
+            showToast("Problem occurred while pinning shelf..", 'error');
+            console.error(`[client:library] => Error occurred while pinning shelf: ${error.message}`);
         }
     }
 
@@ -185,7 +202,7 @@ export function LibraryPage() {
                                         <button
                                             type="button"
                                             onClick={goToUpload}
-                                            className="w-full sm:w-auto bg-stop-3 text-white hover:bg-stop-3/80 cursor-pointer px-4 py-2 rounded text- font-semibold transition-all flex items-center justify-center gap-1.5 shrink-0 shadow-sm"
+                                            className="w-full sm:w-auto bg-stop-2 text-white hover:bg-stop-2/80 cursor-pointer px-4 py-2 rounded-md font-semibold transition-all flex items-center justify-center gap-1.5 shadow-sm"
                                         >
                                             <Upload size={20} />
                                             <span>Upload Book</span>
@@ -206,7 +223,7 @@ export function LibraryPage() {
                                         onClose={() => setDeleteShelf(null)}
                                         onConfirm={handleDeleteShelf}
                                         title="Delete Shelf"
-                                        message={`Are you sure you want to delete the shelf "${d.shelf.name}"?`}
+                                        message={`This will delete the shelf <${d.shelf.name}>`}
                                         warning={d.collections.length > 0 ?
                                             `This will also delete ${d.collections.length} collection${d.collections.length !== 1 ? 's' : ''} and all books within them.`
                                             : undefined
@@ -227,7 +244,7 @@ export function LibraryPage() {
                                 <div className="overflow-x-auto pb-4 w-full">
                                     <div className="flex gap-6">
                                          {d.collections.length === 0 && <p>No collections found</p>}
-                                         {d.collections.map((collection) => <CollectionPlaceholder id={collection.id} name={collection.name} />)}
+                                         {d.collections.map((collection) => <CollectionPlaceholder key={collection.id} id={collection.id} name={collection.name} />)}
                                      </div>
                                   </div>
                             </div>
@@ -251,38 +268,26 @@ export function LibraryPage() {
                                 
                                 <div className="flex flex-row items-center gap-2">
                                     <ButtonTip
-                                        icon={<Trash2 size={20} />}
-                                        tip={"Delete Shelf"}
-                                        colorClass='bg-red-600'
-                                        onClick={() => setDeleteShelf(d.shelf.id)}
-                                    />
-                                    <ButtonTip
                                         icon={<PenBox size={20} />}
                                         tip={"Edit Name"}
                                         colorClass='bg-stop-1'
                                         onClick={() => setEditShelf(d.shelf.id)}
                                     /> 
+                                    <ButtonTip
+                                        icon={<Trash2 size={20} />}
+                                        tip={"Delete Shelf"}
+                                        colorClass='bg-red-600'
+                                        onClick={() => setDeleteShelf(d.shelf.id)}
+                                    />
                                 </div>
                             </div>
                         </div>
                     ))}
 
                     {data.length === 0 && (
-                        <div className="text-center py-20 flex flex-col gap-4 bg-app-card/30 rounded-3xl border border-white/10 backdrop-blur-sm">
-                            <div className="relative mx-auto">
-                                <div className="absolute -inset-4 bg-stop-1/20 blur-2xl rounded-full" />
-                                <BookAlert className="w-24 h-24 text-white relative" />
-                            </div>
-                            <div>
-                                <h3 className="text-3xl font-bold text-white mb-1">Your library is empty</h3>
-                                <p className="text-white/60 font-medium">Start by creating your first shelf and adding collections</p>
-                            </div>
-                            <button 
-                                className="cursor-pointer bg-gradient-to-br from-stop-1 to-stop-2 hover:brightness-110 text-white px-6 py-3 rounded-xl transition-all flex items-center gap-3 mx-auto font-bold shadow-lg shadow-stop-1/20 border border-white/20 active:scale-95"
-                            >
-                                <Plus size={20} strokeWidth={3} />
-                                <span>Create a Shelf</span>
-                            </button>
+                        <div className="py-20 flex flex-col justify-center items-center text-center gap-4 bg-stop-3 rounded-md">
+                            <BookAlert className="w-24 h-24 text-white" />
+                            <h3 className="text-3xl font-bold text-white mb-1">Your library is empty</h3>
                         </div>
                     )}
                 </div>  

@@ -144,7 +144,7 @@ export function CollectionPage() {
         onClose={() => setDeleted(false)}
         onConfirm={handleDelete}
         title="Delete Collection"
-        message={`Are you sure you want to delete the collection "${collection ? collection.name : "N/A"}"?`}
+        message={`This will delete the collection <${collection ? collection.name : "N/A"}>`}
         warning={`This will also delete ${books.length} book${books.length !== 1 ? "s" : ""}.`}
       />
 
@@ -174,7 +174,7 @@ export function CollectionPage() {
               />
               <ButtonTip
                 icon={<Trash2 size={20} />}
-                tip={"Delete Shelf"}
+                tip={"Delete Collection"}
                 colorClass='bg-red-600'
                 onClick={() => setDeleted(true)}
               />

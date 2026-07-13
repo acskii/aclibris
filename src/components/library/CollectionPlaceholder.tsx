@@ -20,7 +20,6 @@ export default function CollectionPlaceholder({ id, name }: CollectionPlaceholde
 
     return (
         <button
-            key={`c-${id}`}
             onClick={() => goToCollection(id)}
             className="group flex flex-none flex-col items-center cursor-pointer"
         >
