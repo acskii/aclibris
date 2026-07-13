@@ -200,23 +200,24 @@ class DatabaseQuery {
         // Get general info about all shelfs stored
         return database.prepare(
             `
-            SELECT id, shelf_name FROM shelfs
+            SELECT id, shelf_name, pinned FROM shelfs
             `
-        ).all().map((o: ShelfQueryObject) => new Shelf(o.id, o.shelf_name));
+        ).all().map((o: ShelfQueryObject) => new Shelf(o.id, o.shelf_name, o.pinned));
     }
 
     getShelfByName(name: string) {
         // Get general info about all shelfs stored
         const result: ShelfQueryObject = database.prepare(
             `
-            SELECT id, shelf_name FROM shelfs
+            SELECT id, shelf_name, pinned FROM shelfs
             WHERE shelf_name = ?
             `
         ).get(name);
 
         if (result) return new Shelf(
             result.id,
-            result.shelf_name
+            result.shelf_name,
+            result.pinned
         ); 
         else return null;
     }
@@ -463,14 +464,15 @@ class DatabaseQuery {
             // return object
             const result: ShelfQueryObject = database.prepare(
                 `
-                SELECT id, shelf_name FROM shelfs
+                SELECT id, shelf_name, pinned FROM shelfs
                 WHERE shelf_name = ?
                 `
             ).get(shelf_name);
 
             return new Shelf(
                 result.id,
-                result.shelf_name
+                result.shelf_name,
+                result.pinned
             );
         } catch (error: any) {
             console.log("[db:query] => Error occurred when attempting to add a shelf: ", error.message);
@@ -561,19 +563,20 @@ class DatabaseQuery {
         }
     }
 
-    updateShelf(shelf_id: number, new_name: string) {
-        // update a given shelf's name by its ID
+    updateShelf(shelf_id: number, new_name: string, pinned: boolean) {
+        // update a given shelf's name and pin status by its ID
 
         try {
             database.prepare(
                 `
                 UPDATE shelfs
-                SET shelf_name = ?
+                SET shelf_name = ?,
+                    pinned = ?
                 WHERE id = ?        
                 `
-            ).run(new_name, shelf_id);
+            ).run(new_name, (pinned ? 1 : 0), shelf_id);
         } catch (error: any) {
-            console.log("[db:query] => Error occurred when attempting to update shelf name: ", error.message);
+            console.log("[db:query] => Error occurred when attempting to update shelf: ", error.message);
         
             // re-throw error
             throw error;

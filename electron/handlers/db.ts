@@ -114,9 +114,9 @@ export function registerDbHandlers() {
         }
     });
 
-    ipcMain.handle('db:shelf:update', async (_, shelf_id, shelf_name) => {
+    ipcMain.handle('db:shelf:update', async (_, shelf_id, shelf_name, pinned) => {
         try {
-            query.updateShelf(shelf_id, shelf_name);
+            query.updateShelf(shelf_id, shelf_name, pinned);
         } catch (error: any) {
             console.log("[db:query] => Error occured when handling 'shelf:update': ", error.message);
         }

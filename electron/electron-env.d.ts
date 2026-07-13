@@ -30,7 +30,7 @@ export interface DatabaseAPI {
     new: (shelf_name: string) => Promise<any>;
     getAll: () => Promise<any>;
     delete: (shelf_id: number) => Promise<any>;
-    update: (shelf_id: number, shelf_name: string) => Promise<any>;
+    update: (shelf_id: number, shelf_name: string, pinned: boolean) => Promise<any>;
   };
   collection: {
     get: (collection_id: number) => Promise<any>;

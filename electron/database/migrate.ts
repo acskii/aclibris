@@ -99,8 +99,8 @@ class DatabaseMigration {
         if (!seeded) {
             database.prepare(
                 `
-                INSERT INTO shelfs (shelf_name) VALUES 
-                ('Default');
+                INSERT INTO shelfs (shelf_name, pinned) VALUES 
+                ('Default', 1);
                 `
             ).run();
 
@@ -181,6 +181,53 @@ class DatabaseMigration {
         });
     }
 
+    private add_shelf_pins() {
+        // Will include a new boolean column to track which shelf has been pinned by the user
+        //      0 -> NOT Pinned
+        //      1 -> Pinned
+
+        const col = database.prepare(
+            `
+            SELECT 1 
+            FROM pragma_table_info('shelfs') 
+            WHERE name = 'pinned';
+            `
+        ).get();
+
+        if (!col) {
+            database.prepare(
+                `
+                ALTER TABLE shelfs
+                ADD COLUMN pinned INTEGER DEFAULT 0 CHECK (pinned IN (0, 1))
+                `
+            ).run();
+        }
+    }
+
+    private add_book_views() {
+        // Will include a new column to track a books viewing preference
+        // Uses numbers to not limit the number of possible options
+        // Number is interpreted by client 
+        //      0 -> Default Horizontal View
+        //      1 -> Vertical Scrolling View    
+
+        const pin = database.prepare(
+            `
+            SELECT page_view FROM books
+            LIMIT 1
+            `
+        ).get();
+
+        if (!pin) {
+            database.prepare(
+                `
+                ALTER TABLE books
+                ADD COLUMN view_page INTEGER DEFAULT 0;
+                `
+            ).run();
+        }
+    }
+
     // private add_indexes() {
     //     // Add indexes to tables to increase search performance
     //     //      With checking to not re-add an existing index
@@ -208,10 +255,11 @@ class DatabaseMigration {
         this.create_tags_table();
         this.create_book_tag_table();
         this.create_meta_table();
-        this.seed_default_values();
         this.add_recent_book_read();
         this.add_toggle_settings();
         this.add_value_settings();
+        this.add_shelf_pins();
+        this.seed_default_values();
         console.log("[db:migrate] => Initialised local database schema");
     }
 }

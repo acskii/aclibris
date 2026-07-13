@@ -3,7 +3,7 @@ import { type ShelfObject } from '../../electron/database/objects/Shelf';
 import { type CollectionObject } from '../../electron/database/objects/Collection';
 import { type BookObject } from "../../electron/database/objects/Book";
 import { Spinner } from '../components/common/spinner/Spinner';
-import { Info, Library, BookAlert, Trash2, PenBox, Plus, ArrowRight, Upload } from 'lucide-react';
+import { Info, Library, BookAlert, Trash2, PenBox, Plus, ArrowRight, Upload, Pin } from 'lucide-react';
 import DeleteDialog from '../components/common/dialog/DeleteDialog';
 import { EditNameDialog } from '../components/common/dialog/EditNameDialog';
 import { ButtonTip } from '../components/common/ButtonTip';
@@ -43,7 +43,18 @@ export function LibraryPage() {
                     collections: collections
                 } as LibraryShelf;
             }));
-            setData(result);
+
+            const sorted = result.sort((a, b) => {
+                // Check pinned status
+                if (a.shelf.pinned !== b.shelf.pinned) {
+                    return a.shelf.pinned ? -1 : 1;
+                }
+
+                // If pinned status is the same, sort alphabetically by name
+                return a.shelf.name.localeCompare(b.shelf.name);
+            });
+
+            setData(sorted);
 
         } catch (error: any) {
             console.error(`[client:library] => Error occurred while loading data: ${error.message}`);
@@ -75,9 +86,21 @@ export function LibraryPage() {
 
     const handleEditShelf = async (new_name: string) => {
         if (editShelf) {
-            await window.db.shelf.update(editShelf, new_name);
+            const shelf = data.find((s) => s.shelf.id === editShelf)?.shelf;
+            if (shelf) {
+                await window.db.shelf.update(editShelf, new_name, shelf.pinned);
+                loadData();
+                setEditShelf(null);
+            }
+        }
+    }
+
+    const handlePinShelf = async (id: number) => {
+        const shelf = data.find((s) => s.shelf.id === id)?.shelf;
+
+        if (shelf) {
+            await window.db.shelf.update(id, shelf.name, !shelf.pinned);
             loadData();
-            setEditShelf(null);
         }
     }
 
@@ -198,22 +221,29 @@ export function LibraryPage() {
                                         currentName={d.shelf.name}
                                         placeholder="Enter new shelf name..."
                                     />
-                                </div> 
-
+                                </div>
+                                
                                 {/* Collections Row */}
                                 <div className="overflow-x-auto pb-4 w-full">
                                     <div className="flex gap-6">
-                                        {d.collections.length === 0 && <p>No collections found</p>}
-                                        {d.collections.map((collection) => <CollectionPlaceholder id={collection.id} name={collection.name} />)}
-                                    </div>
-                                </div>
+                                         {d.collections.length === 0 && <p>No collections found</p>}
+                                         {d.collections.map((collection) => <CollectionPlaceholder id={collection.id} name={collection.name} />)}
+                                     </div>
+                                  </div>
                             </div>
                             
                             <div className="bg-stop-3/80 flex gap-4 py-2 px-4 items-center justify-between border border-3 border-t-5 border-stop-3 w-full">
-                                {/* Necessary? */}
-                                <h2 className="bg-stop-2 text-xl font-bold px-2 py-1 rounded-md">
-                                    {index + 1}
-                                </h2>
+                                <ButtonTip
+                                    icon={
+                                        <Pin 
+                                            size={20} 
+                                            className={d.shelf.pinned ? "fill-white text-white rotate-45 transition-transform" : "text-white/60"} 
+                                        />
+                                    }
+                                    tip={d.shelf.pinned ? "Unpin Shelf" : "Pin Shelf"}
+                                    colorClass={d.shelf.pinned ? 'bg-amber-500' : 'bg-gray-700/50 hover:bg-gray-600'}
+                                    onClick={() => handlePinShelf(d.shelf.id)}
+                                />
 
                                 <h2 className="flex-1 text-center text-2xl font-bold text-white">
                                     {d.shelf.name}
@@ -231,10 +261,7 @@ export function LibraryPage() {
                                         tip={"Edit Name"}
                                         colorClass='bg-stop-1'
                                         onClick={() => setEditShelf(d.shelf.id)}
-                                    />
-                                    {/* <p className="bg-stop-2 text-md font-bold px-2 py-1 rounded-md">
-                                        Shelf Desc
-                                    </p> */}
+                                    /> 
                                 </div>
                             </div>
                         </div>
