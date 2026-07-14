@@ -66,8 +66,13 @@ export interface DatabaseAPI {
     loadRecent: () => Promise<any>;
     saveRecent: () => Promise<any>;
     theme: () => Promise<any>;
+    search: {
+      sort: () => Promise<any>;
+      view: () => Promise<any>;
+      pageSize: () => Promise<any>;
+    };
     updateBoolean: (key: string, value: boolean) => Promise<any>;
-    updateValue: (key: string, value: string) => Promise<any>;
+    updateValue: (key: string, value: string | number) => Promise<any>;
   };
 }
 

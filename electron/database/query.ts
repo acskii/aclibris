@@ -11,13 +11,13 @@ import { BookFilterObject } from "./objects/BookFilter";
 import { Page } from "./objects/Page";
 
 class DatabaseQuery {
-    /* Default page size for book pagination */
-    private bookPageSize: number = 12;
-
     getBooks(page: number = 0, filter: BookFilterObject | null = null) {
         // Get general info about all books stored
         // Supports pagination
         // Supports filtering
+
+        /* Default page size for book pagination */
+        const bookPageSize = this.getNumberMeta('search_page_size') ?? 12;
 
         // Build the main query once
         const baseQuery = `
@@ -82,8 +82,8 @@ class DatabaseQuery {
         if (result.length === 0) return null;
 
         const ids = result.map((r) => r.id);
-        const start = page * this.bookPageSize;
-        const paginatedIds = ids.slice(start, start + this.bookPageSize);
+        const start = page * bookPageSize;
+        const paginatedIds = ids.slice(start, start + bookPageSize);
 
         if (paginatedIds.length === 0) return null;
 
@@ -129,7 +129,7 @@ class DatabaseQuery {
         
         return new Page(
             page,
-            Math.ceil(ids.length / this.bookPageSize),
+            Math.ceil(ids.length / bookPageSize),
             Array.from(books.values())
         );
     }
@@ -655,6 +655,19 @@ class DatabaseQuery {
         else return null;
     }
 
+    getNumberMeta(key: string) {
+        // Works with 'search_page_size'
+        const result = database.prepare(
+            `
+            SELECT value FROM meta
+            WHERE key = ?
+            `
+        ).get(key);
+
+        if (result) return parseInt(result.value);
+        else return null;
+    }
+
     getValueMeta(key: string) {
         // Works with 'theme'
         const result = database.prepare(
@@ -679,7 +692,7 @@ class DatabaseQuery {
         ).run((value) ? 'true' : 'false', key);
     }
 
-    updateValueMeta(key: string, value: string) {
+    updateStringMeta(key: string, value: string) {
         // Value settings 
         database.prepare(
             `
@@ -688,6 +701,16 @@ class DatabaseQuery {
             WHERE key = ?
             `
         ).run((value.length > 0) ? value : 'default', key);
+    }
+
+    updateNumberMeta(key: string, value: number) {
+        database.prepare(
+            `
+            UPDATE meta
+            SET value = ?
+            WHERE key = ?
+            `
+        ).run(`${value}`, key);
     }
 }
 

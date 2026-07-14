@@ -234,6 +234,30 @@ export function registerDbHandlers() {
         }
     });
 
+    ipcMain.handle('db:settings:search:page', async (_) => {
+        try {
+            return query.getNumberMeta('search_page_size');
+        } catch (error: any) {
+            console.log("[db:query] => Error occured when handling 'settings:search:page': ", error.message);
+        }
+    });
+
+    ipcMain.handle('db:settings:search:view', async (_) => {
+        try {
+            return query.getValueMeta('default_search_view');
+        } catch (error: any) {
+            console.log("[db:query] => Error occured when handling 'settings:search:view': ", error.message);
+        }
+    });
+
+    ipcMain.handle('db:settings:search:sort', async (_) => {
+        try {
+            return query.getBooleanMeta('default_search_sort');
+        } catch (error: any) {
+            console.log("[db:query] => Error occured when handling 'settings:search:sort': ", error.message);
+        }
+    });
+
     ipcMain.handle('db:settings:updateBoolean', async (_, key: string, value: boolean) => {
         try {
             query.updateBooleanMeta(key, value);
@@ -242,9 +266,13 @@ export function registerDbHandlers() {
         }
     });
 
-    ipcMain.handle('db:settings:updateValue', async (_, key: string, value: string) => {
+    ipcMain.handle('db:settings:updateValue', async (_, key: string, value: string | number) => {
         try {
-            query.updateValueMeta(key, value);
+            if (typeof value === "string") {
+                query.updateStringMeta(key, value);
+            } else {
+                query.updateNumberMeta(key, value);
+            }
         } catch (error: any) {
             console.log("[db:query] => Error occured when handling 'settings:updateValue': ", error.message);
         }

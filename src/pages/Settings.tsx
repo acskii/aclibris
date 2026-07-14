@@ -1,26 +1,42 @@
-import { useState, useEffect } from 'react';
-import { Settings, Save, Book, Image, RotateCcw } from 'lucide-react';
-import { Spinner } from '../components/common/spinner/Spinner';
-import { ToggleSwitch } from '../components/common/toggle/ToggleSwitch';
-import { useTheme } from '../contexts/ThemeContext';
-import { themes } from '../themes';
-import SocialLayout from '../layouts/SocialLayout';
-
-import { useToast } from '../contexts/ToastContext';
+import { useState, useEffect } from "react";
+import {
+  Settings,
+  Save,
+  Book,
+  Image,
+  RotateCcw,
+  ArrowUpDown,
+  LayoutGrid,
+  Hash,
+  List,
+} from "lucide-react";
+import { Spinner } from "../components/Spinner";
+import { ToggleSwitch } from "../components/common/toggle/ToggleSwitch";
+import { useTheme } from "../contexts/ThemeContext";
+import { themes } from "../themes";
+import SocialLayout from "../layouts/SocialLayout";
+import { useToast } from "../contexts/ToastContext";
 
 interface SettingsState {
   can_save_recent: boolean;
   can_load_recent: boolean;
   thumbnail_on_upload: boolean;
   theme: string;
+  // New Search settings
+  search_sort: boolean; // true = asc, false = desc
+  search_view: "grid" | "list";
+  search_page_size: number;
 }
 
 const defaultSettings: SettingsState = {
-    can_save_recent: true,
-    can_load_recent: true,
-    thumbnail_on_upload: true,
-    theme: 'default'
-}
+  can_save_recent: true,
+  can_load_recent: true,
+  thumbnail_on_upload: true,
+  theme: "default",
+  search_sort: true,
+  search_view: "grid",
+  search_page_size: 12,
+};
 
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
@@ -35,23 +51,38 @@ export default function SettingsPage() {
       setLoading(true);
       clearToast();
 
-      const [saveRecent, loadRecent, thumbnail, theme] = await Promise.all([
+      const [
+        saveRecent,
+        loadRecent,
+        thumbnail,
+        themeVal,
+        searchSort,
+        searchView,
+        searchPageSize,
+      ] = await Promise.all([
         window.db.settings.saveRecent(),
         window.db.settings.loadRecent(),
         window.db.settings.thumbnail(),
-        window.db.settings.theme()
+        window.db.settings.theme(),
+        window.db.settings.search.sort(),
+        window.db.settings.search.view(),
+        window.db.settings.search.pageSize(),
       ]);
 
       setSettings({
         can_save_recent: saveRecent,
         can_load_recent: loadRecent,
         thumbnail_on_upload: thumbnail,
-        theme: theme
+        theme: themeVal,
+        search_sort: searchSort,
+        search_view: searchView as "grid" | "list",
+        search_page_size: searchPageSize,
       });
-
     } catch (error: any) {
-      console.error(`[client:settings] => Error occurred while loading settings: ${error.message}`);
-      showToast(error.message, 'error');
+      console.error(
+        `[client:settings] => Error occurred while loading settings: ${error.message}`,
+      );
+      showToast(error.message, "error");
     } finally {
       setLoading(false);
     }
@@ -61,9 +92,15 @@ export default function SettingsPage() {
     loadSettings();
   }, []);
 
-  const handleToggle = async (key: keyof SettingsState, value: boolean) => {
-    const newSettings = { ...settings, [key]: value };
-    setSettings(newSettings);
+  const handleToggle = (key: keyof SettingsState, value: boolean) => {
+    setSettings((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleValueChange = (
+    key: keyof SettingsState,
+    value: string | number,
+  ) => {
+    setSettings((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleSave = async () => {
@@ -71,26 +108,46 @@ export default function SettingsPage() {
       setSaving(true);
       clearToast();
 
-      // Update each setting individually
+      // Update standard and search settings
       await Promise.all([
-        window.db.settings.updateBoolean('can_save_recent', settings.can_save_recent),
-        window.db.settings.updateBoolean('can_load_recent', settings.can_load_recent),
-        window.db.settings.updateBoolean('thumbnail_on_upload', settings.thumbnail_on_upload)
+        window.db.settings.updateBoolean("can_save_recent", settings.can_save_recent),
+        window.db.settings.updateBoolean("can_load_recent", settings.can_load_recent),
+        window.db.settings.updateBoolean("thumbnail_on_upload", settings.thumbnail_on_upload),
+        window.db.settings.updateBoolean("default_search_sort", settings.search_sort),
+        window.db.settings.updateValue("default_search_view", settings.search_view),
+        window.db.settings.updateValue("search_page_size",settings.search_page_size),
       ]);
 
-      showToast('Settings saved successfully!', 'success');
-
+      showToast("Settings saved successfully!", "success");
     } catch (error: any) {
-      console.error(`[client:settings] => Error occurred while loading settings: ${error.message}`);
-      showToast(error.message, 'error');
+      console.error(
+        `[client:settings] => Error occurred while saving settings: ${error.message}`,
+      );
+      showToast(error.message, "error");
     } finally {
       setSaving(false);
     }
   };
 
-  const handleReset = async () => {    
+  const handleReset = async () => {
     setSettings(defaultSettings);
-    await handleSave();
+    // Directly saving the default state
+    try {
+      setSaving(true);
+      await Promise.all([
+        window.db.settings.updateBoolean("can_save_recent", defaultSettings.can_save_recent),
+        window.db.settings.updateBoolean("can_load_recent", defaultSettings.can_load_recent),
+        window.db.settings.updateBoolean("thumbnail_on_upload", defaultSettings.thumbnail_on_upload),
+        window.db.settings.updateBoolean("default_search_sort", defaultSettings.search_sort),
+        window.db.settings.updateValue("default_search_view", defaultSettings.search_view),
+        window.db.settings.updateValue("search_page_size", defaultSettings.search_page_size),
+      ]);
+      showToast("Settings reset to defaults!", "success");
+    } catch (error: any) {
+      showToast(error.message, "error");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -111,9 +168,7 @@ export default function SettingsPage() {
           <Settings size={40} className="text-white" />
           <span className="text-4xl font-bold text-white">Settings</span>
         </h1>
-        <p className="text-white/80 font-medium">
-          Manage your preferences
-        </p>
+        <p className="text-white/80 font-medium">Manage your preferences</p>
       </div>
 
       {/* Action Bar (Save/Reset) */}
@@ -123,16 +178,16 @@ export default function SettingsPage() {
         </h2>
         <div className="flex gap-3">
           <button
-              className="flex flex-row items-center justify-center gap-2 bg-red-500/80 hover:bg-red-600 p-2 px-4 rounded-lg font-bold text-sm cursor-pointer transition-all duration-200 text-white border border-white/10 shadow-md"
-              onClick={handleReset}
-              disabled={saving}
+            className="flex flex-row items-center justify-center gap-2 bg-red-500/80 hover:bg-red-600 p-2 px-4 rounded-lg font-bold text-sm cursor-pointer transition-all duration-200 text-white border border-white/10 shadow-md"
+            onClick={handleReset}
+            disabled={saving}
           >
             <RotateCcw size={18} /> Reset to Default
           </button>
           <button
-              onClick={handleSave}
-              disabled={saving}
-              className="bg-green-500/80 cursor-pointer hover:bg-green-600 disabled:bg-green-800 text-white px-5 py-2 rounded-lg font-bold transition-all border border-white/10 shadow-md flex items-center gap-2"
+            onClick={handleSave}
+            disabled={saving}
+            className="bg-green-500/80 cursor-pointer hover:bg-green-600 disabled:bg-green-800 text-white px-5 py-2 rounded-lg font-bold transition-all border border-white/10 shadow-md flex items-center gap-2"
           >
             {saving ? (
               <>
@@ -151,44 +206,48 @@ export default function SettingsPage() {
 
       {/* Theme Card */}
       <div className="bg-app-card backdrop-blur-md rounded-xl border border-white/20 p-6 mb-6 shadow-xl">
-          <h2 className="text-2xl font-bold text-white flex items-center gap-2 mb-6 drop-shadow-sm">
-            Interface Theme
-          </h2>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-            {themes.map((t) => (
-              <button
-                key={t.id}
-                onClick={() => setTheme(t.id as any)}
-                className={`group relative overflow-hidden rounded-2xl border-4 transition-all duration-300 ${
-                  theme === t.id ? 'border-white scale-105 shadow-2xl z-10' : 'border-white/5 opacity-70 hover:opacity-100 hover:scale-102'
-                }`}
-              >
-                {/* Mini UI Layout Preview */}
-                <div className={`h-32 w-full bg-gradient-to-br ${t.colors} flex`}>
-                  {/* Fake Sidebar */}
-                  <div className="w-1/4 h-full bg-white/10 backdrop-blur-sm border-r border-white/10" />
-                  {/* Fake Content Area */}
-                  <div className="flex-1 p-3 flex flex-col gap-2">
-                    <div className="h-2 w-1/2 bg-white/40 rounded" />
-                    <div className="flex gap-2">
-                        <div className="h-10 w-8 bg-white/20 rounded shadow-sm border border-white/10" />
-                        <div className="h-10 w-8 bg-white/20 rounded shadow-sm border border-white/10" />
-                    </div>
+        <h2 className="text-2xl font-bold text-white flex items-center gap-2 mb-6 drop-shadow-sm">
+          Interface Theme
+        </h2>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+          {themes.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setTheme(t.id as any)}
+              className={`group relative overflow-hidden rounded-2xl border-4 transition-all duration-300 ${
+                theme === t.id
+                  ? "border-white scale-105 shadow-2xl z-10"
+                  : "border-white/5 opacity-70 hover:opacity-100 hover:scale-102"
+              }`}
+            >
+              {/* Mini UI Layout Preview */}
+              <div className={`h-32 w-full bg-gradient-to-br ${t.colors} flex`}>
+                {/* Fake Sidebar */}
+                <div className="w-1/4 h-full bg-white/10 backdrop-blur-sm border-r border-white/10" />
+                {/* Fake Content Area */}
+                <div className="flex-1 p-3 flex flex-col gap-2">
+                  <div className="h-2 w-1/2 bg-white/40 rounded" />
+                  <div className="flex gap-2">
+                    <div className="h-10 w-8 bg-white/20 rounded shadow-sm border border-white/10" />
+                    <div className="h-10 w-8 bg-white/20 rounded shadow-sm border border-white/10" />
                   </div>
                 </div>
-                
-                {/* Label with Icon */}
-                <div className={`absolute bottom-0 w-full backdrop-blur-md py-2 flex items-center justify-center gap-2 font-bold text-white text-[10px] tracking-widest ${theme === t.id ? 'bg-white/30' : 'bg-black/40'}`}>
-                  {t.name.toUpperCase()}
-                </div>
-              </button>
-            ))}
-          </div>
+              </div>
+
+              {/* Label with Icon */}
+              <div
+                className={`absolute bottom-0 w-full backdrop-blur-md py-2 flex items-center justify-center gap-2 font-bold text-white text-[10px] tracking-widest ${theme === t.id ? "bg-white/30" : "bg-black/40"}`}
+              >
+                {t.name.toUpperCase()}
+              </div>
+            </button>
+          ))}
         </div>
+      </div>
 
       {/* Application Settings List Card */}
-      <div className="bg-app-card backdrop-blur-md rounded-xl border border-white/20 p-8 shadow-xl">
+      <div className="bg-app-card backdrop-blur-md rounded-xl border border-white/20 p-8 mb-6 shadow-xl">
         <h2 className="text-2xl font-bold text-white flex items-center gap-2 mb-8 drop-shadow-sm">
           Application Preferences
         </h2>
@@ -201,7 +260,9 @@ export default function SettingsPage() {
                 <Save className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="font-bold text-white text-lg">Save Last Viewed Pages</h3>
+                <h3 className="font-bold text-white text-lg">
+                  Save Last Viewed Pages
+                </h3>
                 <p className="text-app-secondary/60 text-sm">
                   Save the last page visited in every book viewed.
                 </p>
@@ -209,7 +270,7 @@ export default function SettingsPage() {
             </div>
             <ToggleSwitch
               enabled={settings.can_save_recent}
-              onChange={(enabled) => handleToggle('can_save_recent', enabled)}
+              onChange={(enabled) => handleToggle("can_save_recent", enabled)}
             />
           </div>
 
@@ -220,7 +281,9 @@ export default function SettingsPage() {
                 <Book className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="font-bold text-white text-lg">Load Recent Book</h3>
+                <h3 className="font-bold text-white text-lg">
+                  Load Recent Book
+                </h3>
                 <p className="text-app-secondary/60 text-sm">
                   Show last viewed book in home page.
                 </p>
@@ -228,7 +291,7 @@ export default function SettingsPage() {
             </div>
             <ToggleSwitch
               enabled={settings.can_load_recent}
-              onChange={(enabled) => handleToggle('can_load_recent', enabled)}
+              onChange={(enabled) => handleToggle("can_load_recent", enabled)}
             />
           </div>
 
@@ -239,7 +302,9 @@ export default function SettingsPage() {
                 <Image className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="font-bold text-white text-lg">Generate Thumbnails</h3>
+                <h3 className="font-bold text-white text-lg">
+                  Generate Thumbnails
+                </h3>
                 <p className="text-app-secondary/60 text-sm">
                   Automatically create thumbnails when uploading new books.
                 </p>
@@ -247,8 +312,109 @@ export default function SettingsPage() {
             </div>
             <ToggleSwitch
               enabled={settings.thumbnail_on_upload}
-              onChange={(enabled) => handleToggle('thumbnail_on_upload', enabled)}
+              onChange={(enabled) =>
+                handleToggle("thumbnail_on_upload", enabled)
+              }
             />
+          </div>
+        </div>
+      </div>
+
+      {/* Search Settings */}
+      <div className="bg-app-card backdrop-blur-md rounded-xl border border-white/20 p-8 shadow-xl">
+        <h2 className="text-2xl font-bold text-white flex items-center gap-2 mb-8 drop-shadow-sm">
+          Search Preferences
+        </h2>
+
+        <div className="space-y-4">
+          {/* Search Sort Order setting */}
+          <div className="flex items-center justify-between p-5 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-colors">
+            <div className="flex items-center gap-5">
+              <div className="bg-gradient-to-br from-stop-1 to-stop-3 p-3 rounded-xl shadow-lg border border-white/20">
+                <ArrowUpDown className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="font-bold text-white text-lg">Sort Order</h3>
+                <p className="text-app-secondary/60 text-sm">
+                  Choose default search results sort ordering.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-semibold text-white/60">
+                {settings.search_sort ? "Descending (Z-A)" : "Ascending (A-Z)"}
+              </span>
+              <ToggleSwitch
+                enabled={settings.search_sort}
+                onChange={(enabled) => handleToggle("search_sort", enabled)}
+              />
+            </div>
+          </div>
+
+          {/* Search View layout setting */}
+          <div className="flex items-center justify-between p-5 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-colors">
+            <div className="flex items-center gap-5">
+              <div className="bg-gradient-to-br from-stop-2 to-side-3 p-3 rounded-xl shadow-lg border border-white/20">
+                <LayoutGrid className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="font-bold text-white text-lg">
+                  Default View Layout
+                </h3>
+                <p className="text-app-secondary/60 text-sm">
+                  Select whether books search results render as lists or cards by default.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center bg-stop-3/40 p-1 rounded-md border border-white/5">
+              <button
+                onClick={() => handleValueChange("search_view", "grid")}
+                className={`p-1.5 rounded transition-all cursor-pointer ${
+                  settings.search_view === "grid"
+                    ? "bg-stop-1 text-white shadow-sm"
+                    : "text-white/50 hover:text-white"
+                }`}
+                title="Grid View"
+              >
+                <LayoutGrid size={18} />
+              </button>
+              <button
+                onClick={() => handleValueChange("search_view", "list")}
+                className={`p-1.5 rounded transition-all cursor-pointer ${
+                  settings.search_view === "list"
+                    ? "bg-stop-1 text-white shadow-sm"
+                    : "text-white/50 hover:text-white"
+                }`}
+                title="List View"
+              >
+                <List size={18} />
+              </button>
+            </div>
+          </div>
+
+          {/* Search Page Size setting */}
+          <div className="flex items-center justify-between p-5 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-colors">
+            <div className="flex items-center gap-5">
+              <div className="bg-gradient-to-br from-stop-3 to-side-2 p-3 rounded-xl shadow-lg border border-white/20">
+                <Hash className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="font-bold text-white text-lg">Books Per Page</h3>
+                <p className="text-app-secondary/60 text-sm">
+                  Configure how many items to return per page on search results.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="number"
+                min={1}
+                max={100}
+                value={settings.search_page_size}
+                onChange={(e) => handleValueChange("search_page_size", parseInt(e.target.value) || 12)}
+                className="w-20 bg-black/40 border border-white/20 rounded-lg p-2 text-white text-center font-bold outline-none focus:border-stop-1 text-sm"
+              />
+            </div>
           </div>
         </div>
       </div>

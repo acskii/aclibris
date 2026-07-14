@@ -147,7 +147,7 @@ class DatabaseMigration {
         // Will include 'true' if these settings are added for the first time
         //      may change to 'false' based on user change
 
-        const settings = ['can_save_recent', 'can_load_recent', 'thumbnail_on_upload'];
+        const settings = ['can_save_recent', 'can_load_recent', 'thumbnail_on_upload', 'default_search_sort'];
     
         settings.forEach(setting => {
             const existing = database.prepare(`
@@ -166,17 +166,21 @@ class DatabaseMigration {
         // Will include 'default' string value if these settings are added for the first time
         //      may change to any other string based on user change
 
-        const settings = ['theme'];
+        const settings = [
+            { setting: 'theme', default: 'default' },
+            { setting: 'search_page_size', default: '12' },
+            { setting: 'default_search_view', default: 'grid' },
+        ];
     
         settings.forEach(setting => {
             const existing = database.prepare(`
                 SELECT value FROM meta WHERE key = ?
-            `).get(setting);
+            `).get(setting.setting);
             
             if (!existing) {
                 database.prepare(`
-                    INSERT INTO meta (key, value) VALUES (?, 'default')
-                `).run(setting);
+                    INSERT INTO meta (key, value) VALUES (?, ?)
+                `).run(setting.setting, setting.default);
             }
         });
     }
@@ -204,29 +208,29 @@ class DatabaseMigration {
         }
     }
 
-    private add_book_views() {
-        // Will include a new column to track a books viewing preference
-        // Uses numbers to not limit the number of possible options
-        // Number is interpreted by client 
-        //      0 -> Default Horizontal View
-        //      1 -> Vertical Scrolling View    
+    // private add_book_views() {
+    //     // Will include a new column to track a books viewing preference
+    //     // Uses numbers to not limit the number of possible options
+    //     // Number is interpreted by client 
+    //     //      0 -> Default Horizontal View
+    //     //      1 -> Vertical Scrolling View    
 
-        const pin = database.prepare(
-            `
-            SELECT page_view FROM books
-            LIMIT 1
-            `
-        ).get();
+    //     const pin = database.prepare(
+    //         `
+    //         SELECT page_view FROM books
+    //         LIMIT 1
+    //         `
+    //     ).get();
 
-        if (!pin) {
-            database.prepare(
-                `
-                ALTER TABLE books
-                ADD COLUMN view_page INTEGER DEFAULT 0;
-                `
-            ).run();
-        }
-    }
+    //     if (!pin) {
+    //         database.prepare(
+    //             `
+    //             ALTER TABLE books
+    //             ADD COLUMN view_page INTEGER DEFAULT 0;
+    //             `
+    //         ).run();
+    //     }
+    // }
 
     // private add_indexes() {
     //     // Add indexes to tables to increase search performance
