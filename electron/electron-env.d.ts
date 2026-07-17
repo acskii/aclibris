@@ -1,5 +1,7 @@
 /// <reference types="vite-plugin-electron/electron-env" />
 
+import { ViewType } from './database/objects/Book';
+
 declare namespace NodeJS {
   interface ProcessEnv {
     /**
@@ -44,14 +46,15 @@ export interface DatabaseAPI {
     getAll: (page: number, filter: BookFilterObject) => Promise<any>;
     getByCollection: (collection_id: number) => Promise<any>;
     exist: () => Promise<any>;
-    add: (file_path: string, data: any, collection_name: string, shelf_name: string) => Promise<any>;
+    add: (file_path: string, data: any, collection_name: string, shelf_name: string, page_view: ViewType) => Promise<any>;
     update: (
       book_id: number, 
       title: string, 
       author: string, 
       collection_name: string, 
       shelf_name: string, 
-      thumbnail: Uint8Array, 
+      thumbnail: Uint8Array,
+      page_view: ViewType, 
       tags: string[]
     ) => Promise<any>;
     delete: (book_id: number) => Promise<any>;

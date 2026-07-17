@@ -93,7 +93,7 @@ class DatabaseQuery {
             SELECT 
                 b.id, b.title, b.author, b.recent_page, b.recent_read_at, 
                 b.thumbnail, b.pages, b.file_path, b.file_size, 
-                b.collection_id, b.created_at,
+                b.collection_id, b.created_at, b.page_view,
                 t.id AS tag_id, t.tag_name
             FROM books b
             LEFT JOIN book_tag bt ON b.id = bt.book_id
@@ -118,7 +118,8 @@ class DatabaseQuery {
                     row.author, 
                     row.thumbnail, 
                     row.recent_page, 
-                    row.recent_read_at
+                    row.recent_read_at,
+                    row.page_view
                 ));
             }
 
@@ -138,7 +139,7 @@ class DatabaseQuery {
         // Get details on a specific book
         const result = database.prepare(
             `
-            SELECT b.id, b.title, b.author, b.recent_page, b.recent_read_at, b.thumbnail, b.pages, b.file_path, b.file_size, b.collection_id, b.created_at, t.id AS tag_id, t.tag_name
+            SELECT b.id, b.title, b.author, b.recent_page, b.recent_read_at, b.thumbnail, b.pages, b.file_path, b.file_size, b.collection_id, b.created_at, b.page_view, t.id AS tag_id, t.tag_name
             FROM books AS b
             LEFT JOIN book_tag AS bt ON b.id == bt.book_id
             LEFT JOIN tags AS t ON bt.tag_id == t.id
@@ -162,7 +163,8 @@ class DatabaseQuery {
                         row.author,
                         row.thumbnail,
                         row.recent_page,
-                        row.recent_read_at
+                        row.recent_read_at,
+                        row.page_view
                     );
                 }
                 if (row.tag_id && row.tag_name && book) {
@@ -252,7 +254,7 @@ class DatabaseQuery {
         // Get general info about books within a specific collection
         const result = database.prepare(
             `
-            SELECT b.id, b.title, b.author, b.recent_page, b.recent_read_at, b.thumbnail, b.pages, b.file_path, b.file_size, b.collection_id, b.created_at, t.id AS tag_id, t.tag_name
+            SELECT b.id, b.title, b.author, b.recent_page, b.recent_read_at, b.thumbnail, b.pages, b.file_path, b.file_size, b.collection_id, b.created_at, b.page_view, t.id AS tag_id, t.tag_name
             FROM books AS b
             LEFT JOIN book_tag AS bt ON b.id == bt.book_id
             LEFT JOIN tags AS t ON bt.tag_id == t.id
@@ -276,7 +278,8 @@ class DatabaseQuery {
                         row.author, 
                         row.thumbnail, 
                         row.recent_page, 
-                        row.recent_read_at
+                        row.recent_read_at,
+                        row.page_view
                     ));
                 }
 
@@ -357,16 +360,16 @@ class DatabaseQuery {
 
     addBook(title: string, pages: number, file_path: string, 
             file_size: number, created_at: number, collection_id: number, 
-            author: string, thumbnail: Buffer, tags: string[]) {
+            author: string, thumbnail: Buffer, view: number, tags: string[]) {
         // add a new book
         // added values must be validated before calling this function
         try {
             const info = database.prepare(
                 `
-                INSERT INTO books (title, pages, thumbnail, file_path, file_size, created_at, collection_id, author) VALUES 
-                (?, ?, ?, ?, ?, ?, ?, ?);
+                INSERT INTO books (title, pages, thumbnail, file_path, file_size, created_at, collection_id, author, page_view) VALUES 
+                (?, ?, ?, ?, ?, ?, ?, ?, ?);
                 `
-            ).run(title, pages, thumbnail, file_path, file_size, created_at, collection_id, author);
+            ).run(title, pages, thumbnail, file_path, file_size, created_at, collection_id, author, view);
 
             const bookId = info.lastInsertRowid;
 
@@ -379,7 +382,7 @@ class DatabaseQuery {
             // return object
             const result: BookQueryObject = database.prepare(
                 `
-                SELECT id, title, pages, thumbnail, file_path, file_size, created_at, collection_id, author FROM books
+                SELECT id, title, pages, thumbnail, file_path, file_size, created_at, collection_id, author, page_view FROM books
                 WHERE id = ?
                 `
             ).get(bookId);
@@ -405,6 +408,7 @@ class DatabaseQuery {
                 result.thumbnail,
                 1,      // lastReadPage
                 null,   // lastVisitedInUnix
+                result.page_view,
                 tagResult.map((t) => new Tag(t.id, t.tag_name))
             );
 
@@ -602,7 +606,7 @@ class DatabaseQuery {
         }
     }
 
-    updateBook(book_id: number, title: string, author: string, collection_id: number, thumbnail: Buffer, tags: string[]) {
+    updateBook(book_id: number, title: string, author: string, collection_id: number, thumbnail: Buffer, view: number, tags: string[]) {
         // updates an existing book with new data
         // -> only select fields can be changed
         try {
@@ -613,10 +617,11 @@ class DatabaseQuery {
                     title = ?,
                     author = ?,
                     collection_id = ?,
-                    thumbnail = ?
+                    thumbnail = ?,
+                    page_view = ?
                 WHERE id = ?
                 `
-            ).run(title, author, collection_id, thumbnail, book_id);
+            ).run(title, author, collection_id, thumbnail, view, book_id);
 
             // remove tags that aren't in the tags list
             const bookTags: TagObject[] = this.getTagsForBook(book_id);

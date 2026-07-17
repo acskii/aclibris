@@ -2,6 +2,7 @@ import { ipcMain } from "electron";
 import { query } from "../database/query";
 import { Collection } from "../database/objects/Collection";
 import { BookFilterObject } from "../database/objects/BookFilter";
+import { ViewType } from "../database/objects/Book";
 
 export function registerDbHandlers() {
     ipcMain.handle('db:book:getAll', async (_, page: number, filter: BookFilterObject) => {
@@ -44,13 +45,18 @@ export function registerDbHandlers() {
         }
     });
 
-    ipcMain.handle('db:book:add', async (_, file_path: string, data, collection_name: string, shelf_name: string) => {
+    ipcMain.handle('db:book:add', async (_, file_path: string, data, collection_name: string, shelf_name: string, page_view: ViewType) => {
         // KNOWN BUG:
         // When trying to add a book that already exists in a new shelf/collection
         // It creates the collection then attempts to add the book where it fails
         // Error: Empty shelf/collection
+
+        // KNOWN ERROR:
+        // Thumbnail can not be null or it raises an error and prevents books addition, 
+        // even though there is a remove thumbnail setting
         
         try {
+            const view = page_view === 'horizontal' ? 0 : 1;
             // Check for shelf and collection 
             // Create collection and/or shelf if needed
             const s = query.getShelfByName(shelf_name);
@@ -63,7 +69,7 @@ export function registerDbHandlers() {
                 // Save book
                 query.addBook(
                     data.title, data.pages, file_path, data.filesize,
-                    data.createdAt, c.id, data.author, Buffer.from(data.thumbnail), data.tags
+                    data.createdAt, c.id, data.author, Buffer.from(data.thumbnail), view, data.tags
                 );
             } else {
                 const ns = query.addShelf(shelf_name);
@@ -72,7 +78,7 @@ export function registerDbHandlers() {
                 // Save book
                 query.addBook(
                     data.title, data.pages, file_path, data.filesize,
-                    data.createdAt, nc.id, data.author, Buffer.from(data.thumbnail), data.tags
+                    data.createdAt, nc.id, data.author, Buffer.from(data.thumbnail), view, data.tags
                 );
             }
 
@@ -83,8 +89,9 @@ export function registerDbHandlers() {
         }
     })
 
-    ipcMain.handle('db:book:update', async (_, book_id: number, title: string, author: string, collection_name: string, shelf_name: string, thumbnail: Uint8Array, tags: string[]) => {
+    ipcMain.handle('db:book:update', async (_, book_id: number, title: string, author: string, collection_name: string, shelf_name: string, thumbnail: Uint8Array, page_view: ViewType, tags: string[]) => {
         try {
+            const view = page_view === 'horizontal' ? 0 : 1;
             const s = query.getShelfByName(shelf_name);
             if (s) {
                 const cs: Collection[] = query.getCollectionsByShelfId(s.id);
@@ -92,12 +99,12 @@ export function registerDbHandlers() {
                 let c = cs.find((c) => c.name === collection_name);
                 if (!c) c = query.addCollection(collection_name, s.id);
                 
-                query.updateBook(book_id, title, author, c.id, Buffer.from(thumbnail), tags);
+                query.updateBook(book_id, title, author, c.id, Buffer.from(thumbnail), view, tags);
             } else {
                 const ns = query.addShelf(shelf_name);
                 const nc = query.addCollection(collection_name, ns.id);
 
-                query.updateBook(book_id, title, author, nc.id, Buffer.from(thumbnail), tags);
+                query.updateBook(book_id, title, author, nc.id, Buffer.from(thumbnail), view, tags);
             }
             return null;
         } catch (error: any) {

@@ -119,8 +119,8 @@ function UploadPage() {
         if (meta.creationdate) data.createdAt = toUnix(meta.creationdate);
 
         // TODO: validation for metadata
-        
-        const error = await window.db.book.add(file.path, data, cn, sn);
+        // TODO: Change the static view type
+        const error = await window.db.book.add(file.path, data, cn, sn, 'horizontal');
         setSaving(false);
 
         if (error) {

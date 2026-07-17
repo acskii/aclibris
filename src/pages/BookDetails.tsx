@@ -115,6 +115,7 @@ export default function BookDetailsPage() {
         selectedCollection ? selectedCollection.name : collectionInput,
         selectedShelf ? selectedShelf.name : shelfInput,
         meta.thumbnail,
+        'horizontal',
         selectedTags,
       );
       setSaving(false);

@@ -208,29 +208,30 @@ class DatabaseMigration {
         }
     }
 
-    // private add_book_views() {
-    //     // Will include a new column to track a books viewing preference
-    //     // Uses numbers to not limit the number of possible options
-    //     // Number is interpreted by client 
-    //     //      0 -> Default Horizontal View
-    //     //      1 -> Vertical Scrolling View    
+    private add_book_views() {
+        // Will include a new column to track a books viewing preference
+        // Uses numbers to not limit the number of possible options
+        // Number is interpreted by client 
+        //      0 -> Default Horizontal View
+        //      1 -> Vertical Scrolling View    
 
-    //     const pin = database.prepare(
-    //         `
-    //         SELECT page_view FROM books
-    //         LIMIT 1
-    //         `
-    //     ).get();
+        const col = database.prepare(
+            `
+            SELECT 1 
+            FROM pragma_table_info('books') 
+            WHERE name = 'page_view';
+            `
+        ).get();
 
-    //     if (!pin) {
-    //         database.prepare(
-    //             `
-    //             ALTER TABLE books
-    //             ADD COLUMN view_page INTEGER DEFAULT 0;
-    //             `
-    //         ).run();
-    //     }
-    // }
+        if (!col) {
+            database.prepare(
+                `
+                ALTER TABLE books
+                ADD COLUMN page_view INTEGER DEFAULT 0;
+                `
+            ).run();
+        }
+    }
 
     // private add_indexes() {
     //     // Add indexes to tables to increase search performance
@@ -263,6 +264,7 @@ class DatabaseMigration {
         this.add_toggle_settings();
         this.add_value_settings();
         this.add_shelf_pins();
+        this.add_book_views();
         this.seed_default_values();
         console.log("[db:migrate] => Initialised local database schema");
     }

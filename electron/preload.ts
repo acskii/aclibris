@@ -1,5 +1,6 @@
 import { ipcRenderer, contextBridge } from 'electron'
 import { BookFilterObject } from './database/objects/BookFilter'
+import { ViewType } from './database/objects/Book'
 
 // --------- Expose some API to the Renderer process ---------
 contextBridge.exposeInMainWorld('ipcRenderer', {
@@ -47,8 +48,8 @@ contextBridge.exposeInMainWorld('db', {
     getAll: (page: number, filter: BookFilterObject) => ipcRenderer.invoke('db:book:getAll', page, filter),
     getByCollection: (collection_id: number) => ipcRenderer.invoke('db:book:get-by-collection', collection_id),
     exist: () => ipcRenderer.invoke('db:book:exist'),
-    add: (file_path: string, data: any, collection_name: string, shelf_name: string) => ipcRenderer.invoke('db:book:add', file_path, data, collection_name, shelf_name),
-    update: (book_id: number, title: string, author: string, collection_name: string, shelf_name: string, thumbnail: Uint8Array, tags: string[]) => ipcRenderer.invoke('db:book:update', book_id, title, author, collection_name, shelf_name, thumbnail, tags),
+    add: (file_path: string, data: any, collection_name: string, shelf_name: string, page_view: ViewType) => ipcRenderer.invoke('db:book:add', file_path, data, collection_name, shelf_name, page_view),
+    update: (book_id: number, title: string, author: string, collection_name: string, shelf_name: string, thumbnail: Uint8Array, page_view: ViewType, tags: string[]) => ipcRenderer.invoke('db:book:update', book_id, title, author, collection_name, shelf_name, thumbnail, page_view, tags),
     delete: (book_id: number) => ipcRenderer.invoke('db:book:delete', book_id),
     addRecent: (book_id: number, last_page: number, last_visited_at_unix: number) => ipcRenderer.invoke('db:book:add-recent', book_id, last_page, last_visited_at_unix),
     getRecent: () => ipcRenderer.invoke('db:book:get-recent')

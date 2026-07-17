@@ -2,6 +2,8 @@
 
 import { TagObject } from "./Tag";
 
+export type ViewType = 'vertical' | 'horizontal';
+
 export class Book {
     public id: number;
     public title: string;
@@ -15,11 +17,13 @@ export class Book {
     public lastReadPage: number = 1;
     public lastVisitedInUnix: number | null = null;
     public tags: TagObject[];
+    public view: ViewType;
 
     constructor(id: number, title: string, collectionId: number, 
                 filePath: string, fileSize: number, pages: number,
                 createdAtInUnix: number, author: string = 'N/A', thumbnail: Buffer | null = null,
-                lastReadPage: number = 1, lastVisitedInUnix: number | null = null, tags: TagObject[] = []
+                lastReadPage: number = 1, lastVisitedInUnix: number | null = null, view: number, 
+                tags: TagObject[] = []
             ) {
         this.id = id;
         this.title = title;
@@ -32,7 +36,7 @@ export class Book {
         this.lastReadPage = lastReadPage;
         this.lastVisitedInUnix = lastVisitedInUnix;
         this.tags = tags;
-        
+        this.view = (view === 0) ? 'horizontal' : 'vertical';
         this.thumbnail = (thumbnail) ? 
             new Uint8Array(thumbnail.buffer, thumbnail.byteOffset, thumbnail.byteLength)
             : null;
@@ -52,6 +56,7 @@ export type BookObject = {
     lastReadPage?: number;
     lastVisitedInUnix?: number | null;
     tags: TagObject[];
+    view: ViewType;
 };
 
 export type BookQueryObject = {
@@ -68,4 +73,5 @@ export type BookQueryObject = {
     thumbnail?: Buffer;
     tag_id?: number;
     tag_name?: string;
+    page_view: number;
 };
