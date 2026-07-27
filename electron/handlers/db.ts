@@ -69,7 +69,7 @@ export function registerDbHandlers() {
                 // Save book
                 query.addBook(
                     data.title, data.pages, file_path, data.filesize,
-                    data.createdAt, c.id, data.author, Buffer.from(data.thumbnail), view, data.tags
+                    data.createdAt, c.id, data.author, data.thumbnail ? Buffer.from(data.thumbnail) : null, view, data.tags
                 );
             } else {
                 const ns = query.addShelf(shelf_name);
@@ -78,7 +78,7 @@ export function registerDbHandlers() {
                 // Save book
                 query.addBook(
                     data.title, data.pages, file_path, data.filesize,
-                    data.createdAt, nc.id, data.author, Buffer.from(data.thumbnail), view, data.tags
+                    data.createdAt, nc.id, data.author, data.thumbnail ? Buffer.from(data.thumbnail) : null, view, data.tags
                 );
             }
 

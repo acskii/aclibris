@@ -27,6 +27,10 @@ export interface FilesAPI {
   get: (filePath: string) => Promise<any>;
 }
 
+export interface FolderAPI {
+  get: () => Promise<any>;
+}
+
 export interface DatabaseAPI {
   shelf: {
     new: (shelf_name: string) => Promise<any>;
@@ -84,6 +88,7 @@ declare global {
   interface Window {
     ipcRenderer: import('electron').IpcRenderer;
     files: FilesAPI;
+    folder: FolderAPI;
     db: DatabaseAPI;
   }
 }

@@ -1,6 +1,7 @@
-import { ipcMain } from 'electron';
+import { ipcMain, dialog } from 'electron';
 import fs from 'fs/promises';
 import { registerDbHandlers } from './handlers/db';
+import path from 'path';
 
 
 export function registerIPCHandlers() {
@@ -32,5 +33,40 @@ export function registerIPCHandlers() {
             console.error('[file:get] => Error getting the file: ', error);
             return { success: false, error: error.message };
         }
-    })
+    });
+
+    ipcMain.handle('folder:get', async (_) => {
+        try {
+            const { canceled, filePaths } = await dialog.showOpenDialog({
+                properties: ['openDirectory']
+            });
+
+            if (canceled || filePaths.length === 0) {
+                return { success: false, result: [] };
+            }
+
+            const folderPath = filePaths[0];
+            const folderName = path.basename(folderPath);
+
+            const children = await fs.readdir(folderPath, { withFileTypes: true });
+            const batch = children.filter((c) => {
+                if (c.isFile() && c.name.endsWith(".pdf")) return true;
+                return false;
+            }).map((c) => {
+                return path.join(folderPath, c.name);
+            });
+
+            return {
+                success: true,
+                result: {
+                    folder: folderName,
+                    files: batch,
+                },
+            };
+
+        } catch (error: any) {
+            console.error('[folder:get] => Error getting the folder content: ', error);
+            return { success: false, error: error.message };
+        }
+    });
 }

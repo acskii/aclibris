@@ -75,7 +75,7 @@ class DocumentCache {
 
         if (can_get_thumbnail) {
             const page = await doc.getPage(1);
-            const viewport = page.getViewport({ scale: 2.0 });
+            const viewport = page.getViewport({ scale: 1.0 });
             const canvas = document.createElement('canvas');
 
             canvas.width = viewport.width;
@@ -104,43 +104,90 @@ class DocumentCache {
         }
     }
 
-    async getMetadata(filePath: string) {
-        // Get the document from the cache
-        // Avoid confusion with clashing names
-        const document = await this.getDocument(filePath);
-        if (!document) return null;
+    private getTitle(filePath: string, title?: string) {
+        const normalized = filePath.replace(/\\/g, '/');
+        const parts = normalized.split('/').filter(Boolean);
 
-        const data = await document.getMetadata();
-        const info: Map<string, any> = new Map();
-        // Get a screenshot of the first page
-        const thumbnail: Uint8Array | null = await this.getThumbnail(document);
+        const fileName = parts.pop() || "Untitled";
+        const cleanFileName = fileName.replace(/\.[^/.]+$/, ""); // Strip extension
+        const parentFolder = parts.length > 0 ? parts.pop() : null;
 
-        // From data.info you can get Title, Author, CreationDate
-        // Then any other meta is from data.metadata
+        // Reject generic useless embedded PDF metadata titles
+        const isGenericTitle = title && /^(microsoft word|scan|document|untitled|pdf|output)/i.test(title.trim());
 
-        // Get the data from data.info separated
-        for (const [key, value] of Object.entries(data.info)) {
-            if (["Title", "Author", "CreationDate"].includes(key)) {
-                if (key == "CreationDate") {
-                    info.set(key.toLowerCase(), parsePDFDate(value));
-                } else {
-                    info.set(key.toLowerCase(), value);
+        if (title && title.trim().length > 0 && !isGenericTitle) {
+            return parentFolder ? `${parentFolder} - ${title.trim()}` : title.trim();
+        }
+
+        const isSequentialPattern = /^\[?\s*(?:ch|chap|chapter|vol|volume|pt|part|bk|book|sec|section)[\s\.\-_]*\d+\s*.*\]?$/i.test(cleanFileName);
+        const isPurelyNumeric = /^\d+$/.test(cleanFileName);
+
+        if (parentFolder && (isSequentialPattern || isPurelyNumeric)) {
+            return `${parentFolder} - ${cleanFileName}`;
+        }
+
+        return cleanFileName || "Untitled Book";
+    }
+
+    async getMetadata(filePath: string, batch: boolean = false) {
+        let document = null;
+
+        try {
+            // Get the document from the cache
+            // Avoid confusion with clashing names
+            const response = await window.files.get(filePath);
+            const array = new Uint8Array(response.result);
+            const fileSize = array.byteLength;
+
+            document = await getDocument({
+                data: array,
+                disableAutoFetch: true,
+                disableStream: false,
+                disableRange: true,
+                disableFontFace: true,
+                useSystemFonts: true,
+                isImageDecoderSupported: false,
+                useWorkerFetch: false,
+            }).promise;
+            if (!document) return null;
+
+            const data = await document.getMetadata();
+            const info: Map<string, any> = new Map();
+
+            // Get a screenshot of the first page if it is a single file
+            const thumbnail: Uint8Array | null = await this.getThumbnail(document);
+
+            // From data.info you can get Title, Author, CreationDate
+            // Then any other meta is from data.metadata
+
+            // Get the data from data.info separated
+            for (const [key, value] of Object.entries(data.info)) {
+                if (["Title", "Author", "CreationDate"].includes(key)) {
+                    if (key == "CreationDate") {
+                        info.set(key.toLowerCase(), parsePDFDate(value));
+                    } else {
+                        info.set(key.toLowerCase(), value);
+                    }
                 }
             }
-        }
-    
-        const response = await window.files.get(filePath);
-        const array = new Uint8Array(response.result);
-        const fileSize = array.byteLength;
 
-        const result = {
-            ...Object.fromEntries(info),
-            pages: document.numPages,
-            filesize: fileSize,
-            thumbnail: thumbnail
-        }
+            if (batch) info.set("title", this.getTitle(filePath, info.get("title")));
 
-        return result;
+            const result = {
+                ...Object.fromEntries(info),
+                pages: document.numPages,
+                filesize: fileSize,
+                thumbnail: thumbnail
+            }
+
+            return result;
+        } finally {
+            // Cleanup loaded document
+            if (document) {
+                await document.cleanup().catch(() => {});
+                await document.destroy().catch(() => {});
+            }
+        }
     }
 }
 

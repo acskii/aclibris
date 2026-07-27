@@ -360,7 +360,7 @@ class DatabaseQuery {
 
     addBook(title: string, pages: number, file_path: string, 
             file_size: number, created_at: number, collection_id: number, 
-            author: string, thumbnail: Buffer, view: number, tags: string[]) {
+            author: string, thumbnail: Buffer | null, view: number, tags: string[]) {
         // add a new book
         // added values must be validated before calling this function
         try {
@@ -414,8 +414,8 @@ class DatabaseQuery {
 
         } catch (error: any) {
             if (error.code == 'SQLITE_CONSTRAINT_UNIQUE') {
-                if (error.message.includes("books.title")) throw new TitleAlreadyExistsError("Book title is already used");
-                else if (error.message.includes("books.file_path")) throw new FileAlreadyExistsError("File uploaded already exists");
+                if (error.message.includes("books.title")) throw new TitleAlreadyExistsError("Book title already exists");
+                if (error.message.includes("books.file_path")) throw new FileAlreadyExistsError("File uploaded already exists");
             } else {
                 // re-throw if not recognised
                 throw error;
