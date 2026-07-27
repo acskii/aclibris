@@ -6,7 +6,7 @@ interface EditNameDialogProps {
     onClose: () => void;
     onSave: (newName: string) => void;
     title: string;
-    currentName: string;
+    currentName?: string;
     placeholder?: string;
     type?: 'shelf' | 'collection' | 'book';
 }
@@ -16,7 +16,7 @@ export function EditNameDialog({
     onClose,
     onSave,
     title,
-    currentName,
+    currentName = "",
     placeholder = "Enter new name..."
 }: EditNameDialogProps) {
     const [newName, setNewName] = useState(currentName);
@@ -66,9 +66,9 @@ export function EditNameDialog({
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4">
                         <label className="block text-indigo-200 text-sm font-medium mb-2">
-                            Enter New Name <span className="text-white/50">
+                            Enter New Name {currentName != "" && <span className="text-white/50">
                                 (Current: "{currentName}")
-                            </span>
+                            </span>}
                         </label>
                         <input
                             type="text"

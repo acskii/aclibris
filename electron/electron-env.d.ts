@@ -39,6 +39,7 @@ export interface DatabaseAPI {
     update: (shelf_id: number, shelf_name: string, pinned: boolean) => Promise<any>;
   };
   collection: {
+    add: (collection_name: string, shelf_id: number) => Promise<any>;
     get: (collection_id: number) => Promise<any>;
     delete: (collection_id: number) => Promise<any>;
     getByShelf: (shelf_id: number) => Promise<any>;

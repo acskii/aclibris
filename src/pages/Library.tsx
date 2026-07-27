@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { type ShelfObject } from '../../electron/database/objects/Shelf';
 import { type CollectionObject } from '../../electron/database/objects/Collection';
 import { type BookObject } from "../../electron/database/objects/Book";
-import { Spinner } from '../components/common/spinner/Spinner';
-import { Info, Library, BookAlert, Trash2, PenBox, Plus, ArrowRight, Upload, Pin } from 'lucide-react';
+import { Spinner } from '../components/Spinner';
+import { Info, Library, BookAlert, Trash2, PenBox, ArrowRight, Upload, Pin, Plus } from 'lucide-react';
 import DeleteDialog from '../components/common/dialog/DeleteDialog';
 import { EditNameDialog } from '../components/common/dialog/EditNameDialog';
 import { ButtonTip } from '../components/common/ButtonTip';
@@ -28,6 +28,8 @@ export function LibraryPage() {
     const [loading, setLoading] = useState(true);
     const [deleteShelf, setDeleteShelf] = useState<number | null>(null);
     const [editShelf, setEditShelf] = useState<number | null>(null);
+    const [createShelf, setCreateShelf] = useState<boolean>(false);
+    const [createCollectionShelfId, setCreateCollectionShelfId] = useState<number | null>(null);
 
     const loadData = async () => {
         try {            
@@ -121,6 +123,34 @@ export function LibraryPage() {
         }
     }
 
+    const handleCreateShelf = async (shelfName: string) => {
+        if (!shelfName.trim()) return;
+        try {
+            await window.db.shelf.new(shelfName.trim());
+            await loadData();
+            showToast(`Shelf "${shelfName}" created`, 'success');
+        } catch (error: any) {
+            showToast("Failed to create new shelf", 'error');
+            console.error(`[client:library] => Error creating shelf: ${error.message}`);
+        } finally {
+            setCreateShelf(false);
+        }
+    }
+
+    const handleCreateCollection = async (collectionName: string) => {
+        if (!collectionName.trim() || createCollectionShelfId === null) return;
+        try {
+            await window.db.collection.add(collectionName.trim(), createCollectionShelfId);
+            await loadData();
+            showToast(`Collection "${collectionName}" created`, 'success');
+        } catch (error: any) {
+            showToast("Failed to create new collection", 'error');
+            console.error(`[client:library] => Error creating collection: ${error.message}`);
+        } finally {
+            setCreateCollectionShelfId(null);
+        }
+    }
+
     const goToRecent = () => {
         if (recent) navigate(`/view/${recent.id}/${recent.lastReadPage}`);
     }
@@ -140,6 +170,26 @@ export function LibraryPage() {
                         </p>
                     </div>
                 )}
+
+                <div className="w-full px-6 py-4 min-w-0">
+                    <EditNameDialog
+                        isOpen={createShelf}
+                        onClose={() => setCreateShelf(false)}
+                        onSave={handleCreateShelf}
+                        title="Create New Shelf"
+                        currentName=""
+                        placeholder="Enter shelf name..."
+                    />
+
+                    <EditNameDialog
+                        isOpen={createCollectionShelfId !== null}
+                        onClose={() => setCreateCollectionShelfId(null)}
+                        onSave={handleCreateCollection}
+                        title="Create New Collection"
+                        currentName=""
+                        placeholder="Enter collection name..."
+                    />
+                </div>
 
                 <div className="mb-8 flex flex-col items-start drop-shadow-md">
                     <h1 className="mb-2 flex gap-3 justify-start items-center">
@@ -243,10 +293,20 @@ export function LibraryPage() {
                                 {/* Collections Row */}
                                 <div className="overflow-x-auto pb-4 w-full">
                                     <div className="flex gap-6">
-                                         {d.collections.length === 0 && <p>No collections found</p>}
-                                         {d.collections.map((collection) => <CollectionPlaceholder key={collection.id} id={collection.id} name={collection.name} />)}
-                                     </div>
-                                  </div>
+                                        {d.collections.map((collection) => <CollectionPlaceholder key={collection.id} id={collection.id} name={collection.name} />)}
+                                        <button
+                                            type="button"
+                                            onClick={() => setCreateCollectionShelfId(d.shelf.id)}
+                                            className="group shrink-0 w-36 h-48 border-2 border-dashed border-white/20 hover:border-white/60 bg-white/5 hover:bg-white/10 rounded-lg flex flex-col items-center justify-center gap-3 transition-all cursor-pointer"
+                                            title="Add new collection"
+                                        >
+                                            <Plus size={20} />
+                                            <span className="text-sm font-semibold text-white/70 group-hover:text-white text-center px-2">
+                                                Add Collection
+                                            </span>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                             
                             <div className="bg-stop-3/80 flex gap-4 py-2 px-4 items-center justify-between border border-3 border-t-5 border-stop-3 w-full">
@@ -283,6 +343,15 @@ export function LibraryPage() {
                             </div>
                         </div>
                     ))}
+
+                    <button
+                        type="button"
+                        onClick={() => setCreateShelf(true)}
+                        className="w-full py-5 border-2 border-dashed border-white/20 hover:border-white/50 bg-stop-3/40 hover:bg-stop-3 rounded-md flex items-center justify-center gap-3 transition-all cursor-pointer group text-white/80 hover:text-white"
+                    >
+                        <Plus size={20} />
+                        <span className="text-lg font-semibold">Create New Shelf</span>
+                    </button>
 
                     {data.length === 0 && (
                         <div className="py-20 flex flex-col justify-center items-center text-center gap-4 bg-stop-3 rounded-md">

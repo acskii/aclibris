@@ -41,6 +41,7 @@ contextBridge.exposeInMainWorld('db', {
     update: (shelf_id: number, shelf_name: string, pinned: boolean) => ipcRenderer.invoke('db:shelf:update', shelf_id, shelf_name, pinned)
   },
   collection: {
+    add: (collection_name: string, shelf_id: number) => ipcRenderer.invoke('db:collection:add', collection_name, shelf_id),
     get: (collection_id: number) => ipcRenderer.invoke('db:collection:get', collection_id),
     delete: (collection_id: number) => ipcRenderer.invoke('db:collection:delete', collection_id),
     getByShelf: (shelf_id: number) => ipcRenderer.invoke('db:collection:get-by-shelf', shelf_id),
