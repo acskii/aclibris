@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Library, Minus, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Layers, Minus, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { ViewType } from "../../../electron/database/objects/Book";
@@ -7,6 +7,7 @@ type PageNavigateProps = {
     current: number;
     total: number;
     bookId: number;
+    collectionId: number;
     bookTitle: string;
     scale: number;
     minScale: number;
@@ -16,7 +17,7 @@ type PageNavigateProps = {
     OnZoomOut: () => void;
 }
 
-export function PageNavigate({ current, total, bookId, bookTitle, scale, minScale = 1, maxScale = 2, view, OnZoomIn, OnZoomOut }: PageNavigateProps) {
+export function PageNavigate({ current, total, bookId, collectionId, bookTitle, scale, minScale = 1, maxScale = 2, view, OnZoomIn, OnZoomOut }: PageNavigateProps) {
     const progress = total > 0 ? (current / total) * 100 : 0;
     const navigate = useNavigate();
     const [page, setPage] = useState<string>('');
@@ -51,7 +52,7 @@ export function PageNavigate({ current, total, bookId, bookTitle, scale, minScal
         navigate(`/view/${bookId}/${jump}`);
     };
 
-    const jumpToLibrary = () => navigate("/");
+    const jumpToCollection = () => navigate(`/collection/${collectionId}`);
 
     const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === "Enter") confirmPageInput();
@@ -63,10 +64,11 @@ export function PageNavigate({ current, total, bookId, bookTitle, scale, minScal
           {/* Navigation Controls */}
           <div className="flex flex-row gap-10 items-center justify-between w-full px-5 py-2">
             <button
-                onClick={jumpToLibrary}
+                onClick={jumpToCollection}
                 className="bg-stop-3 p-2 cursor-pointer rounded-md hover:bg-slate-600 text-white transition"
+                title={"Back to collection"}
             >
-                <Library size={20} />
+                <Layers size={20} />
             </button>
 
             <div className="flex-1 hidden lg:inline-block">
@@ -83,7 +85,7 @@ export function PageNavigate({ current, total, bookId, bookTitle, scale, minScal
               >
                   <Plus size={20} />
               </button>
-              <div className="text-nowrap flex flex-row gap-2 text-sm font-bold text-white border border-slate-700 px-3 py-1 bg-slate-900 rounded-lg">
+              <div className="text-nowrap flex flex-row gap-2 text-sm font-bold text-white px-3 py-1 bg-stop-3 rounded-md">
                 {Math.round(scale * 100)}%
               </div>
               <button
@@ -111,7 +113,7 @@ export function PageNavigate({ current, total, bookId, bookTitle, scale, minScal
                   >
                     <ChevronLeft size={20} />
                   </button>
-                  <div className="text-nowrap flex flex-row gap-2 text-sm font-bold text-white border border-slate-700 px-3 py-1 bg-slate-900 rounded-lg">
+                  <div className="text-nowrap flex flex-row gap-2 text-sm font-bold text-white px-3 py-1 bg-stop-3 rounded-md">
                     <input
                       type="text"
                       inputMode="numeric"

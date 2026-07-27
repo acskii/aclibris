@@ -23,6 +23,7 @@ export function View() {
     const [title, setTitle] = useState<string>('');
     const [totalPages, setTotalPages] = useState<number>(0);
     const [scale, setScale] = useState<number>(1);
+    const [collectionId, setCollectionId] = useState<number>(0);
     const [view, setView] = useState<ViewType>('horizontal');
 
     const id = params.id ? parseInt(params.id) : null;
@@ -54,6 +55,7 @@ export function View() {
             setTotalPages(book.pages);
             setView(book.view);
             setFile(book.filePath);
+            setCollectionId(book.collectionId);
         } catch (error: any) {
             console.error(`[client:view] => Error parsing metadata: ${error.message}`);
             showToast(error.message, "error");
@@ -142,6 +144,7 @@ export function View() {
                 current={pdf ? page : 0} 
                 total={totalPages} 
                 bookId={id}
+                collectionId={collectionId}
                 bookTitle={pdf ? title : "Loading..."}
                 scale={scale}
                 minScale={minZoom}
