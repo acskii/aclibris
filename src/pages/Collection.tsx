@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -11,8 +11,11 @@ import {
   Eye,
   PenBox,
   Trash2,
+  Search,
+  ArrowUpWideNarrow,
+  ArrowDownWideNarrow,
 } from "lucide-react";
-import { Spinner } from "../components/common/spinner/Spinner";
+import { Spinner } from "../components/Spinner";
 import { CollectionObject } from "../../electron/database/objects/Collection";
 import { BookObject } from "../../electron/database/objects/Book";
 import { fromUnix } from "../service/util/Date";
@@ -32,12 +35,14 @@ export function CollectionPage() {
   const [loading, setLoading] = useState(true);
   const [edit, setEdit] = useState(false);
   const [deleted, setDeleted] = useState(false);
+  const [asc, setAsc] = useState(false);
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
 
   const id = params.id ? parseInt(params.id) : null; 
 
   const goBack = () => {
-    navigate("/library");
+    navigate("/");
   };
 
   const loadData = async () => {
@@ -97,9 +102,36 @@ export function CollectionPage() {
     if (deleted && collection) {
       await window.db.collection.delete(collection.id);
       setDeleted(false);
-      navigate("/library");
+      navigate("/");
     }
   };
+
+  const sorted = useMemo(() => {
+    let result = [...books];
+
+    // Filter by Search Query
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      result = result.filter(book => 
+        (book.title && book.title.toLowerCase().includes(q)) ||
+        (book.author && book.author.toLowerCase().includes(q))
+      );
+    }
+
+    result.sort((a, b) => {
+      const titleA = a.title || "";
+      const titleB = b.title || "";
+      
+      const comparison = titleA.localeCompare(titleB, undefined, {
+        numeric: true,
+        sensitivity: "base",
+      });
+
+      return asc ? comparison : -comparison;
+    });
+
+    return result;
+  }, [books, searchQuery, asc]);
 
   return (
     <SocialLayout>
@@ -201,7 +233,7 @@ export function CollectionPage() {
                         selectedBook.thumbnail
                       )}`}
                       alt="Book cover thumbnail"
-                      className="w-full h-full object-contain rounded-md"
+                      className="w-full h-full max-h-100 object-contain rounded-md"
                     />
                   ) : (
                     <div className="w-full h-full bg-stop-1/30 rounded-md flex flex-col gap-2 items-center justify-center border-2 border-dashed border-stop-1/50">
@@ -276,15 +308,33 @@ export function CollectionPage() {
 
         {/* Books List */}
         <div className="lg:col-span-2">
-          <div className="bg-gray-800/30 backdrop-blur-sm rounded-md p-6 border border-indigo-500/20">
+          <div className="bg-gray-800/30 flex flex-col gap-4 backdrop-blur-sm rounded-md p-6 border border-indigo-500/20">
             <h2 className="text-2xl font-semibold text-white mb-6 flex items-center gap-2">
               <Library size={30} />
               All Books ({books.length})
             </h2>
 
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <input
+                type="text"
+                placeholder="Search by title or author"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full py-1 px-2 bg-app-card border border-1 border-white/40 rounded-md text-white font-semibold placeholder-white/50 focus:border-3 focus:outline-none text-base"
+              />
+
+              <button
+                onClick={() => setAsc((prev) => !prev)}
+                className="p-1.5 rounded bg-app-card transition-all cursor-pointer text-white/50 hover:text-white border border-1 border-white/40"
+                title={`${asc ? "Ascending" : "Descending"}`}
+              >
+                {asc ? <ArrowUpWideNarrow size={18} /> : <ArrowDownWideNarrow size={18} />}
+              </button>
+            </div>
+
             {books.length === 0 ? (
               <div className="text-center py-12 max-h-50">
-                <Book size={60} className="text-white mx-auto mb-2" />
+                <Book size={40} className="text-white mx-auto mb-2" />
                 <p className="text-white/80 font-bold text-lg">
                   No books in this collection yet
                 </p>
@@ -292,9 +342,19 @@ export function CollectionPage() {
                   Add books from the upload page
                 </p>
               </div>
+            ) : sorted.length === 0 ? (
+              <div className="text-center py-12">
+                <Search size={40} className="text-white mx-auto mb-2 opacity-50" />
+                <p className="text-white/80 font-bold text-lg">
+                  No matching books found
+                </p>
+                <p className="text-white/60 text-sm">
+                  Try searching with a different title or author query
+                </p>
+              </div>
             ) : (
-              <div className="space-y-4 max-h-90 overflow-y-auto lg:max-h-full">
-                {books.map((book: BookObject) => {
+              <div className="space-y-4 overflow-y-auto max-h-[calc(100vh-250px)]">
+                {sorted.map((book: BookObject) => {
                   return (
                     <div
                       key={book.id}
