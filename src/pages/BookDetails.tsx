@@ -5,15 +5,10 @@ import { Spinner } from "../components/Spinner";
 import {
   ArrowLeft,
   FileText,
-  Library,
   PenBox,
   Save,
   Trash2,
   Upload,
-  Tag as TagIcon,
-  FolderOpen,
-  Layers,
-  Sparkles,
   RectangleVertical,
   Book,
 } from "lucide-react";

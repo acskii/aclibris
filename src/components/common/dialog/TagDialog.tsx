@@ -64,7 +64,7 @@ export default function TagDialog({
             <div className="bg-stop-3 border border-stop-3 rounded-md p-6 max-w-lg w-full mx-auto" ref={boundaryRef}>
                 <div className="flex flex-col gap-4 justify-center">
                     <div className="flex justify-between items-center">
-                        <h3 className="text-lg font-bold text-white">Filter by Tags</h3>
+                        <h3 className="text-lg font-bold text-white">{onCreateTag ? "Tags" : "Filter by Tags"}</h3>
                     </div>
 
                     {/* Search input */}
