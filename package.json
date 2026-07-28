@@ -11,7 +11,7 @@
     "vite:build": "vite build",
     "tsc:build": "tsc -p tsconfig.electron.json",
     "build": "npm run vite:build && npm run tsc:build && electron-builder",
-    "package-win": "npx @electron/packager . aclibris --overwrite --asar --platform=win32 --arch=x64 --arch=ia32 --icon=build/icons/icon.ico --out=temp --name=Aclibris",
+    "package-win": "npx @electron/packager . aclibris --overwrite --asar --platform=win32 --arch=x64 --icon=build/icons/icon.ico --out=temp --name=Aclibris --ignore=\"^/(src|docs|build|tsconfig.*|vite.config.*|eslint.*|\\.git)\"",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "postinstall": "electron-builder install-app-deps",
     "preview": "vite preview"
