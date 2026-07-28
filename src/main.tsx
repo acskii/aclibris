@@ -6,7 +6,6 @@ import { Routes, Route, HashRouter } from 'react-router-dom'
 import { View } from './pages/View.tsx'
 import { SideMenuProvider } from './contexts/SideMenuContext.tsx'
 import { ThemeProvider } from './contexts/ThemeContext.tsx'
-import { HomePage } from './pages/Home.tsx'
 import { LibraryPage } from './pages/Library.tsx'
 import { CollectionPage } from './pages/Collection.tsx'
 import SearchPage from './pages/Search.tsx'
@@ -22,7 +21,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <SideMenuProvider>
           <ToastProvider>
               <Routes>
-                <Route path="/" element={<HomePage />} />
+                <Route path="/" element={<LibraryPage />} />
                 <Route path="/upload" element={<UploadPage />} />
                 <Route path="/search" element={<SearchPage />} />
                 <Route path="/library" element={<LibraryPage />} />
