@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { BookObject } from "../../electron/database/objects/Book";
+import { BookObject, ViewType } from "../../electron/database/objects/Book";
 import { Spinner } from "../components/Spinner";
 import {
   ArrowLeft,
@@ -14,6 +14,8 @@ import {
   FolderOpen,
   Layers,
   Sparkles,
+  RectangleVertical,
+  Book,
 } from "lucide-react";
 import { arrayToBase64 } from "../service/util/Thumbnail";
 import { formatFileSize } from "../service/util/FileSize";
@@ -46,6 +48,7 @@ export default function BookDetailsPage() {
     shelfId: number | null;
     tags: string[];
     thumbnail: Uint8Array | null;
+    view: ViewType;
   }>({
     title: "",
     author: "",
@@ -53,6 +56,7 @@ export default function BookDetailsPage() {
     shelfId: null,
     tags: [],
     thumbnail: null,
+    view: "horizontal",
   });
 
   const [shelves, setShelves] = useState<DialogOption[]>([]);
@@ -67,6 +71,8 @@ export default function BookDetailsPage() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [tagSelect, setTagSelect] = useState<boolean>(false);
 
+  const [view, setView] = useState<ViewType>('horizontal');
+
   const [collectOptions, setCollectOptions] = useState<DialogOption[]>([]);
   const [selectedShelf, setSelectedShelf] = useState<DialogOption | null>(null);
   const [selectedCollection, setSelectedCollection] = useState<CollectionObject | null>(null);
@@ -80,6 +86,7 @@ export default function BookDetailsPage() {
       setLoading(true);
       const response1: BookObject = await window.db.book.get(id);
       setMeta(response1);
+      setView(response1.view);
       const loadedTags = response1.tags ? response1.tags.map((t) => t.name) : [];
       setSelectedTags(loadedTags);
 
@@ -116,6 +123,7 @@ export default function BookDetailsPage() {
         shelfId: shelf ? shelf.id : null,
         tags: loadedTags,
         thumbnail: response1.thumbnail || null,
+        view: response1.view,
       });
 
     } catch (error: any) {
@@ -143,13 +151,14 @@ export default function BookDetailsPage() {
     const shelfChanged = (selectedShelf?.id ?? null) !== initialState.shelfId;
     const collectionChanged = (selectedCollection?.id ?? null) !== initialState.collectionId;
     const thumbnailChanged = meta.thumbnail !== initialState.thumbnail;
+    const viewChanged = view !== initialState.view;
 
     const tagsChanged =
       selectedTags.length !== initialState.tags.length ||
       selectedTags.some((t, i) => t !== initialState.tags[i]);
 
-    return titleChanged || authorChanged || shelfChanged || collectionChanged || thumbnailChanged || tagsChanged;
-  }, [meta, selectedShelf, selectedCollection, selectedTags, initialState]);
+    return titleChanged || authorChanged || shelfChanged || collectionChanged || thumbnailChanged || viewChanged || tagsChanged;
+  }, [meta, selectedShelf, selectedCollection, selectedTags, view, initialState]);
 
   const saveBook = async () => {
     if (meta) {
@@ -162,7 +171,7 @@ export default function BookDetailsPage() {
         selectedCollection ? selectedCollection.name : collectionInput,
         selectedShelf ? selectedShelf.name : shelfInput,
         meta.thumbnail,
-        'horizontal',
+        view,
         selectedTags,
       );
       setSaving(false);
@@ -405,6 +414,39 @@ export default function BookDetailsPage() {
                 onChange={(e) => handleMetaChange("author", e.target.value)}
                 placeholder="Enter author name"
               />
+            </div>
+
+            <div className="space-y-1.5 flex gap-4 items-center">
+              <h3 className="font-semibold text-white text-nowrap underline decoration-stop-1">
+                Book View
+              </h3>
+              <div className="flex items-center bg-stop-3/40 p-1 rounded-md border border-white/5">
+                <button
+                  onClick={() => setView("horizontal")}
+                  className={`p-1.5 rounded transition-all cursor-pointer ${
+                    view === "horizontal"
+                      ? "bg-stop-1 text-white shadow-sm"
+                      : "text-white/50 hover:text-white"
+                  }`}
+                  title="One Page"
+                >
+                  <Book size={18} />
+                </button>
+                <button
+                  onClick={() => setView("vertical")}
+                  className={`p-1.5 rounded transition-all cursor-pointer ${
+                    view === "vertical"
+                      ? "bg-stop-1 text-white shadow-sm"
+                      : "text-white/50 hover:text-white"
+                  }`}
+                  title="Vertical Strip"
+                >
+                  <RectangleVertical size={18} />
+                </button>
+              </div>
+              <span className="flex items-center bg-stop-3/40 p-2 rounded-md border border-white/5 font-semibold">
+                {`${(view === "horizontal" ? "Only one page is displayed at a time" : "No pages. Panels are viewed as you scroll.")}`}
+              </span>
             </div>
           </div>
 
