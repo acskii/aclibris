@@ -1,8 +1,9 @@
 {
   "name": "aclibris",
-  "author": "Andrew Sameh Adel",
+  "productName": "Aclibris",
+  "author": "Andrew Sameh Adel <andrew.sameh.adel@gmail.com>",
   "description": "Your organized desktop bookshelf. A PDF reader that helps you manage and categorize your entire collection.",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite --port 3173",
@@ -10,7 +11,6 @@
     "vite:build": "vite build",
     "tsc:build": "tsc -p tsconfig.electron.json",
     "build": "npm run vite:build && npm run tsc:build && electron-builder",
-    "electron-builder": "electron-builder",
     "package-win": "npx @electron/packager . aclibris --overwrite --asar --platform=win32 --arch=x64 --arch=ia32 --icon=build/icons/icon.ico --out=temp --name=Aclibris",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "postinstall": "electron-builder install-app-deps",
